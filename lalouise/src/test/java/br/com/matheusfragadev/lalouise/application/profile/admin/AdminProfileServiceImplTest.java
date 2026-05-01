@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.application.profile.admin;
-import br.com.matheusfragadev.lalouise.application.profile.ProfileChangePassword;
+import br.com.matheusfragadev.lalouise.application.profile.AdminProfileServiceImpl;
+import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
 import br.com.matheusfragadev.lalouise.domain.admin.entity.Admin;
 import br.com.matheusfragadev.lalouise.domain.admin.repository.AdminRepository;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
@@ -20,19 +21,26 @@ import java.util.Optional;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
+
 class AdminProfileServiceImplTest {
+
     @Mock
     private AdminRepository adminRepository;
+
     @Mock
     private PasswordEncoder encoder;
+
     @InjectMocks
     private AdminProfileServiceImpl service;
+
     // ── Infraestrutura ────────────────────────────────────────────────────────
     @Test
     void getRoleShouldReturnAdmin() {
         assertEquals(Role.ADMIN, service.getRole());
     }
+
     @Test
     void findByIdShouldReturnPresentWhenAdminExists() {
         UUID id = UUID.randomUUID();
@@ -42,22 +50,26 @@ class AdminProfileServiceImplTest {
         assertTrue(result.isPresent());
         assertSame(admin, result.get());
     }
+
     @Test
     void findByIdShouldReturnEmptyWhenAdminDoesNotExist() {
         UUID id = UUID.randomUUID();
         when(adminRepository.findById(id)).thenReturn(Optional.empty());
         assertTrue(service.findById(id).isEmpty());
     }
+
     @Test
     void saveShouldDelegateToRepository() {
         Admin admin = mock(Admin.class);
         service.save(admin);
         verify(adminRepository).save(admin);
     }
+
     @Test
     void passwordEncoderShouldReturnInjectedBean() {
         assertSame(encoder, service.passwordEncoder());
     }
+
     // ── getProfile ────────────────────────────────────────────────────────────
     @Test
     void getProfileShouldReturnAdminWhenFound() {
@@ -66,12 +78,14 @@ class AdminProfileServiceImplTest {
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         assertSame(admin, service.getProfile(id));
     }
+
     @Test
     void getProfileShouldThrowUsernameNotFoundWhenMissing() {
         UUID id = UUID.randomUUID();
         when(adminRepository.findById(id)).thenReturn(Optional.empty());
         assertThrows(UsernameNotFoundException.class, () -> service.getProfile(id));
     }
+
     // ── changeName — caminho feliz ────────────────────────────────────────────
     @Test
     void changeNameShouldUpdateNicknameAndSave() {
@@ -85,6 +99,7 @@ class AdminProfileServiceImplTest {
         verify(admin).changeNickname(new Nickname("New Name"));
         verify(adminRepository).save(admin);
     }
+
     // ── changeName — erros de negócio ─────────────────────────────────────────
     @Test
     void changeNameShouldThrowNicknameExceptionWhenNameIsIdentical() {
@@ -97,12 +112,14 @@ class AdminProfileServiceImplTest {
         assertThrows(NicknameException.class, () -> service.changeName(id, "SameName"));
         verify(adminRepository, never()).save(any());
     }
+
     @Test
     void changeNameShouldThrowUsernameNotFoundWhenAdminMissing() {
         UUID id = UUID.randomUUID();
         when(adminRepository.findById(id)).thenReturn(Optional.empty());
         assertThrows(UsernameNotFoundException.class, () -> service.changeName(id, "Valid Name"));
     }
+
     // ── changeName — casos de borda (validação do VO Nickname) ───────────────
     @Test
     void changeNameShouldThrowWhenNewNameIsBlank() {
@@ -115,6 +132,7 @@ class AdminProfileServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> service.changeName(id, "   "));
         verify(adminRepository, never()).save(any());
     }
+
     @Test
     void changeNameShouldThrowWhenNewNameIsTooShort() {
         UUID id = UUID.randomUUID();
@@ -127,6 +145,7 @@ class AdminProfileServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> service.changeName(id, "Ab"));
         verify(adminRepository, never()).save(any());
     }
+
     @Test
     void changeNameShouldThrowWhenNewNameIsTooLong() {
         UUID id = UUID.randomUUID();
@@ -140,6 +159,7 @@ class AdminProfileServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> service.changeName(id, longName));
         verify(adminRepository, never()).save(any());
     }
+
     @ParameterizedTest
     @ValueSource(strings = {"Name123", "Name!", "Name@", "Name#"})
     void changeNameShouldThrowWhenNewNameHasInvalidCharacters(String invalidName) {
@@ -152,6 +172,7 @@ class AdminProfileServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> service.changeName(id, invalidName));
         verify(adminRepository, never()).save(any());
     }
+
     // ── changePassword — caminho feliz ────────────────────────────────────────
     @Test
     void changePasswordShouldHashAndSave() {
@@ -170,6 +191,7 @@ class AdminProfileServiceImplTest {
         verify(admin).changePassword(any(Password.class));
         verify(adminRepository).save(admin);
     }
+
     // ── changePassword — erros de negócio ─────────────────────────────────────
     @Test
     void changePasswordShouldThrowWhenCurrentPasswordIsWrong() {
@@ -186,6 +208,7 @@ class AdminProfileServiceImplTest {
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());
     }
+
     @Test
     void changePasswordShouldThrowWhenConfirmationDoesNotMatch() {
         UUID id = UUID.randomUUID();
@@ -201,6 +224,7 @@ class AdminProfileServiceImplTest {
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());
     }
+
     @Test
     void changePasswordShouldThrowWhenAdminNotFound() {
         UUID id = UUID.randomUUID();
@@ -211,6 +235,7 @@ class AdminProfileServiceImplTest {
                 .build();
         assertThrows(UsernameNotFoundException.class, () -> service.changePassword(command));
     }
+
     // ── changePassword — casos de borda (validação do VO Password) ───────────
     @Test
     void changePasswordShouldThrowWhenNewPasswordIsTooShort() {
@@ -228,6 +253,7 @@ class AdminProfileServiceImplTest {
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());
     }
+
     @Test
     void changePasswordShouldThrowWhenNewPasswordIsTooLong() {
         UUID id = UUID.randomUUID();
@@ -244,6 +270,7 @@ class AdminProfileServiceImplTest {
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());
     }
+
     @ParameterizedTest
     @ValueSource(strings = {"onlyletters", "12345678", "NoSpecial1"})
     void changePasswordShouldThrowWhenNewPasswordDoesNotMeetRequirements(String weakPassword) {
