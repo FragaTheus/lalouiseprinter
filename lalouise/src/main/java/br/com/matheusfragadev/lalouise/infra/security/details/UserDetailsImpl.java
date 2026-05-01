@@ -24,6 +24,10 @@ public class UserDetailsImpl implements UserDetails {
         return credentials.getNickname().value();
     }
 
+    public br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role getRole(){
+        return credentials.getRole();
+    }
+
     @Override
     public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(()-> credentials.getRole().name());
@@ -31,7 +35,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public @Nullable String getPassword() {
-        return credentials.getPassword().value();
+        return credentials.getPassword().getValue();
     }
 
     @Override

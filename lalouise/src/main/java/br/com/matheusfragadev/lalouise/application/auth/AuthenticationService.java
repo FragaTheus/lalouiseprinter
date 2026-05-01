@@ -1,4 +1,4 @@
-package br.com.matheusfragadev.lalouise.application;
+package br.com.matheusfragadev.lalouise.application.auth;
 
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import br.com.matheusfragadev.lalouise.infra.security.jwt.JwtService;
@@ -25,7 +25,7 @@ public class AuthenticationService {
             );
             var userDetails = (UserDetailsImpl) auth.getPrincipal();
             var id = userDetails.getId().toString();
-            var role = userDetails.getAuthorities().stream().findFirst().orElseThrow().getAuthority();
+            var role = userDetails.getRole().name();
             var token = jwtService.generateToken(id, role);
             log.info("User authenticated successfully, generated token: {}", token);
             return new LoginResult(token, userDetails);

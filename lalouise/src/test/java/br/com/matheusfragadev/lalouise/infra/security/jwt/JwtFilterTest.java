@@ -1,9 +1,8 @@
 package br.com.matheusfragadev.lalouise.infra.security.jwt;
 
+import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +12,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -32,6 +34,9 @@ class JwtFilterTest {
     private HandlerExceptionResolver exceptionResolver;
 
     @Mock
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Mock
     private FilterChain filterChain;
 
     @AfterEach
@@ -41,7 +46,7 @@ class JwtFilterTest {
 
     @Test
     void shouldContinueChainWhenAuthorizationHeaderIsMissing() throws Exception {
-        JwtFilter jwtFilter = new JwtFilter(jwtService, exceptionResolver);
+        JwtFilter jwtFilter = new JwtFilter(jwtService, userDetailsService, exceptionResolver);
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -52,27 +57,32 @@ class JwtFilterTest {
 
     @Test
     void shouldSetAuthenticationWhenTokenIsValid() throws Exception {
-        JwtFilter jwtFilter = new JwtFilter(jwtService, exceptionResolver);
+        JwtFilter jwtFilter = new JwtFilter(jwtService, userDetailsService, exceptionResolver);
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         Claims claims = org.mockito.Mockito.mock(Claims.class);
+        UUID userId = UUID.randomUUID();
+        var userDetails = User.withUsername("admin@local")
+                .password("encoded-password")
+                .authorities("ADMIN")
+                .build();
 
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer valid-token");
         when(jwtService.extractClaims("valid-token")).thenReturn(claims);
-        when(claims.getSubject()).thenReturn("123");
-        when(claims.get("role", String.class)).thenReturn("admin");
+        when(claims.getSubject()).thenReturn(userId.toString());
+        when(userDetailsService.loadUserById(userId)).thenReturn(userDetails);
 
         jwtFilter.doFilter(request, response, filterChain);
 
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         assertNotNull(authentication);
-        assertEquals("123", authentication.getPrincipal());
+        assertEquals(userDetails, authentication.getPrincipal());
         assertEquals("ADMIN", authentication.getAuthorities().iterator().next().getAuthority());
     }
 
     @Test
     void shouldDelegateToExceptionResolverWhenTokenParsingFails() throws Exception {
-        JwtFilter jwtFilter = new JwtFilter(jwtService, exceptionResolver);
+        JwtFilter jwtFilter = new JwtFilter(jwtService, userDetailsService, exceptionResolver);
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         RuntimeException error = new RuntimeException("invalid token");

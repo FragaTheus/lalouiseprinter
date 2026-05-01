@@ -14,7 +14,7 @@ class PasswordTest {
     void shouldCreatePasswordUsingHasher() {
         Password password = Password.of("Strong@123", raw -> "HASH_" + raw);
 
-        assertEquals("HASH_Strong@123", password.value());
+        assertEquals("HASH_Strong@123", password.getValue());
     }
 
     @Test

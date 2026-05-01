@@ -32,7 +32,7 @@ class UserDetailsImplTest {
         when(credentials.isActive()).thenReturn(true);
         when(email.value()).thenReturn("admin@lalouise.com");
         when(nickname.value()).thenReturn("Admin User");
-        when(password.value()).thenReturn("hashed-password");
+        when(password.getValue()).thenReturn("hashed-password");
 
         UserDetailsImpl userDetails = new UserDetailsImpl(credentials);
 

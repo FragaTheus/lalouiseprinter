@@ -3,6 +3,7 @@ package br.com.matheusfragadev.lalouise.domain.base.credentials.vo;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.EmailException;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EmailTest {
@@ -13,8 +14,8 @@ class EmailTest {
     }
 
     @Test
-    void shouldThrowWhenEmailHasCommonValidFormatDueToCurrentRegexRule() {
-        assertThrows(EmailException.class, () -> new Email("user@lalouise.com"));
+    void shouldNotThrowWhenEmailHasValidFormat() {
+        assertDoesNotThrow(() -> new Email("user@lalouise.com"));
     }
 
     @Test

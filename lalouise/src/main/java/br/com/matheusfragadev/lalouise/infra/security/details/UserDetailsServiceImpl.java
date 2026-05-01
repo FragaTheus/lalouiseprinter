@@ -9,6 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -18,6 +20,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public @NonNull UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
         var userDetailsImpl =  adminRepository.findByEmail(new Email(email))
+                .map(UserDetailsImpl::new)
+                .orElseThrow(()-> new UsernameNotFoundException("Usuário não encontrado"));
+        if (!userDetailsImpl.isEnabled()) {
+            throw new DisableUserException("Usuário inativo");
+        }
+        return userDetailsImpl;
+    }
+
+    public UserDetails loadUserById(UUID id) throws UsernameNotFoundException {
+        var userDetailsImpl =  adminRepository.findById(id)
                 .map(UserDetailsImpl::new)
                 .orElseThrow(()-> new UsernameNotFoundException("Usuário não encontrado"));
         if (!userDetailsImpl.isEnabled()) {

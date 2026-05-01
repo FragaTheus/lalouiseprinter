@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.application;
 
+import br.com.matheusfragadev.lalouise.application.auth.LoginResult;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import org.junit.jupiter.api.Test;
 

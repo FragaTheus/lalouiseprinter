@@ -1,14 +1,20 @@
 package br.com.matheusfragadev.lalouise.domain.base.credentials.entity;
+
 import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.ActiveException;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Password;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@Getter
 @MappedSuperclass
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Credentials{
 
     @Id
@@ -25,39 +31,12 @@ public class Credentials{
 
     private boolean active;
 
-    protected Credentials() {
-    }
-
-    public Credentials(Nickname nickname, Email email, Password password, Role role, boolean active) {
+    protected Credentials(Nickname nickname, Email email, Password password, Role role, boolean active) {
         this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.role = role;
         this.active = active;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Nickname getNickname() {
-        return nickname;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public Password getPassword() {
-        return password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public boolean isActive() {
-        return active;
     }
 
     public void changeNickname(Nickname nickname) {

@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.controller.auth;
 
-import br.com.matheusfragadev.lalouise.application.AuthenticationService;
+import br.com.matheusfragadev.lalouise.application.auth.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;

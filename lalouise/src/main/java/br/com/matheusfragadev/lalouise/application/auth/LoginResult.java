@@ -1,4 +1,4 @@
-package br.com.matheusfragadev.lalouise.application;
+package br.com.matheusfragadev.lalouise.application.auth;
 
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 

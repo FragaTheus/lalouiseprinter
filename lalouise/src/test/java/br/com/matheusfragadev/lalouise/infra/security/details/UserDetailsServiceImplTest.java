@@ -31,7 +31,7 @@ class UserDetailsServiceImplTest {
         Admin admin = mock(Admin.class);
         Email email = mock(Email.class);
 
-        when(adminRepository.findByEmail("admin@lalouise.com")).thenReturn(Optional.of(admin));
+        when(adminRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.of(admin));
         when(admin.isActive()).thenReturn(true);
         when(admin.getEmail()).thenReturn(email);
         when(email.value()).thenReturn("admin@lalouise.com");
@@ -43,7 +43,7 @@ class UserDetailsServiceImplTest {
 
     @Test
     void shouldThrowWhenUserDoesNotExist() {
-        when(adminRepository.findByEmail("none@lalouise.com")).thenReturn(Optional.empty());
+        when(adminRepository.findByEmail(new Email("none@lalouise.com"))).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class,
                 () -> userDetailsService.loadUserByUsername("none@lalouise.com"));
@@ -52,7 +52,7 @@ class UserDetailsServiceImplTest {
     @Test
     void shouldThrowWhenUserIsInactive() {
         Admin admin = mock(Admin.class);
-        when(adminRepository.findByEmail("admin@lalouise.com")).thenReturn(Optional.of(admin));
+        when(adminRepository.findByEmail( new Email("admin@lalouise.com"))).thenReturn(Optional.of(admin));
         when(admin.isActive()).thenReturn(false);
 
         assertThrows(DisableUserException.class,

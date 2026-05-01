@@ -3,27 +3,23 @@ package br.com.matheusfragadev.lalouise.domain.base.credentials.vo;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.PasswordException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+@Getter
 @Embeddable
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Password {
 
     @Column(name = "password")
     private String value;
-
-    private Password() {
-    }
-
-    private Password(String value) {
-        this.value = value;
-    }
-
-    public String value() {
-        return value;
-    }
 
     private static final String REGEX = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d\\s]).+$";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
@@ -39,5 +35,9 @@ public final class Password {
             throw new PasswordException("Senha não atende aos requisitos de segurança");
         }
         return new Password(hasher.apply(value));
+    }
+
+    public boolean matches(String rawPassword, BiFunction<String, String, Boolean> matcher) {
+        return matcher.apply(rawPassword, this.value);
     }
 }

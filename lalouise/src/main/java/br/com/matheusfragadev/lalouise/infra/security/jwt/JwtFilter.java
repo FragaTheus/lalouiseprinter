@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.security.jwt;
 
+import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,38 +10,38 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UserDetailsServiceImpl userDetailsService;
     private final HandlerExceptionResolver resolver;
 
     public JwtFilter(
             JwtService jwtService,
+            UserDetailsServiceImpl userDetailsService,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver
     ) {
         this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
         this.resolver = resolver;
     }
 
     @Override
-    protected void doFilterInternal
-            (
-                    @NonNull HttpServletRequest request,
-                    @NonNull HttpServletResponse response,
-                    @NonNull FilterChain filterChain
-            )
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
         var authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -49,20 +50,23 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        try{
+        try {
             var token = authHeader.substring(7);
             var claims = jwtService.extractClaims(token);
             var id = claims.getSubject();
-            var role = new SimpleGrantedAuthority
-                    (claims.get("role", String.class).toUpperCase());
 
             if (id != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                var auth = new UsernamePasswordAuthenticationToken(id, null, List.of(role));
+                var userDetails = userDetailsService.loadUserById(UUID.fromString(id));
+
+                var auth = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception e) {
             resolver.resolveException(request, response, null, e);
         }
 
+        filterChain.doFilter(request, response);
     }
 }

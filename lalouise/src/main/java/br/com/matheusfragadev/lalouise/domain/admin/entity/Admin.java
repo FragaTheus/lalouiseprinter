@@ -7,15 +7,16 @@ import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Password;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "admins")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Admin extends Credentials {
-
-    private Admin() {
-    }
 
     public Admin(Nickname nickname, Email email, Password password) {
         super(nickname, email, password, Role.ADMIN, true);
     }
+
 }
