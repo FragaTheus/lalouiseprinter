@@ -1,8 +1,12 @@
-package br.com.matheusfragadev.lalouise.infra.controller.profile;
+package br.com.matheusfragadev.lalouise.infra.controller.profile.utils.mapper;
 
 import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
 import br.com.matheusfragadev.lalouise.domain.admin.entity.Admin;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangePasswordRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.AdminResponse;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.ProfileResponse;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.StaffResponse;
 
 import java.util.UUID;
 

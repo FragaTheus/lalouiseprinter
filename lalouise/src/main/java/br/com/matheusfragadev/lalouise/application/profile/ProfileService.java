@@ -41,15 +41,20 @@ public interface ProfileService<T extends Credentials> {
 
     @Transactional
     default void changePassword(ProfileChangePassword command) {
-        T entity = getProfile(command.userId());
-
-        if (!entity.getPassword().matches(command.currentPassword(), passwordEncoder()::matches)) {
-            throw new PasswordException("Senha atual incorreta");
-        }
         if (!command.newPassword().equals(command.confirmNewPassword())) {
             throw new PasswordException("A nova senha e a confirmação não coincidem");
         }
 
+        T entity = getProfile(command.userId());
+
+        if (entity.getPassword().matches(command.newPassword(), passwordEncoder()::matches)) {
+            throw new PasswordException("Nova senha deve ser diferente da atual");
+        }
+
+        if (!entity.getPassword().matches(command.currentPassword(), passwordEncoder()::matches)) {
+            throw new PasswordException("Senha atual incorreta");
+        }
+        
         entity.changePassword(Password.of(command.newPassword(), passwordEncoder()::encode));
         save(entity);
     }

@@ -3,6 +3,11 @@ import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePa
 import br.com.matheusfragadev.lalouise.application.profile.facade.ProfileFacade;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.mapper.ProfileMapper;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangeNameRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangePasswordRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.AdminResponse;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.ProfileResponse;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

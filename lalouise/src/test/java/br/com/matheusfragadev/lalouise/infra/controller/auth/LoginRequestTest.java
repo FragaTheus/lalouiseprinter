@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.controller.auth;
 
+import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

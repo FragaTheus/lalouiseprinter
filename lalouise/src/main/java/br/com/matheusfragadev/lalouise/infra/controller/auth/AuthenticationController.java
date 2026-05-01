@@ -1,6 +1,9 @@
 package br.com.matheusfragadev.lalouise.infra.controller.auth;
 
 import br.com.matheusfragadev.lalouise.application.auth.AuthenticationService;
+import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginResponse;
+import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.mapper.AuthenticationMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -20,13 +23,8 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
         var result = authenticationService.authenticate(request.email(), request.password());
-        var user = result.userDetails();
-        var response = new LoginResponse(
-                user.getId(),
-                user.getNickname(),
-                user.getUsername(),
-                user.getAuthorities().stream().findFirst().orElseThrow().getAuthority()
-        );
+        var userDetails = result.userDetails();
+        var response = AuthenticationMapper.toLoginResponse(userDetails);
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.token())
                 .body(response);

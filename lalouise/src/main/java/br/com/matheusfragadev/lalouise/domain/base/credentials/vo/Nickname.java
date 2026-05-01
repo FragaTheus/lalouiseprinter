@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.domain.base.credentials.vo;
 
+import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.NicknameException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
@@ -16,14 +17,14 @@ public record Nickname(
 
     public Nickname {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("Nickname não pode ser nulo ou vazio");
+            throw new NicknameException("Nome não pode ser nulo ou vazio");
         }
         value = value.trim();
         if (value.length() < 3 || value.length() > 30) {
-            throw new IllegalArgumentException("Nickname deve ter entre 3 e 30 caracteres");
+            throw new NicknameException("Nome deve ter entre 3 e 30 caracteres");
         }
         if (!PATTERN.matcher(value).matches()) {
-            throw new IllegalArgumentException("Nickname não é válido");
+            throw new NicknameException("Nome não é válido");
         }
     }
 

@@ -2,6 +2,8 @@ package br.com.matheusfragadev.lalouise.infra.controller.auth;
 
 import br.com.matheusfragadev.lalouise.application.auth.AuthenticationService;
 import br.com.matheusfragadev.lalouise.application.auth.LoginResult;
+import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginResponse;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

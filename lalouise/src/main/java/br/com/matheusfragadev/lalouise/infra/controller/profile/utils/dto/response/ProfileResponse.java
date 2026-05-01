@@ -1,4 +1,4 @@
-package br.com.matheusfragadev.lalouise.infra.controller.profile;
+package br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response;
 
 import java.util.UUID;
 

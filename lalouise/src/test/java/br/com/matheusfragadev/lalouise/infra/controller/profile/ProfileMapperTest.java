@@ -5,6 +5,11 @@ import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credential
 import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Nickname;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.mapper.ProfileMapper;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangePasswordRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.AdminResponse;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.ProfileResponse;
+import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.StaffResponse;
 import org.junit.jupiter.api.Test;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;

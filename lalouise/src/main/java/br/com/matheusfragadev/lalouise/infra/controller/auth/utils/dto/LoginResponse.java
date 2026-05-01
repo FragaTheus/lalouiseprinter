@@ -1,4 +1,4 @@
-package br.com.matheusfragadev.lalouise.infra.controller.auth;
+package br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto;
 
 import java.util.UUID;
 
