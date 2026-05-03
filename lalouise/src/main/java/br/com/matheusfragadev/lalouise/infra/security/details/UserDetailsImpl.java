@@ -1,6 +1,7 @@
 package br.com.matheusfragadev.lalouise.infra.security.details;
 
-import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -24,7 +25,7 @@ public class UserDetailsImpl implements UserDetails {
         return credentials.getNickname().value();
     }
 
-    public br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role getRole(){
+    public Role getRole(){
         return credentials.getRole();
     }
 

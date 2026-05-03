@@ -1,8 +1,8 @@
 package br.com.matheusfragadev.lalouise.infra.security.details;
 
-import br.com.matheusfragadev.lalouise.domain.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.admin.repository.AdminRepository;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Email;
+import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
+import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +22,7 @@ class UserDetailsServiceImplTest {
 
     @Mock
     private AdminRepository adminRepository;
+
 
     @InjectMocks
     private UserDetailsServiceImpl userDetailsService;

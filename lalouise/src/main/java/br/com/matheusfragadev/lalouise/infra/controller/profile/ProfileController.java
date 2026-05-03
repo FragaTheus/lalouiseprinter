@@ -30,7 +30,7 @@ public class ProfileController {
     public ResponseEntity<Void> changeName(
             @AuthenticationPrincipal UserDetailsImpl principal,
             @Valid @RequestBody ChangeNameRequest request) {
-        profileFacade.changeName(principal.getId(), principal.getRole(), request.newName());
+        profileFacade.changeName(principal.getId(), principal.getRole(), request.newNickname());
         return ResponseEntity.noContent().build();
     }
 

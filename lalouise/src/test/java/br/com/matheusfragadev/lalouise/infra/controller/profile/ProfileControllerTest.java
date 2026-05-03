@@ -1,8 +1,8 @@
 package br.com.matheusfragadev.lalouise.infra.controller.profile;
 import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
 import br.com.matheusfragadev.lalouise.application.profile.facade.ProfileFacade;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.mapper.ProfileMapper;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangeNameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangePasswordRequest;
@@ -17,6 +17,7 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import java.time.Instant;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -42,7 +43,8 @@ class ProfileControllerTest {
         UserDetailsImpl principal = mockPrincipal(id, Role.ADMIN);
         // bare mock — mapping is fully delegated to ProfileMapper (mocked statically)
         Credentials credentials = mock(Credentials.class);
-        AdminResponse expectedResponse = new AdminResponse(id, "Admin User", "admin@lalouise.com", "ADMIN", true);
+        Instant now = Instant.now();
+        AdminResponse expectedResponse = new AdminResponse(id, "Admin User", "admin@lalouise.com", "ADMIN", true, now, now);
         when(profileFacade.getProfile(id, Role.ADMIN)).thenReturn(credentials);
         try (MockedStatic<ProfileMapper> mapper = mockStatic(ProfileMapper.class)) {
             mapper.when(() -> ProfileMapper.toResponse(credentials)).thenReturn(expectedResponse);
@@ -55,13 +57,13 @@ class ProfileControllerTest {
     @Test
     void getProfileShouldPropagateExceptionFromFacade() {
         UUID id = UUID.randomUUID();
-        UserDetailsImpl principal = mockPrincipal(id, Role.MANAGER);
-        when(profileFacade.getProfile(id, Role.MANAGER))
-                .thenThrow(new IllegalArgumentException("No UserService found for role: MANAGER"));
+        UserDetailsImpl principal = mockPrincipal(id, Role.ADMIN);
+        when(profileFacade.getProfile(id, Role.ADMIN))
+                .thenThrow(new IllegalArgumentException("unexpected failure"));
         try {
             profileController.getProfile(principal);
         } catch (IllegalArgumentException ex) {
-            assertEquals("No UserService found for role: MANAGER", ex.getMessage());
+            assertEquals("unexpected failure", ex.getMessage());
         }
     }
     // ── changeName ────────────────────────────────────────────────────────────
@@ -79,14 +81,14 @@ class ProfileControllerTest {
     @Test
     void changeNameShouldPropagateExceptionFromFacade() {
         UUID id = UUID.randomUUID();
-        UserDetailsImpl principal = mockPrincipal(id, Role.MANAGER);
+        UserDetailsImpl principal = mockPrincipal(id, Role.ADMIN);
         ChangeNameRequest request = new ChangeNameRequest("Name");
-        doThrow(new IllegalArgumentException("No UserService found for role: MANAGER"))
-                .when(profileFacade).changeName(id, Role.MANAGER, "Name");
+        doThrow(new IllegalArgumentException("unexpected failure"))
+                .when(profileFacade).changeName(id, Role.ADMIN, "Name");
         try {
             profileController.changeName(principal, request);
         } catch (IllegalArgumentException ex) {
-            assertEquals("No UserService found for role: MANAGER", ex.getMessage());
+            assertEquals("unexpected failure", ex.getMessage());
         }
     }
     // ── changePassword ────────────────────────────────────────────────────────
@@ -110,19 +112,19 @@ class ProfileControllerTest {
     @Test
     void changePasswordShouldPropagateExceptionFromFacade() {
         UUID id = UUID.randomUUID();
-        UserDetailsImpl principal = mockPrincipal(id, Role.MANAGER);
+        UserDetailsImpl principal = mockPrincipal(id, Role.ADMIN);
         ChangePasswordRequest request = new ChangePasswordRequest("Current@1", "NewPass@1", "NewPass@1");
         ProfileChangePassword command = ProfileChangePassword.builder()
                 .userId(id).currentPassword("Current@1")
                 .newPassword("NewPass@1").confirmNewPassword("NewPass@1").build();
         try (MockedStatic<ProfileMapper> mapper = mockStatic(ProfileMapper.class)) {
             mapper.when(() -> ProfileMapper.toChangePasswordCommand(id, request)).thenReturn(command);
-            doThrow(new IllegalArgumentException("No UserService found for role: MANAGER"))
-                    .when(profileFacade).changePassword(any(), eq(Role.MANAGER));
+            doThrow(new IllegalArgumentException("unexpected failure"))
+                    .when(profileFacade).changePassword(any(), eq(Role.ADMIN));
             try {
                 profileController.changePassword(principal, request);
             } catch (IllegalArgumentException ex) {
-                assertEquals("No UserService found for role: MANAGER", ex.getMessage());
+                assertEquals("unexpected failure", ex.getMessage());
             }
         }
     }

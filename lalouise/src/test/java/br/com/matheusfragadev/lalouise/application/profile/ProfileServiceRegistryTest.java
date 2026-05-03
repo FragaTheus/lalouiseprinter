@@ -1,7 +1,7 @@
 package br.com.matheusfragadev.lalouise.application.profile;
 import br.com.matheusfragadev.lalouise.application.profile.registry.ProfileServiceRegistry;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,22 +22,13 @@ class ProfileServiceRegistryTest {
         assertSame(adminService, resolved);
     }
     @Test
-    void shouldResolveEachServiceByItsOwnRole() {
-        var adminService = mockService(Role.ADMIN);
-        var staffService = mockService(Role.STAFF);
-        var registry = new ProfileServiceRegistry(List.of(adminService, staffService));
-        assertSame(adminService, registry.resolve(Role.ADMIN));
-        assertSame(staffService, registry.resolve(Role.STAFF));
-    }
-    @Test
     void shouldThrowWhenNoServiceRegisteredForRole() {
-        var adminService = mockService(Role.ADMIN);
-        var registry = new ProfileServiceRegistry(List.of(adminService));
+        var registry = new ProfileServiceRegistry(List.of());
         IllegalArgumentException ex = assertThrows(
                 IllegalArgumentException.class,
-                () -> registry.resolve(Role.MANAGER)
+                () -> registry.resolve(Role.ADMIN)
         );
-        assertTrue(ex.getMessage().contains("MANAGER"));
+        assertTrue(ex.getMessage().contains("ADMIN"));
     }
     @Test
     void shouldThrowWhenRegistryIsEmpty() {

@@ -1,7 +1,7 @@
 package br.com.matheusfragadev.lalouise.application;
 import br.com.matheusfragadev.lalouise.application.auth.AuthenticationService;
 import br.com.matheusfragadev.lalouise.application.auth.LoginResult;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import br.com.matheusfragadev.lalouise.infra.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package br.com.matheusfragadev.lalouise.application.profile;
-import br.com.matheusfragadev.lalouise.domain.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.admin.repository.AdminRepository;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
+import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -1,9 +1,13 @@
 package br.com.matheusfragadev.lalouise.infra.controller.handler;
 
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.ActiveException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.EmailException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.NicknameException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.PasswordException;
+import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
+import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantActiveException;
+import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNameException;
+import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNotFoundException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.ActiveException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.EmailException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.infra.security.details.DisableUserException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -19,6 +23,7 @@ class GlobalExceptionHandlerTest {
 
     private final GlobalExceptionHandler handler = new GlobalExceptionHandler();
 
+    // ── credentials ───────────────────────────────────────────────────────────
     @Test
     void shouldHandleActiveException() {
         var response = handler.handleActiveException(new ActiveException("ativo"));
@@ -61,6 +66,36 @@ class GlobalExceptionHandlerTest {
         assertEquals("inativo", response.getBody().error());
     }
 
+    // ── restaurant ────────────────────────────────────────────────────────────
+    @Test
+    void shouldHandleRestaurantNotFoundException() {
+        var response = handler.handleRestaurantNotFoundException(new RestaurantNotFoundException("Restaurante não encontrado"));
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Restaurante não encontrado", response.getBody().error());
+    }
+
+    @Test
+    void shouldHandleCnpjException() {
+        var response = handler.handleCnpjException(new CnpjException("CNPJ inválido"));
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("CNPJ inválido", response.getBody().error());
+    }
+
+    @Test
+    void shouldHandleRestaurantNameException() {
+        var response = handler.handleRestaurantNameException(new RestaurantNameException("Nome inválido"));
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Nome inválido", response.getBody().error());
+    }
+
+    @Test
+    void shouldHandleRestaurantActiveException() {
+        var response = handler.handleRestaurantActiveException(new RestaurantActiveException("Restaurante já está inativo"));
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Restaurante já está inativo", response.getBody().error());
+    }
+
+    // ── jwt / auth ────────────────────────────────────────────────────────────
     @Test
     void shouldHandleExpiredJwtException() {
         var response = handler.handleExpired(new ExpiredJwtException(null, null, "expired"));
@@ -96,4 +131,3 @@ class GlobalExceptionHandlerTest {
         assertEquals("Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.", response.getBody().error());
     }
 }
-

@@ -1,12 +1,16 @@
 package br.com.matheusfragadev.lalouise.infra.controller.handler;
 
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.ActiveException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.EmailException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.NicknameException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.PasswordException;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.ActiveException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.EmailException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
+import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
+import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantActiveException;
+import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNameException;
+import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNotFoundException;
 import br.com.matheusfragadev.lalouise.infra.security.details.DisableUserException;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +65,34 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(RestaurantNotFoundException.class)
+    public ResponseEntity<HandlerResponse> handleRestaurantNotFoundException(RestaurantNotFoundException ex) {
+        HandlerResponse response = new HandlerResponse(ex.getMessage());
+        log.warn("RestaurantNotFoundException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(CnpjException.class)
+    public ResponseEntity<HandlerResponse> handleCnpjException(CnpjException ex) {
+        HandlerResponse response = new HandlerResponse(ex.getMessage());
+        log.warn("CnpjException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(RestaurantNameException.class)
+    public ResponseEntity<HandlerResponse> handleRestaurantNameException(RestaurantNameException ex) {
+        HandlerResponse response = new HandlerResponse(ex.getMessage());
+        log.warn("RestaurantNameException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(RestaurantActiveException.class)
+    public ResponseEntity<HandlerResponse> handleRestaurantActiveException(RestaurantActiveException ex) {
+        HandlerResponse response = new HandlerResponse(ex.getMessage());
+        log.warn("RestaurantActiveException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<HandlerResponse> handleUsernameNotFoundException(UsernameNotFoundException ex) {
         HandlerResponse response = new HandlerResponse(ex.getMessage());
@@ -104,15 +136,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public ResponseEntity<String> handleInternalAuth(InternalAuthenticationServiceException e) {
+    public ResponseEntity<HandlerResponse> handleInternalAuth(InternalAuthenticationServiceException e) {
+        log.error("InternalAuth cause: {}", e.getCause());
         Throwable cause = e.getCause();
-        if (cause instanceof EmailException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(cause.getMessage());
+        if (cause instanceof DisableUserException) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new HandlerResponse(cause.getMessage()));
         }
-        if (cause instanceof PasswordException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(cause.getMessage());
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciais inválidas");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new HandlerResponse("Credenciais inválidas"));
     }
 
     @ExceptionHandler(Exception.class)
@@ -121,6 +153,13 @@ public class GlobalExceptionHandler {
                 ("Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");
         log.error("Unexpected error: {}", ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(AdminAlreadyExists.class)
+    public ResponseEntity<HandlerResponse> handleAdminAlreadyExists(AdminAlreadyExists ex) {
+        HandlerResponse response = new HandlerResponse(ex.getMessage());
+        log.warn("AdminAlreadyExists: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
 }

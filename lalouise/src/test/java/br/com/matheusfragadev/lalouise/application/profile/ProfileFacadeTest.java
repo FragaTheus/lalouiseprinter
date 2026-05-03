@@ -2,8 +2,8 @@ package br.com.matheusfragadev.lalouise.application.profile;
 import br.com.matheusfragadev.lalouise.application.profile.facade.ProfileFacade;
 import br.com.matheusfragadev.lalouise.application.profile.registry.ProfileServiceRegistry;
 import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,13 +38,6 @@ class ProfileFacadeTest {
         verify(profileServiceRegistry).resolve(Role.ADMIN);
         verify(service).getProfile(id);
     }
-    @Test
-    void getProfileShouldPropagateExceptionWhenRoleNotRegistered() {
-        when(profileServiceRegistry.resolve(Role.MANAGER))
-                .thenThrow(new IllegalArgumentException("No UserService found for role: MANAGER"));
-        assertThrows(IllegalArgumentException.class,
-                () -> profileFacade.getProfile(UUID.randomUUID(), Role.MANAGER));
-    }
     // ── changeName ───────────────────────────────────────────────────────────
     @Test
     void changeNameShouldDelegateToResolvedService() {
@@ -53,13 +46,6 @@ class ProfileFacadeTest {
         profileFacade.changeName(id, Role.ADMIN, "New Name");
         verify(profileServiceRegistry).resolve(Role.ADMIN);
         verify(service).changeName(id, "New Name");
-    }
-    @Test
-    void changeNameShouldPropagateExceptionWhenRoleNotRegistered() {
-        when(profileServiceRegistry.resolve(Role.MANAGER))
-                .thenThrow(new IllegalArgumentException("No UserService found for role: MANAGER"));
-        assertThrows(IllegalArgumentException.class,
-                () -> profileFacade.changeName(UUID.randomUUID(), Role.MANAGER, "Name"));
     }
     // ── changePassword ───────────────────────────────────────────────────────
     @Test
@@ -75,18 +61,5 @@ class ProfileFacadeTest {
         profileFacade.changePassword(command, Role.ADMIN);
         verify(profileServiceRegistry).resolve(Role.ADMIN);
         verify(service).changePassword(command);
-    }
-    @Test
-    void changePasswordShouldPropagateExceptionWhenRoleNotRegistered() {
-        var command = ProfileChangePassword.builder()
-                .userId(UUID.randomUUID())
-                .currentPassword("Current@1")
-                .newPassword("NewPass@1")
-                .confirmNewPassword("NewPass@1")
-                .build();
-        when(profileServiceRegistry.resolve(Role.MANAGER))
-                .thenThrow(new IllegalArgumentException("No UserService found for role: MANAGER"));
-        assertThrows(IllegalArgumentException.class,
-                () -> profileFacade.changePassword(command, Role.MANAGER));
     }
 }

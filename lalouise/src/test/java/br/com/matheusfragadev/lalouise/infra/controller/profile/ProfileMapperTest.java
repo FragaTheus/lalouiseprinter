@@ -1,15 +1,13 @@
 package br.com.matheusfragadev.lalouise.infra.controller.profile;
 import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
-import br.com.matheusfragadev.lalouise.domain.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Email;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Nickname;
+import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.mapper.ProfileMapper;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangePasswordRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.AdminResponse;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.ProfileResponse;
-import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.StaffResponse;
 import org.junit.jupiter.api.Test;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,38 +37,7 @@ class ProfileMapperTest {
         assertEquals("ADMIN", adminResponse.role());
         assertTrue(adminResponse.active());
     }
-    @Test
-    void toResponseShouldReturnStaffResponseWhenRoleIsStaff() {
-        UUID id = UUID.randomUUID();
-        Credentials credentials = mock(Credentials.class);
-        Nickname nickname = mock(Nickname.class);
-        Email email = mock(Email.class);
-        when(credentials.getRole()).thenReturn(Role.STAFF);
-        when(credentials.getId()).thenReturn(id);
-        when(credentials.getNickname()).thenReturn(nickname);
-        when(credentials.getEmail()).thenReturn(email);
-        when(credentials.isActive()).thenReturn(false);
-        when(nickname.value()).thenReturn("Staff User");
-        when(email.value()).thenReturn("staff@lalouise.com");
-        ProfileResponse response = ProfileMapper.toResponse(credentials);
-        assertInstanceOf(StaffResponse.class, response);
-        StaffResponse staffResponse = (StaffResponse) response;
-        assertEquals(id, staffResponse.id());
-        assertEquals("Staff User", staffResponse.nickname());
-        assertEquals("staff@lalouise.com", staffResponse.email());
-        assertEquals("STAFF", staffResponse.role());
-        assertFalse(staffResponse.active());
-    }
-    @Test
-    void toResponseShouldThrowForUnmappedRole() {
-        Credentials credentials = mock(Credentials.class);
-        when(credentials.getRole()).thenReturn(Role.MANAGER);
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
-                () -> ProfileMapper.toResponse(credentials)
-        );
-        assertTrue(ex.getMessage().contains("MANAGER"));
-    }
+
     // ── toChangePasswordCommand ───────────────────────────────────────────────
     @Test
     void toChangePasswordCommandShouldMapAllFieldsCorrectly() {

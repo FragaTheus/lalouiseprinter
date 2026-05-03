@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public record AdminResponse(
@@ -7,6 +8,8 @@ public record AdminResponse(
         String nickname,
         String email,
         String role,
-        boolean active
+        boolean active,
+        Instant createdAt,
+        Instant updatedAt
 ) implements ProfileResponse {
 }

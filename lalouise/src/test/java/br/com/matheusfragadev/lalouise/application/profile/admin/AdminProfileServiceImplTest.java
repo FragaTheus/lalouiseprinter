@@ -1,13 +1,13 @@
 package br.com.matheusfragadev.lalouise.application.profile.admin;
 import br.com.matheusfragadev.lalouise.application.profile.AdminProfileServiceImpl;
 import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
-import br.com.matheusfragadev.lalouise.domain.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.admin.repository.AdminRepository;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.NicknameException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.PasswordException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Nickname;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Password;
+import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
+import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -129,7 +129,7 @@ class AdminProfileServiceImplTest {
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getNickname()).thenReturn(current);
         when(current.value()).thenReturn("SomeName");
-        assertThrows(IllegalArgumentException.class, () -> service.changeName(id, "   "));
+        assertThrows(NicknameException.class, () -> service.changeName(id, "   "));
         verify(adminRepository, never()).save(any());
     }
 
@@ -141,8 +141,7 @@ class AdminProfileServiceImplTest {
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getNickname()).thenReturn(current);
         when(current.value()).thenReturn("SomeName");
-        // "Ab" → 2 chars, below the 3-char minimum
-        assertThrows(IllegalArgumentException.class, () -> service.changeName(id, "Ab"));
+        assertThrows(NicknameException.class, () -> service.changeName(id, "Ab"));
         verify(adminRepository, never()).save(any());
     }
 
@@ -154,9 +153,8 @@ class AdminProfileServiceImplTest {
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getNickname()).thenReturn(current);
         when(current.value()).thenReturn("SomeName");
-        // 31 chars, above the 30-char maximum
         String longName = "A".repeat(31);
-        assertThrows(IllegalArgumentException.class, () -> service.changeName(id, longName));
+        assertThrows(NicknameException.class, () -> service.changeName(id, longName));
         verify(adminRepository, never()).save(any());
     }
 
@@ -169,7 +167,7 @@ class AdminProfileServiceImplTest {
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getNickname()).thenReturn(current);
         when(current.value()).thenReturn("SomeName");
-        assertThrows(IllegalArgumentException.class, () -> service.changeName(id, invalidName));
+        assertThrows(NicknameException.class, () -> service.changeName(id, invalidName));
         verify(adminRepository, never()).save(any());
     }
 
@@ -185,6 +183,7 @@ class AdminProfileServiceImplTest {
                 .build();
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getPassword()).thenReturn(password);
+        when(password.matches(eq("NewPass@1"), any())).thenReturn(false);
         when(password.matches(eq("Current@1"), any())).thenReturn(true);
         when(encoder.encode("NewPass@1")).thenReturn("hashed");
         service.changePassword(command);
@@ -204,6 +203,7 @@ class AdminProfileServiceImplTest {
                 .build();
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getPassword()).thenReturn(password);
+        when(password.matches(eq("NewPass@1"), any())).thenReturn(false);
         when(password.matches(eq("Wrong@1"), any())).thenReturn(false);
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());
@@ -212,15 +212,10 @@ class AdminProfileServiceImplTest {
     @Test
     void changePasswordShouldThrowWhenConfirmationDoesNotMatch() {
         UUID id = UUID.randomUUID();
-        Admin admin = mock(Admin.class);
-        Password password = mock(Password.class);
         var command = ProfileChangePassword.builder()
                 .userId(id).currentPassword("Current@1")
                 .newPassword("NewPass@1").confirmNewPassword("Different@1")
                 .build();
-        when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
-        when(admin.getPassword()).thenReturn(password);
-        when(password.matches(eq("Current@1"), any())).thenReturn(true);
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());
     }
@@ -242,13 +237,13 @@ class AdminProfileServiceImplTest {
         UUID id = UUID.randomUUID();
         Admin admin = mock(Admin.class);
         Password password = mock(Password.class);
-        // "Short@1" → 7 chars, below 8-char minimum
         var command = ProfileChangePassword.builder()
                 .userId(id).currentPassword("Current@1")
                 .newPassword("Short@1").confirmNewPassword("Short@1")
                 .build();
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getPassword()).thenReturn(password);
+        when(password.matches(eq("Short@1"), any())).thenReturn(false);
         when(password.matches(eq("Current@1"), any())).thenReturn(true);
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());
@@ -259,13 +254,13 @@ class AdminProfileServiceImplTest {
         UUID id = UUID.randomUUID();
         Admin admin = mock(Admin.class);
         Password password = mock(Password.class);
-        // 17 chars, above 16-char maximum
         var command = ProfileChangePassword.builder()
                 .userId(id).currentPassword("Current@1")
                 .newPassword("LongPassw@rd12345").confirmNewPassword("LongPassw@rd12345")
                 .build();
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getPassword()).thenReturn(password);
+        when(password.matches(eq("LongPassw@rd12345"), any())).thenReturn(false);
         when(password.matches(eq("Current@1"), any())).thenReturn(true);
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());
@@ -283,6 +278,7 @@ class AdminProfileServiceImplTest {
                 .build();
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
         when(admin.getPassword()).thenReturn(password);
+        when(password.matches(eq(weakPassword), any())).thenReturn(false);
         when(password.matches(eq("Current@1"), any())).thenReturn(true);
         assertThrows(PasswordException.class, () -> service.changePassword(command));
         verify(adminRepository, never()).save(any());

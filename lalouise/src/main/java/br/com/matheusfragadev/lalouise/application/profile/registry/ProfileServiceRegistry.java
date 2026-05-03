@@ -1,8 +1,8 @@
 package br.com.matheusfragadev.lalouise.application.profile.registry;
 
 import br.com.matheusfragadev.lalouise.application.profile.ProfileService;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

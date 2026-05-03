@@ -1,12 +1,12 @@
 package br.com.matheusfragadev.lalouise.application.profile;
 
 import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.enums.Role;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.NicknameException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.exception.PasswordException;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Nickname;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Password;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,7 +54,7 @@ public interface ProfileService<T extends Credentials> {
         if (!entity.getPassword().matches(command.currentPassword(), passwordEncoder()::matches)) {
             throw new PasswordException("Senha atual incorreta");
         }
-        
+
         entity.changePassword(Password.of(command.newPassword(), passwordEncoder()::encode));
         save(entity);
     }

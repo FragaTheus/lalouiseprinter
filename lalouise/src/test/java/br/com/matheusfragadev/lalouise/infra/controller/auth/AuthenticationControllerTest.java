@@ -2,6 +2,7 @@ package br.com.matheusfragadev.lalouise.infra.controller.auth;
 
 import br.com.matheusfragadev.lalouise.application.auth.AuthenticationService;
 import br.com.matheusfragadev.lalouise.application.auth.LoginResult;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginResponse;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
@@ -36,11 +37,10 @@ class AuthenticationControllerTest {
         UUID userId = UUID.randomUUID();
         UserDetailsImpl userDetails = org.mockito.Mockito.mock(UserDetailsImpl.class);
 
-        doReturn(List.of(new SimpleGrantedAuthority("ADMIN"))).when(userDetails).getAuthorities();
-
         when(userDetails.getId()).thenReturn(userId);
         when(userDetails.getNickname()).thenReturn("Admin User");
         when(userDetails.getUsername()).thenReturn("admin@lalouise.comabcde");
+        when(userDetails.getRole()).thenReturn(Role.ADMIN);
         when(authenticationService.authenticate("admin@lalouise.comabcde", "Strong@123"))
                 .thenReturn(new LoginResult("jwt-token", userDetails));
 

@@ -1,19 +1,18 @@
 package br.com.matheusfragadev.lalouise.infra.controller.profile.utils.mapper;
 
 import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
-import br.com.matheusfragadev.lalouise.domain.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangePasswordRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.AdminResponse;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.ProfileResponse;
-import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.StaffResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProfileMapper {
-
-    private ProfileMapper() {
-    }
 
     public static ProfileResponse toResponse(Credentials credentials) {
         return switch (credentials.getRole()) {
@@ -24,19 +23,12 @@ public final class ProfileMapper {
                         admin.getNickname().value(),
                         admin.getEmail().value(),
                         admin.getRole().name(),
-                        admin.isActive()
+                        admin.isActive(),
+                        admin.getCreatedAt(),
+                        admin.getUpdatedAt()
                 );
             }
-            case STAFF -> {
-                // Staff entity not yet implemented – forward base fields
-                yield new StaffResponse(
-                        credentials.getId(),
-                        credentials.getNickname().value(),
-                        credentials.getEmail().value(),
-                        credentials.getRole().name(),
-                        credentials.isActive()
-                );
-            }
+
             default -> throw new IllegalArgumentException(
                     "No ProfileResponse mapping for role: " + credentials.getRole());
         };

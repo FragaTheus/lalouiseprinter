@@ -6,6 +6,6 @@ CREATE TABLE admins
     password   VARCHAR(255) NOT NULL,
     role       VARCHAR(20)  NOT NULL,
     active     BOOLEAN      NOT NULL,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
+    created_at TIMESTAMP NOT NULL ,
+    updated_at TIMESTAMP NOT NULL
 );

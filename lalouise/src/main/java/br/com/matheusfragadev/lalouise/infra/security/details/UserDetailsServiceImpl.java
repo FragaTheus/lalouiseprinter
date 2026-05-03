@@ -1,7 +1,7 @@
 package br.com.matheusfragadev.lalouise.infra.security.details;
 
-import br.com.matheusfragadev.lalouise.domain.admin.repository.AdminRepository;
-import br.com.matheusfragadev.lalouise.domain.base.credentials.vo.Email;
+import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
