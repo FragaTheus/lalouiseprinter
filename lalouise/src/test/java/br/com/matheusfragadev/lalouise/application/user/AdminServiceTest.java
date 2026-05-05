@@ -3,8 +3,9 @@ package br.com.matheusfragadev.lalouise.application.user;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
-import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.EmailException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
@@ -15,6 +16,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -70,7 +75,7 @@ class AdminServiceTest {
 
         when(adminRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
 
-        EmailException ex = assertThrows(EmailException.class, () -> service.createUser(command));
+        AdminAlreadyExists ex = assertThrows(AdminAlreadyExists.class, () -> service.createUser(command));
 
         assertEquals("Ja existe um usuario com esse email.", ex.getMessage());
         verify(adminRepository, never()).save(any(Admin.class));
@@ -89,7 +94,7 @@ class AdminServiceTest {
 
         PasswordException ex = assertThrows(PasswordException.class, () -> service.createUser(command));
 
-        assertEquals("Password and confirm password do not match.", ex.getMessage());
+        assertEquals("Senhas não conferem.", ex.getMessage());
         verify(adminRepository, never()).save(any(Admin.class));
     }
 
@@ -136,8 +141,8 @@ class AdminServiceTest {
         when(admin.getNickname()).thenReturn(currentNickname);
         when(currentNickname.value()).thenReturn("Same Name");
 
-        IllegalArgumentException ex = assertThrows(
-                IllegalArgumentException.class,
+        NicknameException ex = assertThrows(
+                NicknameException.class,
                 () -> service.changeUserNickname(id, "Same Name")
         );
 
@@ -150,13 +155,13 @@ class AdminServiceTest {
         UUID id = UUID.randomUUID();
         ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
                 .targetId(id)
-                .password("NewPass@123")
-                .confirmPassword("NewPass@123")
+                .newPassword("NewPass@123")
+                .confirmNewPassword("NewPass@123")
                 .build();
 
         Admin admin = mock(Admin.class);
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
-        when(passwordEncoder.encode(command.password())).thenReturn("new-hashed-password");
+        when(passwordEncoder.encode(command.newPassword())).thenReturn("new-hashed-password");
         when(adminRepository.save(admin)).thenReturn(admin);
 
         Admin result = service.changeUserPassword(command);
@@ -174,8 +179,8 @@ class AdminServiceTest {
         UUID id = UUID.randomUUID();
         ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
                 .targetId(id)
-                .password("NewPass@123")
-                .confirmPassword("Different@123")
+                .newPassword("NewPass@123")
+                .confirmNewPassword("Different@123")
                 .build();
 
         Admin admin = mock(Admin.class);
@@ -183,7 +188,7 @@ class AdminServiceTest {
 
         PasswordException ex = assertThrows(PasswordException.class, () -> service.changeUserPassword(command));
 
-        assertEquals("Password and confirm password do not match.", ex.getMessage());
+        assertEquals("Senhas não conferem.", ex.getMessage());
         verify(adminRepository, never()).save(any(Admin.class));
     }
 
@@ -192,8 +197,8 @@ class AdminServiceTest {
         UUID id = UUID.randomUUID();
         ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
                 .targetId(id)
-                .password("NewPass@123")
-                .confirmPassword("NewPass@123")
+                .newPassword("NewPass@123")
+                .confirmNewPassword("NewPass@123")
                 .build();
 
         when(adminRepository.findById(id)).thenReturn(Optional.empty());
@@ -240,14 +245,34 @@ class AdminServiceTest {
     }
 
     @Test
-    void getAllUsersShouldReturnRepositoryResultIncludingEmptyList() {
+    void getAllAdminsShouldReturnPageFromRepository() {
         Admin admin = mock(Admin.class);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Admin> page = new PageImpl<>(List.of(admin), pageable, 1);
 
-        when(adminRepository.findAll()).thenReturn(List.of(admin));
-        assertEquals(1, service.getAllUsers().size());
+        when(adminRepository.findAllAdmins(null, null, pageable)).thenReturn(page);
 
-        when(adminRepository.findAll()).thenReturn(List.of());
-        assertTrue(service.getAllUsers().isEmpty());
+        Page<Admin> result = service.getAllAdmins(null, null, pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertSame(admin, result.getContent().get(0));
+        verify(adminRepository).findAllAdmins(null, null, pageable);
+    }
+
+    @Test
+    void getAllAdminsShouldReturnEmptyPageWhenNoAdminsExist() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Admin> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+
+        when(adminRepository.findAllAdmins(null, null, pageable)).thenReturn(emptyPage);
+
+        Page<Admin> result = service.getAllAdmins(null, null, pageable);
+
+        assertNotNull(result);
+        assertTrue(result.getContent().isEmpty());
+        assertEquals(0, result.getTotalElements());
+        verify(adminRepository).findAllAdmins(null, null, pageable);
     }
 }
 

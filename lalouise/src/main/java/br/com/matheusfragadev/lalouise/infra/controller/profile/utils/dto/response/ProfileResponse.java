@@ -5,11 +5,12 @@ import java.util.UUID;
 
 public sealed interface ProfileResponse permits AdminResponse {
     UUID id();
+
     String nickname();
+
     String email();
-    String role();
-    boolean active();
+
     Instant createdAt();
-    Instant updatedAt();
+
 }
 

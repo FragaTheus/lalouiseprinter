@@ -1,9 +1,15 @@
-import { Providers } from "./providers";
+import DashboardHeader from "@/features/dashboard/components/dash-header";
+import AppRouteGuard from "@/shared/components/app/app-route-guard";
 
-type DashboardLayoutProps = {
+export default function DashboardLayout({
+  children,
+}: {
   children: React.ReactNode;
-};
-
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  return <Providers>{children}</Providers>;
+}) {
+  return (
+    <AppRouteGuard>
+      <DashboardHeader />
+      {children}
+    </AppRouteGuard>
+  );
 }

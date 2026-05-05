@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Manrope } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Noto_Sans } from "next/font/google";
+import Providers from "./providers";
 import "./globals.css";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/lib/utils";
 
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-sans" });
+const interHeading = Inter({ subsets: ["latin"], variable: "--font-heading" });
+
+const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,11 +37,12 @@ export default function RootLayout({
         geistSans.variable,
         geistMono.variable,
         "font-sans",
-        manrope.variable,
+        notoSans.variable,
+        interHeading.variable,
       )}
     >
-      <body className="min-h-full flex flex-col">
-        <div className="w-full max-w-7xl p-4 mx-auto">{children}</div>
+      <body className="min-h-full flex flex-col overflow-x-hidden">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

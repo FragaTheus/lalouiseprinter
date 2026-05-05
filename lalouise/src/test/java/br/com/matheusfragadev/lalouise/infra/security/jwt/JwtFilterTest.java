@@ -21,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,6 +55,21 @@ class JwtFilterTest {
         jwtFilter.doFilter(request, response, filterChain);
 
         verify(filterChain).doFilter(request, response);
+    }
+
+    @Test
+    void shouldBypassJwtValidationForAuthEndpointsEvenWhenAuthorizationHeaderIsPresent() throws Exception {
+        JwtFilter jwtFilter = new JwtFilter(jwtService, userDetailsService, exceptionResolver);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        request.setRequestURI("/api/v1/auth/login");
+        request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer invalid-token");
+
+        jwtFilter.doFilter(request, response, filterChain);
+
+        verify(filterChain).doFilter(request, response);
+        verifyNoInteractions(jwtService, userDetailsService, exceptionResolver);
     }
 
     @Test
@@ -93,6 +110,7 @@ class JwtFilterTest {
         jwtFilter.doFilter(request, response, filterChain);
 
         verify(exceptionResolver).resolveException(eq(request), eq(response), eq(null), eq(error));
+        verify(filterChain, never()).doFilter(request, response);
     }
 }
 

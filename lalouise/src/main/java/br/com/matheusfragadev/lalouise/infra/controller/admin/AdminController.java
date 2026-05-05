@@ -9,6 +9,9 @@ import br.com.matheusfragadev.lalouise.infra.controller.admin.utils.dto.response
 import br.com.matheusfragadev.lalouise.infra.controller.admin.utils.mapper.AdminMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,10 +26,13 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping
-    public ResponseEntity<List<AdminSummary>> list(){
-        var admins =  adminService.getAllUsers()
-                .stream().map(AdminMapper::toAdminSummary).toList();
-        return ResponseEntity.ok(admins);
+    public ResponseEntity<Page<AdminSummary>> list(
+            @RequestParam(required = false) String term,
+            @RequestParam(required = false) Boolean active,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        var admins = adminService.getAllAdmins(term, active, pageable);
+        return ResponseEntity.ok(admins.map(AdminMapper::toAdminSummary));
     }
 
     @GetMapping("/{targetId}")

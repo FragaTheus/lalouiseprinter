@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.config;
 
+import br.com.matheusfragadev.lalouise.infra.entrypoint.CustomEntryPoint;
 import br.com.matheusfragadev.lalouise.infra.security.jwt.JwtFilter;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.when;
 
 class SecurityConfigTest {
 
-    private final SecurityConfig securityConfig = new SecurityConfig(mock(JwtFilter.class));
+    private final SecurityConfig securityConfig = new SecurityConfig(mock(JwtFilter.class), mock(CustomEntryPoint.class));
 
     @Test
     void passwordEncoderShouldEncodeAndMatch() {

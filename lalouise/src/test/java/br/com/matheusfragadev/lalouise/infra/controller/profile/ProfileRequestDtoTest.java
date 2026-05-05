@@ -11,7 +11,7 @@ class ProfileRequestDtoTest {
     @Test
     void changeNameRequestShouldExposeField() {
         ChangeNameRequest request = new ChangeNameRequest("New Name");
-        assertEquals("New Name", request.newName());
+        assertEquals("New Name", request.newNickname());
     }
 
     @Test

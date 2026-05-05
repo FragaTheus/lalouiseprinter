@@ -22,6 +22,8 @@ import java.util.UUID;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
+    private static final String AUTH_BASE_PATH = "/api/v1/auth";
+
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
     private final HandlerExceptionResolver resolver;
@@ -34,6 +36,11 @@ public class JwtFilter extends OncePerRequestFilter {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.resolver = resolver;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
+        return request.getRequestURI().startsWith(AUTH_BASE_PATH);
     }
 
     @Override
@@ -65,6 +72,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             resolver.resolveException(request, response, null, e);
+            return;
         }
 
         filterChain.doFilter(request, response);

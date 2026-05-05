@@ -12,6 +12,8 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,12 +24,11 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AdminService implements UserService<Admin>{
+public class AdminService{
 
     private final PasswordEncoder passwordEncoder;
     private final AdminRepository adminRepository;
 
-    @Override
     @Transactional
     public Admin createUser(CreateUserCommand command) {
         try {
@@ -49,7 +50,6 @@ public class AdminService implements UserService<Admin>{
         }
     }
 
-    @Override
     @Transactional
     public Admin changeUserNickname(UUID targetId, String newNickname) {
         var admin = getUser(targetId);
@@ -60,7 +60,6 @@ public class AdminService implements UserService<Admin>{
         return adminRepository.save(admin);
     }
 
-    @Override
     @Transactional
     public Admin changeUserPassword(ChangeUserPasswordCommand command) {
         try {
@@ -76,7 +75,6 @@ public class AdminService implements UserService<Admin>{
         }
     }
 
-    @Override
     @Transactional
     public Admin deleteUser(UUID targetId) {
         try{
@@ -90,16 +88,14 @@ public class AdminService implements UserService<Admin>{
 
     }
 
-    @Override
     @Transactional(readOnly = true)
     public Admin getUser(UUID id) {
         return adminRepository.findById(id).orElseThrow(() -> new RuntimeException("Admin not found with id: " + id));
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public List<Admin> getAllUsers() {
-        return adminRepository.findAll();
+    public Page<Admin> getAllAdmins(String term, Boolean active, Pageable pageable) {
+        return adminRepository.findAllAdmins(term, active, pageable);
     }
 
     private void inputPasswordMatches(String password, String confirmPassword){

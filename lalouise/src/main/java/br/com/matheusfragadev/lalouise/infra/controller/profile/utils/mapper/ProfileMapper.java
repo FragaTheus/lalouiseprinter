@@ -22,10 +22,7 @@ public final class ProfileMapper {
                         admin.getId(),
                         admin.getNickname().value(),
                         admin.getEmail().value(),
-                        admin.getRole().name(),
-                        admin.isActive(),
-                        admin.getCreatedAt(),
-                        admin.getUpdatedAt()
+                        admin.getCreatedAt()
                 );
             }
 

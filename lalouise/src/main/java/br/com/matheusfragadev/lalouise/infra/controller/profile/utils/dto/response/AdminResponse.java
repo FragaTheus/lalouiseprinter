@@ -7,9 +7,6 @@ public record AdminResponse(
         UUID id,
         String nickname,
         String email,
-        String role,
-        boolean active,
-        Instant createdAt,
-        Instant updatedAt
+        Instant createdAt
 ) implements ProfileResponse {
 }

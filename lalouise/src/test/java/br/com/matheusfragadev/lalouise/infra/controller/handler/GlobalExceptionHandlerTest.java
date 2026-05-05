@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.controller.handler;
 
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantActiveException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNameException;
@@ -15,6 +16,7 @@ import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -129,5 +131,33 @@ class GlobalExceptionHandlerTest {
         var response = handler.handleGenericException(new RuntimeException("boom"));
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertEquals("Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.", response.getBody().error());
+    }
+
+    // ── admin ─────────────────────────────────────────────────────────────────
+
+    @Test
+    void shouldHandleAdminAlreadyExists() {
+        var response = handler.handleAdminAlreadyExists(new AdminAlreadyExists("Ja existe um usuario com esse email."));
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Ja existe um usuario com esse email.", response.getBody().error());
+    }
+
+    // ── InternalAuthenticationServiceException ────────────────────────────────
+
+    @Test
+    void shouldHandleInternalAuthWithDisableUserExceptionCauseAsUnauthorized() {
+        var cause = new DisableUserException("Usuário inativo");
+        var ex = new InternalAuthenticationServiceException("wrap", cause);
+        var response = handler.handleInternalAuth(ex);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Usuário inativo", response.getBody().error());
+    }
+
+    @Test
+    void shouldHandleInternalAuthWithGenericCauseAsInvalidCredentials() {
+        var ex = new InternalAuthenticationServiceException("unexpected", new RuntimeException("boom"));
+        var response = handler.handleInternalAuth(ex);
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Credenciais inválidas", response.getBody().error());
     }
 }

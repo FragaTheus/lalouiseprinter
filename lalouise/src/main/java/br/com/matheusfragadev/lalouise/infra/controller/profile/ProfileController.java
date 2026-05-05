@@ -9,6 +9,7 @@ import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +27,8 @@ public class ProfileController {
         return ResponseEntity.ok(ProfileMapper.toResponse(credentials));
     }
 
-    @PatchMapping("/name")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PatchMapping("/change-name")
     public ResponseEntity<Void> changeName(
             @AuthenticationPrincipal UserDetailsImpl principal,
             @Valid @RequestBody ChangeNameRequest request) {
@@ -34,7 +36,8 @@ public class ProfileController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/password")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PatchMapping("/change-password")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal UserDetailsImpl principal,
             @Valid @RequestBody ChangePasswordRequest request) {
