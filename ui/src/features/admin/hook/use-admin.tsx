@@ -38,8 +38,6 @@ export const useRegisterAdmin = () => {
 interface AdminListRequest {
   term?: string;
   active?: boolean;
-  page?: number;
-  size?: number;
 }
 
 interface AdminSummary {
@@ -49,9 +47,7 @@ interface AdminSummary {
   active: boolean;
 }
 
-export const useAdminListInfinite = (
-  params?: Omit<AdminListRequest, "page">,
-) => {
+export const useAdminListInfinite = (params?: AdminListRequest) => {
   return useInfiniteQuery({
     queryKey: ["admins", "list", "infinite", params],
     queryFn: async ({ pageParam = 0 }) => {

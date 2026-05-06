@@ -2,12 +2,12 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { Field, FieldContent, FieldLabel } from "@/shared/components/ui/field";
 import Link from "next/link";
 
-export interface AdminSummaryFieldProps {
+export interface AppSummaryCardItemProps {
   label: string;
   children: React.ReactNode;
 }
 
-const AdminSummaryField = ({ label, children }: AdminSummaryFieldProps) => {
+const AppSummaryCardItem = ({ label, children }: AppSummaryCardItemProps) => {
   return (
     <Field>
       <FieldLabel>{label}</FieldLabel>
@@ -16,23 +16,23 @@ const AdminSummaryField = ({ label, children }: AdminSummaryFieldProps) => {
   );
 };
 
-export interface AdminSummaryCardProps {
+export interface AppSummaryCardProps {
   href?: string;
-  fields: AdminSummaryFieldProps[];
+  fields: AppSummaryCardItemProps[];
 }
 
-export default function AdminSummaryCard({
+export default function AppSummaryCard({
   href = "#",
   fields,
-}: AdminSummaryCardProps) {
+}: AppSummaryCardProps) {
   return (
     <Link href={href}>
       <Card className="bg-popover mt-2">
         <CardContent className="relative grid grid-cols-1 md:grid-cols-3 gap-4 items-center justify-items-center">
           {fields.map((f, i) => (
-            <AdminSummaryField key={i} label={f.label}>
+            <AppSummaryCardItem key={i} label={f.label}>
               {f.children}
-            </AdminSummaryField>
+            </AppSummaryCardItem>
           ))}
         </CardContent>
       </Card>

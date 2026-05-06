@@ -1,6 +1,6 @@
 "use client";
 
-import AppChangeNameCard from "@/shared/components/app/app-change-name-card";
+import AppChangeNameCard from "@/shared/components/app/app-form-card";
 import { useProfileChangeName } from "../hooks/use-profile";
 
 export default function ProfileChangeNameWrapper() {

@@ -31,7 +31,7 @@ public class AdminController {
     public ResponseEntity<Page<AdminSummary>> list(
             @RequestParam(required = false) String term,
             @RequestParam(required = false) Boolean active,
-            @PageableDefault(size = 10) Pageable pageable
+            @PageableDefault Pageable pageable
     ) {
         var admins = adminService.getAllAdmins(term, active, pageable);
         return ResponseEntity.ok(admins.map(AdminMapper::toAdminSummary));

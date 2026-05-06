@@ -2,8 +2,8 @@
 
 import { useAdminInfo } from "../hook/use-admin";
 import { useParams } from "next/navigation";
-import AdminInfoLayout from "../layout/admin-info-layout";
 import { useUserStore } from "@/store/user-store";
+import AdminInfoLayout from "../layout/admin-info-layout";
 
 export default function AdminInfoWrapper() {
   const { id } = useParams<{ id: string }>();
