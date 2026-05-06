@@ -1,8 +1,8 @@
 import { PerfilItem } from "../../../shared/components/app/app-info-card";
-import ChangePasswordCard from "../components/change-password-card";
 import { ShieldCheck } from "lucide-react";
 import AppInfoLayout from "@/shared/components/layouts/app-info-layout";
 import ProfileChangeNameWrapper from "../wrapper/profile-change-name-wrapper";
+import ProfileChangePasswordWrapper from "../wrapper/profile-change-password-wrapper";
 
 export default function ProfileLayout({
   title,
@@ -30,7 +30,7 @@ export default function ProfileLayout({
           <h2 className="text-xl font-bold">Configurações da conta</h2>
           <div className="grid grid-cols-1 gap-4 mt-8">
             <ProfileChangeNameWrapper />
-            <ChangePasswordCard />
+            <ProfileChangePasswordWrapper />
           </div>
         </>
       )}

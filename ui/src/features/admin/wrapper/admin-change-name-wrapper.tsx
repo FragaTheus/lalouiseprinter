@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useAdminChangeName } from "../hook/use-admin";
-import AppChangeNameCard from "@/shared/components/app/app-form-card";
+import AppChangeNameCard from "@/shared/components/app/app-change-name-card";
 
 export default function AdminChangeNameWrapper() {
   const { id } = useParams<{ id: string }>();

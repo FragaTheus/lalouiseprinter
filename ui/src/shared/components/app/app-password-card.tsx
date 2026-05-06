@@ -7,19 +7,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
-import { useProfileChangePassword } from "../hooks/use-profile";
 import AppForm from "@/shared/components/app/app-form";
 import { Field, FieldContent, FieldLabel } from "@/shared/components/ui/field";
 import { Input } from "@/shared/components/ui/input";
 import { Info } from "lucide-react";
 
-export default function ChangePasswordCard() {
-  const { mutate, isLoading } = useProfileChangePassword();
+interface AppChangePasswordCardProps {
+  title: string;
+  isProfile: boolean;
+  description: string;
+  mutate: (data: any) => void;
+  isLoading: boolean;
+}
+
+export default function AppChangePasswordCard({
+  title,
+  description,
+  isProfile,
+  mutate,
+  isLoading,
+}: AppChangePasswordCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Alterar senha</CardTitle>
-        <CardDescription>Insira sua nova senha</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AppForm
@@ -27,17 +39,19 @@ export default function ChangePasswordCard() {
           btnText="Alterar senha"
           isPending={isLoading}
         >
-          <Field>
-            <FieldLabel>Senha atual</FieldLabel>
-            <FieldContent>
-              <Input
-                type="password"
-                name="currentPassword"
-                placeholder="******"
-                required
-              />
-            </FieldContent>
-          </Field>
+          {isProfile && (
+            <Field>
+              <FieldLabel>Senha atual</FieldLabel>
+              <FieldContent>
+                <Input
+                  type="password"
+                  name="currentPassword"
+                  placeholder="******"
+                  required
+                />
+              </FieldContent>
+            </Field>
+          )}
 
           <Field>
             <FieldLabel>Nova senha</FieldLabel>

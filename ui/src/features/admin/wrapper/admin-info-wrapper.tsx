@@ -3,10 +3,14 @@
 import { useAdminInfo } from "../hook/use-admin";
 import { useParams } from "next/navigation";
 import AdminInfoLayout from "../layout/admin-info-layout";
+import { useUserStore } from "@/store/user-store";
 
 export default function AdminInfoWrapper() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useAdminInfo(id);
+  const { user } = useUserStore();
+
+  const isProfile = user?.id === data?.id;
 
   const items = [
     { label: "Identificador:", children: data?.id ?? "N/A" },
@@ -44,6 +48,7 @@ export default function AdminInfoWrapper() {
       isError={isError}
       items={items}
       isActive={data?.active ?? false}
+      isProfile={isProfile}
     />
   );
 }

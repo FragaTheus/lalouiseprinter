@@ -1,17 +1,19 @@
 import { PerfilItem } from "@/shared/components/app/app-info-card";
 import AppInfoLayout from "@/shared/components/layouts/app-info-layout";
-import AdminChangePasswordCard from "../component/admin-change-password-card";
 import AdminToggleActivationWrapper from "../wrapper/admin-toggle-activation-wrapper";
 import AdminChangeNameWrapper from "../wrapper/admin-change-name-wrapper";
+import AdminChangePasswordWrapper from "../wrapper/admin-change-password-wrapper";
 
 export default function AdminInfoLayout({
   title,
+  isProfile,
   isLoading,
   isError,
   items,
   isActive,
 }: {
   title: string;
+  isProfile: boolean;
   isLoading: boolean;
   isError: boolean;
   items: PerfilItem[];
@@ -29,8 +31,8 @@ export default function AdminInfoLayout({
         Configuracoes da conta administrativa
       </h2>
       <AdminChangeNameWrapper />
-      <AdminChangePasswordCard />
-      <AdminToggleActivationWrapper isActive={isActive} />
+      <AdminChangePasswordWrapper isProfile={isProfile} />
+      {!isProfile && <AdminToggleActivationWrapper isActive={isActive} />}
     </AppInfoLayout>
   );
 }
