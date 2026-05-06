@@ -14,7 +14,7 @@ export default function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <Toaster richColors position="top-right" />
+      <Toaster position="top-right" />
     </QueryClientProvider>
   );
 }

@@ -12,9 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,10 +44,10 @@ public class AdminController {
     }
 
     @PostMapping
-    public ResponseEntity<AdminInfo> create(@Valid @RequestBody CreateAdminRequest request){
+    public ResponseEntity<String> create(@Valid @RequestBody CreateAdminRequest request){
         var command = AdminMapper.toCreateAdminCommand(request);
         var admin = adminService.createUser(command);
-        return ResponseEntity.ok(AdminMapper.toAdminInfo(admin));
+        return ResponseEntity.status(HttpStatus.CREATED).body(admin.getId().toString());
     }
 
     @PatchMapping("/{targetId}/change-name")
@@ -72,6 +74,12 @@ public class AdminController {
     @DeleteMapping("/{targetId}")
     public ResponseEntity<Void> delete(@PathVariable UUID targetId){
         adminService.deleteUser(targetId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{targetId}/reactivate")
+    public ResponseEntity<Void> reactivate(@PathVariable UUID targetId){
+        adminService.reactivate(targetId);
         return ResponseEntity.noContent().build();
     }
 }

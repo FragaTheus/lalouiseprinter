@@ -1,8 +1,7 @@
 "use client";
 
 import { api } from "@/shared/config/http";
-import { useRouter } from "next/navigation";
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner";
 
 interface ProfileResponse{
@@ -29,14 +28,14 @@ interface ChangeNameRequest{
 }
 
 export const useProfileChangeName = () => {
-    const {refresh} = useRouter();
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (data: ChangeNameRequest) => {
             await api.patch("/api/v1/me/change-name", data);
         },
         onSuccess: ()=>{
             toast.success("Novo nome salvo com sucesso!");
-            refresh();
+            queryClient.invalidateQueries({ queryKey: ["profile"] });
         }
     });
 }

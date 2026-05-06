@@ -1,5 +1,3 @@
-"use client";
-
 import AppForm from "@/shared/components/app/app-form";
 import {
   Card,
@@ -8,18 +6,28 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card";
-import { useProfileChangeName } from "../hooks/use-profile";
 import { Field, FieldContent, FieldLabel } from "@/shared/components/ui/field";
 import { Input } from "@/shared/components/ui/input";
 import { Info } from "lucide-react";
 
-export default function ChangeNameCard() {
-  const { mutate, isPending } = useProfileChangeName();
+export interface AppChangeNameCardProps {
+  mutate: (data: any) => void;
+  isPending: boolean;
+  title: string;
+  description: string;
+}
+
+export default function AppChangeNameCard({
+  mutate,
+  isPending,
+  title,
+  description,
+}: AppChangeNameCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Alterar Nome</CardTitle>
-        <CardDescription>Altere seu nome de usuário.</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AppForm btnText="Alterar nome" onSubmit={mutate} isPending={isPending}>
@@ -29,7 +37,7 @@ export default function ChangeNameCard() {
               <Input
                 type="text"
                 name="newNickname"
-                placeholder="Digite seu novo nome"
+                placeholder="Nome exemplo"
                 required
               />
             </FieldContent>

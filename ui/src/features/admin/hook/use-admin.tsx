@@ -1,6 +1,11 @@
 import { api } from "@/shared/config/http";
 import { Page } from "@/shared/type/pagination";
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -15,11 +20,17 @@ export const useRegisterAdmin = () => {
   const { push } = useRouter();
   return useMutation({
     mutationFn: async (data: RegisterAdminRequest) => {
-      await api.post("/api/v1/admins", data);
+      const response = await api.post("/api/v1/admins", data);
+      return response.data;
     },
-    onSuccess: () => {
-      toast.success("Novo administrador registrado com sucesso!");
-      push("/dashboard/admins");
+    onSuccess: (id) => {
+      toast.success("Novo administrador registrado com sucesso!", {
+        action: {
+          label: "Ver administrador",
+          onClick: () => push(`/dashboard/admins/${id}`),
+        },
+      });
+      push(`/dashboard/admins`);
     },
   });
 };
@@ -80,14 +91,15 @@ interface AdminChangeNameRequest {
 }
 
 export const useAdminChangeName = (targetId: string) => {
-  const { refresh } = useRouter();
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (data: AdminChangeNameRequest) => {
       await api.patch(`/api/v1/admins/${targetId}/change-name`, data);
     },
     onSuccess: () => {
       toast.success("Nome do administrador atualizado com sucesso!");
-      refresh();
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
     },
   });
 };
@@ -109,14 +121,28 @@ export const useAdminChangePassword = (targetId: string) => {
 };
 
 export const useDeactiveAdmin = (targetId: string) => {
-  const { refresh } = useRouter();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
       await api.delete(`/api/v1/admins/${targetId}`);
     },
     onSuccess: () => {
       toast.success("Administrador desativado com sucesso!");
-      refresh();
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
+    },
+  });
+};
+
+export const useReactiveAdmin = (targetId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      await api.patch(`/api/v1/admins/${targetId}/reactivate`);
+    },
+    onSuccess: () => {
+      toast.success("Administrador reativado com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["admins"] });
     },
   });
 };

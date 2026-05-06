@@ -85,7 +85,20 @@ public class AdminService{
             log.error("Error deleting admin user with id {}: {}", targetId, e.getMessage());
             throw e;
         }
+    }
 
+    @Transactional
+    public Admin reactivate(UUID targetId){
+        try{
+            log.info("Reactivating admin user with id: {}", targetId);
+            var user = getUser(targetId);
+            user.reactivate();
+            log.info("Admin user with id {} reactivated successfully", targetId);
+            return adminRepository.save(user);
+        }catch (Exception e){
+            log.error("Error reactivating admin user with id {}: {}", targetId, e.getMessage());
+            throw e;
+        }
     }
 
     @Transactional(readOnly = true)

@@ -43,6 +43,7 @@ export default function AdminInfoWrapper() {
       isLoading={isLoading}
       isError={isError}
       items={items}
+      isActive={data?.active ?? false}
     />
   );
 }
