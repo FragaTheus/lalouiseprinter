@@ -12,6 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +49,42 @@ class RestaurantServiceTest {
         assertThrows(RestaurantNotFoundException.class, () -> service.getRestaurant(id));
     }
 
-    // ── getAllRestaurants ─────────────────────────────────────────────────────
+    // ── getAllRestaurants (pageable) ───────────────────────────────────────────
+    @Test
+    void getAllRestaurantsPageableShouldReturnPageFromRepository() {
+        Restaurant r = mock(Restaurant.class);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Restaurant> page = new PageImpl<>(List.of(r), pageable, 1);
+        when(restaurantRepository.findAllRestaurants(null, null, pageable)).thenReturn(page);
+        Page<Restaurant> result = service.getAllRestaurants(null, null, pageable);
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertSame(r, result.getContent().get(0));
+        verify(restaurantRepository).findAllRestaurants(null, null, pageable);
+    }
+
+    @Test
+    void getAllRestaurantsPageableShouldReturnEmptyPageWhenNoneExist() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Restaurant> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+        when(restaurantRepository.findAllRestaurants(null, null, pageable)).thenReturn(emptyPage);
+        Page<Restaurant> result = service.getAllRestaurants(null, null, pageable);
+        assertNotNull(result);
+        assertTrue(result.getContent().isEmpty());
+        assertEquals(0, result.getTotalElements());
+        verify(restaurantRepository).findAllRestaurants(null, null, pageable);
+    }
+
+    @Test
+    void getAllRestaurantsPageableShouldPassTermAndActiveToRepository() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Restaurant> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+        when(restaurantRepository.findAllRestaurants("louise", true, pageable)).thenReturn(emptyPage);
+        service.getAllRestaurants("louise", true, pageable);
+        verify(restaurantRepository).findAllRestaurants("louise", true, pageable);
+    }
+
+    // ── getAllRestaurants (sem parâmetros) ────────────────────────────────────
     @Test
     void getAllRestaurantsShouldReturnAllRestaurants() {
         Restaurant r1 = mock(Restaurant.class);
@@ -138,6 +177,7 @@ class RestaurantServiceTest {
         Restaurant restaurant = mock(Restaurant.class);
         RestaurantName currentName = mock(RestaurantName.class);
         when(restaurantRepository.findById(id)).thenReturn(Optional.of(restaurant));
+        when(restaurant.isActive()).thenReturn(true);
         when(restaurant.getName()).thenReturn(currentName);
         when(currentName.value()).thenReturn("Old Name");
         service.changeName(id, "New Name");
@@ -146,6 +186,20 @@ class RestaurantServiceTest {
     }
 
     // ── changeName — erros ────────────────────────────────────────────────────
+    @Test
+    void changeNameShouldThrowWhenRestaurantIsInactive() {
+        UUID id = UUID.randomUUID();
+        Restaurant restaurant = mock(Restaurant.class);
+        when(restaurantRepository.findById(id)).thenReturn(Optional.of(restaurant));
+        when(restaurant.isActive()).thenReturn(false);
+        RestaurantActiveException ex = assertThrows(
+                RestaurantActiveException.class,
+                () -> service.changeName(id, "New Name")
+        );
+        assertEquals("Não é possível alterar dados de um restaurante inativo.", ex.getMessage());
+        verify(restaurantRepository, never()).save(any());
+    }
+
     @Test
     void changeNameShouldThrowWhenRestaurantNotFound() {
         UUID id = UUID.randomUUID();
@@ -160,6 +214,7 @@ class RestaurantServiceTest {
         Restaurant restaurant = mock(Restaurant.class);
         RestaurantName currentName = mock(RestaurantName.class);
         when(restaurantRepository.findById(id)).thenReturn(Optional.of(restaurant));
+        when(restaurant.isActive()).thenReturn(true);
         when(restaurant.getName()).thenReturn(currentName);
         when(currentName.value()).thenReturn("Same Name");
         assertThrows(RestaurantNameException.class, () -> service.changeName(id, "Same Name"));
@@ -171,6 +226,7 @@ class RestaurantServiceTest {
         UUID id = UUID.randomUUID();
         Restaurant restaurant = mock(Restaurant.class);
         when(restaurantRepository.findById(id)).thenReturn(Optional.of(restaurant));
+        when(restaurant.isActive()).thenReturn(true);
         assertThrows(RestaurantNameException.class, () -> service.changeName(id, "A"));
         verify(restaurantRepository, never()).save(any());
     }

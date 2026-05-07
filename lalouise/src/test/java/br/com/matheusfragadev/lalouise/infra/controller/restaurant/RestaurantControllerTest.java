@@ -17,6 +17,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -38,18 +42,16 @@ class RestaurantControllerTest {
 
     // ── create ────────────────────────────────────────────────────────────────
     @Test
-    void createShouldReturn200WithRestaurantInfo() {
+    void createShouldReturn201WithRestaurantId() {
+        UUID id = UUID.randomUUID();
         Restaurant restaurant = mock(Restaurant.class);
-        RestaurantInfo info = buildInfo(UUID.randomUUID());
         CreateRestaurantRequest request = new CreateRestaurantRequest("La Louise", "11222333000181");
+        when(restaurant.getId()).thenReturn(id);
         when(restaurantService.create("La Louise", "11222333000181")).thenReturn(restaurant);
-        try (MockedStatic<RestaurantMapper> mapper = mockStatic(RestaurantMapper.class)) {
-            mapper.when(() -> RestaurantMapper.toRestaurantInfo(restaurant)).thenReturn(info);
-            ResponseEntity<RestaurantInfo> response = controller.create(request);
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertEquals(info, response.getBody());
-            verify(restaurantService).create("La Louise", "11222333000181");
-        }
+        ResponseEntity<String> response = controller.create(request);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(id.toString(), response.getBody());
+        verify(restaurantService).create("La Louise", "11222333000181");
     }
 
     @Test
@@ -83,26 +85,48 @@ class RestaurantControllerTest {
         Restaurant r2 = mock(Restaurant.class);
         RestaurantSummary s1 = new RestaurantSummary(id1, "La Louise", true);
         RestaurantSummary s2 = new RestaurantSummary(id2, "Le Gourmet", true);
-        when(restaurantService.getAllRestaurants()).thenReturn(List.of(r1, r2));
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Restaurant> restaurantPage = new PageImpl<>(List.of(r1, r2), pageable, 2);
+        when(restaurantService.getAllRestaurants(null, null, pageable)).thenReturn(restaurantPage);
         try (MockedStatic<RestaurantMapper> mapper = mockStatic(RestaurantMapper.class)) {
             mapper.when(() -> RestaurantMapper.toRestaurantSummary(r1)).thenReturn(s1);
             mapper.when(() -> RestaurantMapper.toRestaurantSummary(r2)).thenReturn(s2);
-            ResponseEntity<List<RestaurantSummary>> response = controller.list();
+            ResponseEntity<Page<RestaurantSummary>> response = controller.list(null, null, pageable);
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertNotNull(response.getBody());
-            assertEquals(2, response.getBody().size());
-            assertEquals(s1, response.getBody().get(0));
-            assertEquals(s2, response.getBody().get(1));
+            assertEquals(2, response.getBody().getContent().size());
+            assertSame(s1, response.getBody().getContent().get(0));
+            assertSame(s2, response.getBody().getContent().get(1));
         }
     }
 
     @Test
-    void listShouldReturn200WithEmptyListWhenNoRestaurantsExist() {
-        when(restaurantService.getAllRestaurants()).thenReturn(List.of());
-        ResponseEntity<List<RestaurantSummary>> response = controller.list();
+    void listShouldReturn200WithEmptyPageWhenNoRestaurantsExist() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Restaurant> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+        when(restaurantService.getAllRestaurants(null, null, pageable)).thenReturn(emptyPage);
+        ResponseEntity<Page<RestaurantSummary>> response = controller.list(null, null, pageable);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
+        assertTrue(response.getBody().getContent().isEmpty());
+    }
+
+    @Test
+    void listShouldFilterByTermAndActive() {
+        UUID id = UUID.randomUUID();
+        Restaurant r = mock(Restaurant.class);
+        RestaurantSummary s = new RestaurantSummary(id, "La Louise", true);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Restaurant> page = new PageImpl<>(List.of(r), pageable, 1);
+        when(restaurantService.getAllRestaurants("La Louise", true, pageable)).thenReturn(page);
+        try (MockedStatic<RestaurantMapper> mapper = mockStatic(RestaurantMapper.class)) {
+            mapper.when(() -> RestaurantMapper.toRestaurantSummary(r)).thenReturn(s);
+            ResponseEntity<Page<RestaurantSummary>> response = controller.list("La Louise", true, pageable);
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody());
+            assertEquals(1, response.getBody().getContent().size());
+            assertSame(s, response.getBody().getContent().get(0));
+        }
     }
 
     // ── info ──────────────────────────────────────────────────────────────────

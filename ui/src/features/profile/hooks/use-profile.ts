@@ -8,6 +8,7 @@ interface ProfileResponse{
     id: string;
     nickname: string;
     email: string;
+    restaurantName?: string;
     createdAt: Date;
 }
 

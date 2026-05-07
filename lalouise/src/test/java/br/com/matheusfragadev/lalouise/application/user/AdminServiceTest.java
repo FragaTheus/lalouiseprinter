@@ -5,6 +5,7 @@ import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
@@ -120,6 +121,7 @@ class AdminServiceTest {
         Nickname currentNickname = mock(Nickname.class);
 
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
+        when(admin.isActive()).thenReturn(true);
         when(admin.getNickname()).thenReturn(currentNickname);
         when(currentNickname.value()).thenReturn("Old Name");
         when(adminRepository.save(admin)).thenReturn(admin);
@@ -132,12 +134,30 @@ class AdminServiceTest {
     }
 
     @Test
+    void changeUserNicknameShouldThrowWhenAdminIsInactive() {
+        UUID id = UUID.randomUUID();
+        Admin admin = mock(Admin.class);
+
+        when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
+        when(admin.isActive()).thenReturn(false);
+
+        InactiveResourceException ex = assertThrows(
+                InactiveResourceException.class,
+                () -> service.changeUserNickname(id, "New Name")
+        );
+
+        assertEquals("Não é possível alterar dados de um usuário inativo.", ex.getMessage());
+        verify(adminRepository, never()).save(any());
+    }
+
+    @Test
     void changeUserNicknameShouldThrowWhenNicknameIsUnchanged() {
         UUID id = UUID.randomUUID();
         Admin admin = mock(Admin.class);
         Nickname currentNickname = mock(Nickname.class);
 
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
+        when(admin.isActive()).thenReturn(true);
         when(admin.getNickname()).thenReturn(currentNickname);
         when(currentNickname.value()).thenReturn("Same Name");
 
@@ -151,6 +171,28 @@ class AdminServiceTest {
     }
 
     @Test
+    void changeUserPasswordShouldThrowWhenAdminIsInactive() {
+        UUID id = UUID.randomUUID();
+        ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
+                .targetId(id)
+                .newPassword("NewPass@123")
+                .confirmNewPassword("NewPass@123")
+                .build();
+
+        Admin admin = mock(Admin.class);
+        when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
+        when(admin.isActive()).thenReturn(false);
+
+        InactiveResourceException ex = assertThrows(
+                InactiveResourceException.class,
+                () -> service.changeUserPassword(command)
+        );
+
+        assertEquals("Não é possível alterar dados de um usuário inativo.", ex.getMessage());
+        verify(adminRepository, never()).save(any());
+    }
+
+    @Test
     void changeUserPasswordShouldSaveWhenInputIsValid() {
         UUID id = UUID.randomUUID();
         ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
@@ -161,6 +203,7 @@ class AdminServiceTest {
 
         Admin admin = mock(Admin.class);
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
+        when(admin.isActive()).thenReturn(true);
         when(passwordEncoder.encode(command.newPassword())).thenReturn("new-hashed-password");
         when(adminRepository.save(admin)).thenReturn(admin);
 
@@ -185,6 +228,7 @@ class AdminServiceTest {
 
         Admin admin = mock(Admin.class);
         when(adminRepository.findById(id)).thenReturn(Optional.of(admin));
+        when(admin.isActive()).thenReturn(true);
 
         PasswordException ex = assertThrows(PasswordException.class, () -> service.changeUserPassword(command));
 

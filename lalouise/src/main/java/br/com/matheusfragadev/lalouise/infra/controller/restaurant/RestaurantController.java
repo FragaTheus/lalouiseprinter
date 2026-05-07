@@ -1,7 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.controller.restaurant;
 
 import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
-import br.com.matheusfragadev.lalouise.domain.restaurant.entity.Restaurant;
 import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.ChangeRestaurantNameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.CreateRestaurantRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.RestaurantInfo;
@@ -9,10 +8,14 @@ import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.Res
 import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.mapper.RestaurantMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -23,17 +26,20 @@ public class RestaurantController {
     private final RestaurantService restaurantService;
 
     @PostMapping
-    public ResponseEntity<RestaurantInfo> create(@Valid @RequestBody CreateRestaurantRequest request){
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<String> create(@Valid @RequestBody CreateRestaurantRequest request){
         var restaurant = restaurantService.create(request.restaurantName(), request.cnpj());
-        return ResponseEntity.ok(RestaurantMapper.toRestaurantInfo(restaurant));
+        return ResponseEntity.status(HttpStatus.CREATED).body(restaurant.getId().toString());
     }
 
     @GetMapping
-    public ResponseEntity<List<RestaurantSummary>> list(){
-        var response = restaurantService.getAllRestaurants()
-                .stream()
-                .map(RestaurantMapper::toRestaurantSummary)
-                .toList();
+    public ResponseEntity<Page<RestaurantSummary>> list(
+            @RequestParam(required = false) String term,
+            @RequestParam(required = false) Boolean active,
+            @PageableDefault Pageable pageable
+    ){
+        var response = restaurantService.getAllRestaurants(term, active, pageable)
+                .map(RestaurantMapper::toRestaurantSummary);
         return ResponseEntity.ok(response);
     }
 
@@ -53,8 +59,16 @@ public class RestaurantController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable("id") UUID restaurantId){
         restaurantService.delete(restaurantId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/reactive")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<Void> reactive(@PathVariable("id") UUID restaurantId){
+        restaurantService.reactive(restaurantId);
         return ResponseEntity.noContent().build();
     }
 

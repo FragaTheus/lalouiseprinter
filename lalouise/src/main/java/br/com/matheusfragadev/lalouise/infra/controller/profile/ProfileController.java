@@ -1,6 +1,7 @@
 package br.com.matheusfragadev.lalouise.infra.controller.profile;
 
 import br.com.matheusfragadev.lalouise.application.profile.facade.ProfileFacade;
+import br.com.matheusfragadev.lalouise.application.user.ManagerService;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangeNameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangePasswordRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.mapper.ProfileMapper;
@@ -19,15 +20,16 @@ import org.springframework.web.bind.annotation.*;
 public class ProfileController {
 
     private final ProfileFacade profileFacade;
+    private final ManagerService managerService;
 
     @GetMapping
     public ResponseEntity<ProfileResponse> getProfile(
             @AuthenticationPrincipal UserDetailsImpl principal) {
         var credentials = profileFacade.getProfile(principal.getId(), principal.getRole());
-        return ResponseEntity.ok(ProfileMapper.toResponse(credentials));
+        return ResponseEntity.ok(ProfileMapper.toResponse(credentials, managerService::getRestaurantName));
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     @PatchMapping("/change-name")
     public ResponseEntity<Void> changeName(
             @AuthenticationPrincipal UserDetailsImpl principal,
@@ -36,7 +38,7 @@ public class ProfileController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     @PatchMapping("/change-password")
     public ResponseEntity<Void> changePassword(
             @AuthenticationPrincipal UserDetailsImpl principal,

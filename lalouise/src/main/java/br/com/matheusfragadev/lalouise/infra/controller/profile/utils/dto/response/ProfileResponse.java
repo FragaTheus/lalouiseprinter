@@ -3,7 +3,7 @@ package br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.respo
 import java.time.Instant;
 import java.util.UUID;
 
-public sealed interface ProfileResponse permits AdminResponse {
+public sealed interface ProfileResponse permits AdminResponse, ManagerResponse {
     UUID id();
 
     String nickname();

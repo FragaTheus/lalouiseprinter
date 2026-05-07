@@ -3,6 +3,7 @@ package br.com.matheusfragadev.lalouise.infra.controller.handler;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.ActiveException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.EmailException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
@@ -41,6 +42,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<HandlerResponse> handleActiveException(ActiveException ex) {
         HandlerResponse response = new HandlerResponse(ex.getMessage());
         log.error("ActiveException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(InactiveResourceException.class)
+    public ResponseEntity<HandlerResponse> handleInactiveResourceException(InactiveResourceException ex) {
+        HandlerResponse response = new HandlerResponse(ex.getMessage());
+        log.warn("InactiveResourceException: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 

@@ -9,7 +9,7 @@ class RoleTest {
 
     @Test
     void shouldContainExpectedRoles() {
-        assertArrayEquals(new Role[]{Role.ADMIN}, Role.values());
+        assertArrayEquals(new Role[]{Role.ADMIN, Role.MANAGER}, Role.values());
     }
 }
 

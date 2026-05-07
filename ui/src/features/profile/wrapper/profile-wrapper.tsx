@@ -21,6 +21,14 @@ export default function ProfileWrapper() {
       label: "email:",
       children: data?.email || "N/A",
     },
+    ...(data?.restaurantName
+      ? [
+          {
+            label: "restaurante:",
+            children: data.restaurantName,
+          },
+        ]
+      : []),
     {
       label: "conosco desde:",
       children: data?.createdAt

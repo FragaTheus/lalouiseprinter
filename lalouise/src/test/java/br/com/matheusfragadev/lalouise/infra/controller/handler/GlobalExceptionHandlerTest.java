@@ -7,6 +7,7 @@ import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNam
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNotFoundException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.ActiveException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.EmailException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.infra.security.details.DisableUserException;
@@ -31,6 +32,14 @@ class GlobalExceptionHandlerTest {
         var response = handler.handleActiveException(new ActiveException("ativo"));
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals("ativo", response.getBody().error());
+    }
+
+    @Test
+    void shouldHandleInactiveResourceException() {
+        var response = handler.handleInactiveResourceException(
+                new InactiveResourceException("Não é possível alterar dados de um usuário inativo."));
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals("Não é possível alterar dados de um usuário inativo.", response.getBody().error());
     }
 
     @Test

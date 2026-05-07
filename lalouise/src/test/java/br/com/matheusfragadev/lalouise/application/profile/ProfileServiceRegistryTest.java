@@ -21,6 +21,24 @@ class ProfileServiceRegistryTest {
         var resolved = registry.resolve(Role.ADMIN);
         assertSame(adminService, resolved);
     }
+
+    @Test
+    void shouldResolveManagerServiceWhenManagerRoleRegistered() {
+        var managerService = mockService(Role.MANAGER);
+        var registry = new ProfileServiceRegistry(List.of(managerService));
+        var resolved = registry.resolve(Role.MANAGER);
+        assertSame(managerService, resolved);
+    }
+
+    @Test
+    void shouldResolveBothAdminAndManagerFromSameRegistry() {
+        var adminService = mockService(Role.ADMIN);
+        var managerService = mockService(Role.MANAGER);
+        var registry = new ProfileServiceRegistry(List.of(adminService, managerService));
+        assertSame(adminService, registry.resolve(Role.ADMIN));
+        assertSame(managerService, registry.resolve(Role.MANAGER));
+    }
+
     @Test
     void shouldThrowWhenNoServiceRegisteredForRole() {
         var registry = new ProfileServiceRegistry(List.of());
@@ -30,6 +48,7 @@ class ProfileServiceRegistryTest {
         );
         assertTrue(ex.getMessage().contains("ADMIN"));
     }
+
     @Test
     void shouldThrowWhenRegistryIsEmpty() {
         var registry = new ProfileServiceRegistry(List.of());

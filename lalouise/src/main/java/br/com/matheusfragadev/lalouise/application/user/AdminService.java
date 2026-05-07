@@ -5,6 +5,7 @@ import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
@@ -18,13 +19,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AdminService{
+public class AdminService implements UserService<Admin> {
 
     private final PasswordEncoder passwordEncoder;
     private final AdminRepository adminRepository;
@@ -53,6 +53,9 @@ public class AdminService{
     @Transactional
     public Admin changeUserNickname(UUID targetId, String newNickname) {
         var admin = getUser(targetId);
+        if (!admin.isActive()) {
+            throw new InactiveResourceException("Não é possível alterar dados de um usuário inativo.");
+        }
         if (admin.getNickname().value().equals(newNickname)) {
             throw new NicknameException("O novo nickname deve ser diferente do atual.");
         }
@@ -65,6 +68,9 @@ public class AdminService{
         try {
             log.info("Changing password for admin user with id: {}", command.targetId());
             var admin = getUser(command.targetId());
+            if (!admin.isActive()) {
+                throw new InactiveResourceException("Não é possível alterar dados de um usuário inativo.");
+            }
             inputPasswordMatches(command.newPassword(), command.confirmNewPassword());
             admin.changePassword(Password.of(command.newPassword(), passwordEncoder::encode));
             log.info("Password changed successfully for admin user with id: {}", command.targetId());

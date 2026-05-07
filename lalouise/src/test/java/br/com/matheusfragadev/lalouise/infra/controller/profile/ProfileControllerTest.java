@@ -1,6 +1,7 @@
 package br.com.matheusfragadev.lalouise.infra.controller.profile;
 import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
 import br.com.matheusfragadev.lalouise.application.profile.facade.ProfileFacade;
+import br.com.matheusfragadev.lalouise.application.user.ManagerService;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.mapper.ProfileMapper;
@@ -28,6 +29,8 @@ import static org.mockito.Mockito.*;
 class ProfileControllerTest {
     @Mock
     private ProfileFacade profileFacade;
+    @Mock
+    private ManagerService managerService;
     @InjectMocks
     private ProfileController profileController;
     private UserDetailsImpl mockPrincipal(UUID id, Role role) {
@@ -44,10 +47,10 @@ class ProfileControllerTest {
         // bare mock — mapping is fully delegated to ProfileMapper (mocked statically)
         Credentials credentials = mock(Credentials.class);
         Instant now = Instant.now();
-        AdminResponse expectedResponse = new AdminResponse(id, "Admin User", "admin@lalouise.com", "ADMIN", true, now, now);
+        AdminResponse expectedResponse = new AdminResponse(id, "Admin User", "admin@lalouise.com", now);
         when(profileFacade.getProfile(id, Role.ADMIN)).thenReturn(credentials);
         try (MockedStatic<ProfileMapper> mapper = mockStatic(ProfileMapper.class)) {
-            mapper.when(() -> ProfileMapper.toResponse(credentials)).thenReturn(expectedResponse);
+            mapper.when(() -> ProfileMapper.toResponse(any(Credentials.class), any())).thenReturn(expectedResponse);
             ResponseEntity<ProfileResponse> response = profileController.getProfile(principal);
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertEquals(expectedResponse, response.getBody());

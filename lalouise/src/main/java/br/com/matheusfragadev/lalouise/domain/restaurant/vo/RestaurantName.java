@@ -27,7 +27,7 @@ public record RestaurantName(
                     "Nome do restaurante deve ter entre " + MIN_LENGTH + " e " + MAX_LENGTH + " caracteres"
             );
         }
-        if (PATTERN.matcher(value).matches() == false) {
+        if (!PATTERN.matcher(value).matches()) {
             throw new RestaurantNameException("Nome do restaurante contém caracteres inválidos");
         }
     }

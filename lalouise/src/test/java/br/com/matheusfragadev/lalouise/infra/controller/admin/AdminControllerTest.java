@@ -98,7 +98,7 @@ class AdminControllerTest {
     }
     // ── create ───────────────────────────────────────────────────────────────
     @Test
-    void createShouldReturn200WithMappedAdminInfo() {
+    void createShouldReturn201WithAdminId() {
         UUID id = UUID.randomUUID();
         CreateAdminRequest request = new CreateAdminRequest("Alice", "alice@test.com", "Alice@123", "Alice@123");
         CreateUserCommand command = CreateUserCommand.builder()
@@ -106,18 +106,13 @@ class AdminControllerTest {
                 .password("Alice@123").confirmPassword("Alice@123")
                 .build();
         Admin admin = mock(Admin.class);
-        Instant now = Instant.now();
-        AdminInfo info = AdminInfo.builder()
-                .id(id).nickname("Alice").email("alice@test.com")
-                .role(Role.ADMIN).active(true).createdAt(now).updatedAt(now)
-                .build();
+        when(admin.getId()).thenReturn(id);
         try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
             mapper.when(() -> AdminMapper.toCreateAdminCommand(request)).thenReturn(command);
             when(adminService.createUser(command)).thenReturn(admin);
-            mapper.when(() -> AdminMapper.toAdminInfo(admin)).thenReturn(info);
-            ResponseEntity<AdminInfo> response = controller.create(request);
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertSame(info, response.getBody());
+            ResponseEntity<String> response = controller.create(request);
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assertEquals(id.toString(), response.getBody());
             verify(adminService).createUser(command);
         }
     }

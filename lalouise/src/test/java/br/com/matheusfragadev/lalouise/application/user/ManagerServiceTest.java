@@ -1,0 +1,369 @@
+package br.com.matheusfragadev.lalouise.application.user;
+
+import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
+import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
+import br.com.matheusfragadev.lalouise.application.user.utils.CreateStaffCommand;
+import br.com.matheusfragadev.lalouise.domain.restaurant.entity.Restaurant;
+import br.com.matheusfragadev.lalouise.domain.restaurant.vo.RestaurantName;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
+import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Manager;
+import br.com.matheusfragadev.lalouise.domain.user.staff.exceptions.ManagerAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.staff.repository.ManagerRepository;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ManagerServiceTest {
+
+    @Mock private PasswordEncoder passwordEncoder;
+    @Mock private ManagerRepository managerRepository;
+    @Mock private RestaurantService restaurantService;
+
+    @InjectMocks private ManagerService service;
+
+    private CreateStaffCommand validCommand(UUID restaurantId) {
+        return CreateStaffCommand.builder()
+                .nickname("Manager User")
+                .email("manager@test.com")
+                .password("Manager@123")
+                .confirmPassword("Manager@123")
+                .restaurantId(restaurantId)
+                .build();
+    }
+
+    // ── createManager ─────────────────────────────────────────────────────────
+
+    @Test
+    void createManagerShouldSaveAndReturnManagerWhenInputIsValid() {
+        UUID restaurantId = UUID.randomUUID();
+        CreateStaffCommand command = validCommand(restaurantId);
+
+        Restaurant restaurant = mock(Restaurant.class);
+        when(restaurant.getId()).thenReturn(restaurantId);
+        when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
+        when(managerRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
+        when(passwordEncoder.encode(command.password())).thenReturn("hashed-password");
+        when(managerRepository.save(any(Manager.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Manager result = service.createManager(command);
+
+        assertNotNull(result);
+        assertEquals("Manager User", result.getNickname().value());
+        assertEquals("manager@test.com", result.getEmail().value());
+        assertEquals("hashed-password", result.getPassword().getValue());
+        assertEquals(restaurantId, result.getRestaurantId());
+        verify(managerRepository).save(any(Manager.class));
+    }
+
+    @Test
+    void createManagerShouldThrowWhenEmailAlreadyExists() {
+        UUID restaurantId = UUID.randomUUID();
+        CreateStaffCommand command = validCommand(restaurantId);
+
+        Restaurant restaurant = mock(Restaurant.class);
+        when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
+        when(managerRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
+
+        ManagerAlreadyExists ex = assertThrows(ManagerAlreadyExists.class, () -> service.createManager(command));
+
+        assertEquals("Já existe um manager com esse email.", ex.getMessage());
+        verify(managerRepository, never()).save(any());
+    }
+
+    @Test
+    void createManagerShouldThrowWhenPasswordsDoNotMatch() {
+        UUID restaurantId = UUID.randomUUID();
+        CreateStaffCommand command = CreateStaffCommand.builder()
+                .nickname("Manager User").email("manager@test.com")
+                .password("Manager@123").confirmPassword("Different@123")
+                .restaurantId(restaurantId)
+                .build();
+
+        Restaurant restaurant = mock(Restaurant.class);
+        when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
+        when(managerRepository.existsByEmail(any())).thenReturn(false);
+
+        PasswordException ex = assertThrows(PasswordException.class, () -> service.createManager(command));
+
+        assertEquals("Senhas não conferem.", ex.getMessage());
+        verify(managerRepository, never()).save(any());
+    }
+
+    @Test
+    void createManagerShouldThrowWhenRestaurantNotFound() {
+        UUID restaurantId = UUID.randomUUID();
+        CreateStaffCommand command = validCommand(restaurantId);
+
+        when(restaurantService.getRestaurant(restaurantId)).thenThrow(new RuntimeException("Restaurant not found"));
+
+        assertThrows(RuntimeException.class, () -> service.createManager(command));
+        verify(managerRepository, never()).save(any());
+    }
+
+    // ── createUser (unsupported) ──────────────────────────────────────────────
+
+    @Test
+    void createUserShouldThrowUnsupportedOperationException() {
+        assertThrows(UnsupportedOperationException.class,
+                () -> service.createUser(null));
+    }
+
+    // ── changeUserNickname ────────────────────────────────────────────────────
+
+    @Test
+    void changeUserNicknameShouldSaveWhenNewNicknameIsDifferent() {
+        UUID id = UUID.randomUUID();
+        Manager manager = mock(Manager.class);
+        Nickname current = mock(Nickname.class);
+
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(manager.isActive()).thenReturn(true);
+        when(manager.getNickname()).thenReturn(current);
+        when(current.value()).thenReturn("Old Name");
+        when(managerRepository.save(manager)).thenReturn(manager);
+
+        Manager result = service.changeUserNickname(id, "New Name");
+
+        assertSame(manager, result);
+        verify(manager).changeNickname(new Nickname("New Name"));
+        verify(managerRepository).save(manager);
+    }
+
+    @Test
+    void changeUserNicknameShouldThrowWhenManagerIsInactive() {
+        UUID id = UUID.randomUUID();
+        Manager manager = mock(Manager.class);
+
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(manager.isActive()).thenReturn(false);
+
+        InactiveResourceException ex = assertThrows(
+                InactiveResourceException.class,
+                () -> service.changeUserNickname(id, "New Name")
+        );
+
+        assertEquals("Não é possível alterar dados de um usuário inativo.", ex.getMessage());
+        verify(managerRepository, never()).save(any());
+    }
+
+    @Test
+    void changeUserNicknameShouldThrowWhenNicknameIsUnchanged() {
+        UUID id = UUID.randomUUID();
+        Manager manager = mock(Manager.class);
+        Nickname current = mock(Nickname.class);
+
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(manager.isActive()).thenReturn(true);
+        when(manager.getNickname()).thenReturn(current);
+        when(current.value()).thenReturn("Same Name");
+
+        NicknameException ex = assertThrows(NicknameException.class,
+                () -> service.changeUserNickname(id, "Same Name"));
+
+        assertEquals("O novo nickname deve ser diferente do atual.", ex.getMessage());
+        verify(managerRepository, never()).save(any());
+    }
+
+    // ── changeUserPassword ────────────────────────────────────────────────────
+
+    @Test
+    void changeUserPasswordShouldSaveWhenInputIsValid() {
+        UUID id = UUID.randomUUID();
+        ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
+                .targetId(id).newPassword("NewPass@123").confirmNewPassword("NewPass@123")
+                .build();
+
+        Manager manager = mock(Manager.class);
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(manager.isActive()).thenReturn(true);
+        when(passwordEncoder.encode(command.newPassword())).thenReturn("new-hashed");
+        when(managerRepository.save(manager)).thenReturn(manager);
+
+        Manager result = service.changeUserPassword(command);
+
+        assertSame(manager, result);
+        ArgumentCaptor<Password> captor = ArgumentCaptor.forClass(Password.class);
+        verify(manager).changePassword(captor.capture());
+        assertEquals("new-hashed", captor.getValue().getValue());
+        verify(managerRepository).save(manager);
+    }
+
+    @Test
+    void changeUserPasswordShouldThrowWhenPasswordsDoNotMatch() {
+        UUID id = UUID.randomUUID();
+        ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
+                .targetId(id).newPassword("NewPass@123").confirmNewPassword("Different@123")
+                .build();
+
+        Manager manager = mock(Manager.class);
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(manager.isActive()).thenReturn(true);
+
+        PasswordException ex = assertThrows(PasswordException.class, () -> service.changeUserPassword(command));
+
+        assertEquals("Senhas não conferem.", ex.getMessage());
+        verify(managerRepository, never()).save(any());
+    }
+
+    @Test
+    void changeUserPasswordShouldThrowWhenManagerIsInactive() {
+        UUID id = UUID.randomUUID();
+        ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
+                .targetId(id).newPassword("NewPass@123").confirmNewPassword("NewPass@123")
+                .build();
+
+        Manager manager = mock(Manager.class);
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(manager.isActive()).thenReturn(false);
+
+        InactiveResourceException ex = assertThrows(
+                InactiveResourceException.class,
+                () -> service.changeUserPassword(command)
+        );
+
+        assertEquals("Não é possível alterar dados de um usuário inativo.", ex.getMessage());
+        verify(managerRepository, never()).save(any());
+    }
+
+    @Test
+    void changeUserPasswordShouldThrowWhenManagerNotFound() {
+        UUID id = UUID.randomUUID();
+        ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
+                .targetId(id).newPassword("NewPass@123").confirmNewPassword("NewPass@123")
+                .build();
+
+        when(managerRepository.findById(id)).thenReturn(Optional.empty());
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> service.changeUserPassword(command));
+
+        assertTrue(ex.getMessage().contains("Manager not found with id"));
+        verify(managerRepository, never()).save(any());
+    }
+
+    // ── deleteUser ────────────────────────────────────────────────────────────
+
+    @Test
+    void deleteUserShouldDeactivateAndSave() {
+        UUID id = UUID.randomUUID();
+        Manager manager = mock(Manager.class);
+
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.save(manager)).thenReturn(manager);
+
+        Manager result = service.deleteUser(id);
+
+        assertSame(manager, result);
+        verify(manager).deactivate();
+        verify(managerRepository).save(manager);
+    }
+
+    // ── reactivate ────────────────────────────────────────────────────────────
+
+    @Test
+    void reactivateShouldReactivateAndSave() {
+        UUID id = UUID.randomUUID();
+        Manager manager = mock(Manager.class);
+
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.save(manager)).thenReturn(manager);
+
+        Manager result = service.reactivate(id);
+
+        assertSame(manager, result);
+        verify(manager).reactivate();
+        verify(managerRepository).save(manager);
+    }
+
+    // ── getUser ───────────────────────────────────────────────────────────────
+
+    @Test
+    void getUserShouldReturnManagerWhenFound() {
+        UUID id = UUID.randomUUID();
+        Manager manager = mock(Manager.class);
+
+        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+
+        assertSame(manager, service.getUser(id));
+    }
+
+    @Test
+    void getUserShouldThrowWhenNotFound() {
+        UUID id = UUID.randomUUID();
+        when(managerRepository.findById(id)).thenReturn(Optional.empty());
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> service.getUser(id));
+
+        assertEquals("Manager not found with id: " + id, ex.getMessage());
+    }
+
+    // ── getAllAdmins ──────────────────────────────────────────────────────────
+
+    @Test
+    void getAllAdminsShouldReturnPageFromRepository() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Manager manager = mock(Manager.class);
+        Page<Manager> page = new PageImpl<>(List.of(manager), pageable, 1);
+
+        when(managerRepository.findAllManagers(null, null, pageable)).thenReturn(page);
+
+        Page<Manager> result = service.getAllAdmins(null, null, pageable);
+
+        assertEquals(1, result.getContent().size());
+        assertSame(manager, result.getContent().get(0));
+        verify(managerRepository).findAllManagers(null, null, pageable);
+    }
+
+    @Test
+    void getAllAdminsShouldReturnEmptyPageWhenNoneExist() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Manager> emptyPage = new PageImpl<>(List.of(), pageable, 0);
+
+        when(managerRepository.findAllManagers(null, null, pageable)).thenReturn(emptyPage);
+
+        Page<Manager> result = service.getAllAdmins(null, null, pageable);
+
+        assertTrue(result.getContent().isEmpty());
+        assertEquals(0, result.getTotalElements());
+    }
+
+    // ── getRestaurantName ─────────────────────────────────────────────────────
+
+    @Test
+    void getRestaurantNameShouldReturnNameFromRestaurantService() {
+        UUID restaurantId = UUID.randomUUID();
+        Restaurant restaurant = mock(Restaurant.class);
+        RestaurantName restaurantName = mock(RestaurantName.class);
+
+        when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
+        when(restaurant.getName()).thenReturn(restaurantName);
+        when(restaurantName.value()).thenReturn("La Louise");
+
+        String result = service.getRestaurantName(restaurantId);
+
+        assertEquals("La Louise", result);
+        verify(restaurantService).getRestaurant(restaurantId);
+    }
+}
+
