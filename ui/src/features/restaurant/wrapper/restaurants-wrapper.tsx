@@ -60,7 +60,7 @@ export default function RestaurantsWrapper() {
   const cards: AppSummaryCardProps[] =
     data?.pages.flatMap((p) =>
       p.content.map((restaurant) => ({
-        href: `/dashboard/restaurants/${restaurant.restaurantId}`,
+        href: `/dashboard/restaurants/${restaurant.restaurantId}/resources`,
         fields: [
           { label: "Nome", children: <span>{restaurant.restaurantName}</span> },
           {

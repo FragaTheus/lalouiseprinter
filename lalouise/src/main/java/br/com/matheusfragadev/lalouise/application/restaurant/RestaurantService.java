@@ -33,11 +33,6 @@ public class RestaurantService {
     }
 
     @Transactional(readOnly = true)
-    public List<Restaurant> getAllRestaurants(){
-        return restaurantRepository.findAll();
-    }
-
-    @Transactional(readOnly = true)
     public Page<Restaurant> getAllRestaurants(String term, Boolean active, Pageable pageable) {
         return restaurantRepository.findAllRestaurants(term, active, pageable);
     }

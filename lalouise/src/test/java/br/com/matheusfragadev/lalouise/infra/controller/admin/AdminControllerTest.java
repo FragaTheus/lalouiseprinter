@@ -48,7 +48,7 @@ class AdminControllerTest {
         AdminSummary s2 = new AdminSummary(id2, "Bob", "bob@test.com", true);
         Pageable pageable = PageRequest.of(0, 10);
         Page<Admin> adminPage = new PageImpl<>(List.of(a1, a2), pageable, 2);
-        when(adminService.getAllAdmins(null, null, pageable)).thenReturn(adminPage);
+        when(adminService.getAll(null, null, pageable)).thenReturn(adminPage);
         try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
             mapper.when(() -> AdminMapper.toAdminSummary(a1)).thenReturn(s1);
             mapper.when(() -> AdminMapper.toAdminSummary(a2)).thenReturn(s2);
@@ -64,7 +64,7 @@ class AdminControllerTest {
     void listShouldReturnEmptyListWhenNoAdminsExist() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Admin> emptyPage = new PageImpl<>(List.of(), pageable, 0);
-        when(adminService.getAllAdmins(null, null, pageable)).thenReturn(emptyPage);
+        when(adminService.getAll(null, null, pageable)).thenReturn(emptyPage);
         ResponseEntity<Page<AdminSummary>> response = controller.list(null, null, pageable);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());

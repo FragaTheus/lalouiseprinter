@@ -84,22 +84,6 @@ class RestaurantServiceTest {
         verify(restaurantRepository).findAllRestaurants("louise", true, pageable);
     }
 
-    // ── getAllRestaurants (sem parâmetros) ────────────────────────────────────
-    @Test
-    void getAllRestaurantsShouldReturnAllRestaurants() {
-        Restaurant r1 = mock(Restaurant.class);
-        Restaurant r2 = mock(Restaurant.class);
-        when(restaurantRepository.findAll()).thenReturn(List.of(r1, r2));
-        List<Restaurant> result = service.getAllRestaurants();
-        assertEquals(2, result.size());
-        verify(restaurantRepository).findAll();
-    }
-
-    @Test
-    void getAllRestaurantsShouldReturnEmptyListWhenNoneExist() {
-        when(restaurantRepository.findAll()).thenReturn(List.of());
-        assertTrue(service.getAllRestaurants().isEmpty());
-    }
 
     // ── create — caminho feliz ────────────────────────────────────────────────
     @Test

@@ -2,7 +2,10 @@ package br.com.matheusfragadev.lalouise.infra.controller.auth;
 
 import br.com.matheusfragadev.lalouise.application.auth.AuthenticationService;
 import br.com.matheusfragadev.lalouise.application.auth.LoginResult;
+import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.auth.utils.dto.LoginResponse;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
@@ -14,13 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,12 +36,21 @@ class AuthenticationControllerTest {
     @Test
     void loginShouldReturnAuthorizationHeaderAndResponseBody() {
         UUID userId = UUID.randomUUID();
-        UserDetailsImpl userDetails = org.mockito.Mockito.mock(UserDetailsImpl.class);
 
-        when(userDetails.getId()).thenReturn(userId);
-        when(userDetails.getNickname()).thenReturn("Admin User");
-        when(userDetails.getUsername()).thenReturn("admin@lalouise.comabcde");
-        when(userDetails.getRole()).thenReturn(Role.ADMIN);
+        Admin admin = mock(Admin.class);
+        Nickname nickname = mock(Nickname.class);
+        Email email = mock(Email.class);
+
+        when(admin.getId()).thenReturn(userId);
+        when(admin.getNickname()).thenReturn(nickname);
+        when(nickname.value()).thenReturn("Admin User");
+        when(admin.getEmail()).thenReturn(email);
+        when(email.value()).thenReturn("admin@lalouise.comabcde");
+        when(admin.getRole()).thenReturn(Role.ADMIN);
+
+        UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
+        when(userDetails.getCredentials()).thenReturn(admin);
+
         when(authenticationService.authenticate("admin@lalouise.comabcde", "Strong@123"))
                 .thenReturn(new LoginResult("jwt-token", userDetails));
 
@@ -50,7 +60,7 @@ class AuthenticationControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Bearer jwt-token", response.getHeaders().getFirst(HttpHeaders.AUTHORIZATION));
-        assertEquals(userId, response.getBody().id());
+        assertEquals(userId.toString(), response.getBody().id());
         assertEquals("Admin User", response.getBody().nickname());
         assertEquals("admin@lalouise.comabcde", response.getBody().email());
         assertEquals("ADMIN", response.getBody().role());

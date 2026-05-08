@@ -6,8 +6,9 @@ import { useUserStore } from "@/store/user-store";
 import ManagerInfoLayout from "../layout/manager-info-layout";
 
 export default function ManagerInfoWrapper() {
-  const { id } = useParams<{ id: string }>();
-  const { data, isLoading, isError } = useManagerInfo(id);
+  const { managerId } = useParams<{ managerId: string; id: string }>();
+  const { id: restaurantId } = useParams<{ id: string }>();
+  const { data, isLoading, isError } = useManagerInfo(restaurantId, managerId);
   const { user } = useUserStore();
 
   const isProfile = user?.id === data?.id;

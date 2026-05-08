@@ -14,6 +14,9 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Manager;
 import br.com.matheusfragadev.lalouise.domain.user.staff.exceptions.ManagerAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.staff.repository.ManagerRepository;
+import br.com.matheusfragadev.lalouise.infra.context.restaurant.RestaurantContext;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -43,13 +46,25 @@ class ManagerServiceTest {
 
     @InjectMocks private ManagerService service;
 
-    private CreateStaffCommand validCommand(UUID restaurantId) {
+    private UUID restaurantId;
+
+    @BeforeEach
+    void setupContext() {
+        restaurantId = UUID.randomUUID();
+        RestaurantContext.set(restaurantId);
+    }
+
+    @AfterEach
+    void clearContext() {
+        RestaurantContext.clear();
+    }
+
+    private CreateStaffCommand validCommand() {
         return CreateStaffCommand.builder()
                 .nickname("Manager User")
                 .email("manager@test.com")
                 .password("Manager@123")
                 .confirmPassword("Manager@123")
-                .restaurantId(restaurantId)
                 .build();
     }
 
@@ -57,11 +72,11 @@ class ManagerServiceTest {
 
     @Test
     void createManagerShouldSaveAndReturnManagerWhenInputIsValid() {
-        UUID restaurantId = UUID.randomUUID();
-        CreateStaffCommand command = validCommand(restaurantId);
+        CreateStaffCommand command = validCommand();
 
         Restaurant restaurant = mock(Restaurant.class);
         when(restaurant.getId()).thenReturn(restaurantId);
+        when(restaurant.isActive()).thenReturn(true);
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
         when(managerRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
         when(passwordEncoder.encode(command.password())).thenReturn("hashed-password");
@@ -79,10 +94,10 @@ class ManagerServiceTest {
 
     @Test
     void createManagerShouldThrowWhenEmailAlreadyExists() {
-        UUID restaurantId = UUID.randomUUID();
-        CreateStaffCommand command = validCommand(restaurantId);
+        CreateStaffCommand command = validCommand();
 
         Restaurant restaurant = mock(Restaurant.class);
+        when(restaurant.isActive()).thenReturn(true);
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
         when(managerRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
 
@@ -94,14 +109,13 @@ class ManagerServiceTest {
 
     @Test
     void createManagerShouldThrowWhenPasswordsDoNotMatch() {
-        UUID restaurantId = UUID.randomUUID();
         CreateStaffCommand command = CreateStaffCommand.builder()
                 .nickname("Manager User").email("manager@test.com")
                 .password("Manager@123").confirmPassword("Different@123")
-                .restaurantId(restaurantId)
                 .build();
 
         Restaurant restaurant = mock(Restaurant.class);
+        when(restaurant.isActive()).thenReturn(true);
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
         when(managerRepository.existsByEmail(any())).thenReturn(false);
 
@@ -113,8 +127,7 @@ class ManagerServiceTest {
 
     @Test
     void createManagerShouldThrowWhenRestaurantNotFound() {
-        UUID restaurantId = UUID.randomUUID();
-        CreateStaffCommand command = validCommand(restaurantId);
+        CreateStaffCommand command = validCommand();
 
         when(restaurantService.getRestaurant(restaurantId)).thenThrow(new RuntimeException("Restaurant not found"));
 
@@ -122,23 +135,15 @@ class ManagerServiceTest {
         verify(managerRepository, never()).save(any());
     }
 
-    // ── createUser (unsupported) ──────────────────────────────────────────────
+    // ── changeManagerNickname ─────────────────────────────────────────────────
 
     @Test
-    void createUserShouldThrowUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class,
-                () -> service.createUser(null));
-    }
-
-    // ── changeUserNickname ────────────────────────────────────────────────────
-
-    @Test
-    void changeUserNicknameShouldSaveWhenNewNicknameIsDifferent() {
+    void changeManagerNicknameShouldSaveWhenNewNicknameIsDifferent() {
         UUID id = UUID.randomUUID();
         Manager manager = mock(Manager.class);
         Nickname current = mock(Nickname.class);
 
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
         when(manager.isActive()).thenReturn(true);
         when(manager.getNickname()).thenReturn(current);
         when(current.value()).thenReturn("Old Name");
@@ -152,11 +157,11 @@ class ManagerServiceTest {
     }
 
     @Test
-    void changeUserNicknameShouldThrowWhenManagerIsInactive() {
+    void changeManagerNicknameShouldThrowWhenManagerIsInactive() {
         UUID id = UUID.randomUUID();
         Manager manager = mock(Manager.class);
 
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
         when(manager.isActive()).thenReturn(false);
 
         InactiveResourceException ex = assertThrows(
@@ -169,12 +174,12 @@ class ManagerServiceTest {
     }
 
     @Test
-    void changeUserNicknameShouldThrowWhenNicknameIsUnchanged() {
+    void changeManagerNicknameShouldThrowWhenNicknameIsUnchanged() {
         UUID id = UUID.randomUUID();
         Manager manager = mock(Manager.class);
         Nickname current = mock(Nickname.class);
 
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
         when(manager.isActive()).thenReturn(true);
         when(manager.getNickname()).thenReturn(current);
         when(current.value()).thenReturn("Same Name");
@@ -186,17 +191,17 @@ class ManagerServiceTest {
         verify(managerRepository, never()).save(any());
     }
 
-    // ── changeUserPassword ────────────────────────────────────────────────────
+    // ── changeManagerPassword ─────────────────────────────────────────────────
 
     @Test
-    void changeUserPasswordShouldSaveWhenInputIsValid() {
+    void changeManagerPasswordShouldSaveWhenInputIsValid() {
         UUID id = UUID.randomUUID();
         ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
                 .targetId(id).newPassword("NewPass@123").confirmNewPassword("NewPass@123")
                 .build();
 
         Manager manager = mock(Manager.class);
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
         when(manager.isActive()).thenReturn(true);
         when(passwordEncoder.encode(command.newPassword())).thenReturn("new-hashed");
         when(managerRepository.save(manager)).thenReturn(manager);
@@ -211,14 +216,14 @@ class ManagerServiceTest {
     }
 
     @Test
-    void changeUserPasswordShouldThrowWhenPasswordsDoNotMatch() {
+    void changeManagerPasswordShouldThrowWhenPasswordsDoNotMatch() {
         UUID id = UUID.randomUUID();
         ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
                 .targetId(id).newPassword("NewPass@123").confirmNewPassword("Different@123")
                 .build();
 
         Manager manager = mock(Manager.class);
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
         when(manager.isActive()).thenReturn(true);
 
         PasswordException ex = assertThrows(PasswordException.class, () -> service.changeUserPassword(command));
@@ -228,14 +233,14 @@ class ManagerServiceTest {
     }
 
     @Test
-    void changeUserPasswordShouldThrowWhenManagerIsInactive() {
+    void changeManagerPasswordShouldThrowWhenManagerIsInactive() {
         UUID id = UUID.randomUUID();
         ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
                 .targetId(id).newPassword("NewPass@123").confirmNewPassword("NewPass@123")
                 .build();
 
         Manager manager = mock(Manager.class);
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
         when(manager.isActive()).thenReturn(false);
 
         InactiveResourceException ex = assertThrows(
@@ -248,13 +253,13 @@ class ManagerServiceTest {
     }
 
     @Test
-    void changeUserPasswordShouldThrowWhenManagerNotFound() {
+    void changeManagerPasswordShouldThrowWhenManagerNotFound() {
         UUID id = UUID.randomUUID();
         ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
                 .targetId(id).newPassword("NewPass@123").confirmNewPassword("NewPass@123")
                 .build();
 
-        when(managerRepository.findById(id)).thenReturn(Optional.empty());
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.changeUserPassword(command));
 
@@ -262,14 +267,14 @@ class ManagerServiceTest {
         verify(managerRepository, never()).save(any());
     }
 
-    // ── deleteUser ────────────────────────────────────────────────────────────
+    // ── deleteManager ─────────────────────────────────────────────────────────
 
     @Test
-    void deleteUserShouldDeactivateAndSave() {
+    void deleteManagerShouldDeactivateAndSave() {
         UUID id = UUID.randomUUID();
         Manager manager = mock(Manager.class);
 
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
         when(managerRepository.save(manager)).thenReturn(manager);
 
         Manager result = service.deleteUser(id);
@@ -279,14 +284,14 @@ class ManagerServiceTest {
         verify(managerRepository).save(manager);
     }
 
-    // ── reactivate ────────────────────────────────────────────────────────────
+    // ── reactivateManager ─────────────────────────────────────────────────────
 
     @Test
-    void reactivateShouldReactivateAndSave() {
+    void reactivateManagerShouldReactivateAndSave() {
         UUID id = UUID.randomUUID();
         Manager manager = mock(Manager.class);
 
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
         when(managerRepository.save(manager)).thenReturn(manager);
 
         Manager result = service.reactivate(id);
@@ -296,53 +301,64 @@ class ManagerServiceTest {
         verify(managerRepository).save(manager);
     }
 
-    // ── getUser ───────────────────────────────────────────────────────────────
+    // ── getManager ────────────────────────────────────────────────────────────
 
     @Test
-    void getUserShouldReturnManagerWhenFound() {
+    void getManagerShouldReturnManagerWhenFound() {
         UUID id = UUID.randomUUID();
         Manager manager = mock(Manager.class);
 
-        when(managerRepository.findById(id)).thenReturn(Optional.of(manager));
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.of(manager));
 
         assertSame(manager, service.getUser(id));
     }
 
     @Test
-    void getUserShouldThrowWhenNotFound() {
+    void getManagerShouldThrowWhenNotFound() {
         UUID id = UUID.randomUUID();
-        when(managerRepository.findById(id)).thenReturn(Optional.empty());
+        when(managerRepository.findByIdAndRestaurantId(id, restaurantId)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class, () -> service.getUser(id));
 
         assertEquals("Manager not found with id: " + id, ex.getMessage());
     }
 
-    // ── getAllAdmins ──────────────────────────────────────────────────────────
+    @Test
+    void getManagerShouldThrowWhenContextIsNull() {
+        RestaurantContext.clear();
+        UUID id = UUID.randomUUID();
+        when(managerRepository.findByIdAndRestaurantId(id, null)).thenReturn(Optional.empty());
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> service.getUser(id));
+
+        assertTrue(ex.getMessage().contains("Manager not found with id"));
+    }
+
+    // ── getAllManagers ────────────────────────────────────────────────────────
 
     @Test
-    void getAllAdminsShouldReturnPageFromRepository() {
+    void getAllManagersShouldReturnPageFromRepository() {
         Pageable pageable = PageRequest.of(0, 10);
         Manager manager = mock(Manager.class);
         Page<Manager> page = new PageImpl<>(List.of(manager), pageable, 1);
 
-        when(managerRepository.findAllManagers(null, null, pageable)).thenReturn(page);
+        when(managerRepository.findAllManagers(null, null, restaurantId, pageable)).thenReturn(page);
 
-        Page<Manager> result = service.getAllAdmins(null, null, pageable);
+        Page<Manager> result = service.getAll(null, null, pageable);
 
         assertEquals(1, result.getContent().size());
         assertSame(manager, result.getContent().get(0));
-        verify(managerRepository).findAllManagers(null, null, pageable);
+        verify(managerRepository).findAllManagers(null, null, restaurantId, pageable);
     }
 
     @Test
-    void getAllAdminsShouldReturnEmptyPageWhenNoneExist() {
+    void getAllManagersShouldReturnEmptyPageWhenNoneExist() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Manager> emptyPage = new PageImpl<>(List.of(), pageable, 0);
 
-        when(managerRepository.findAllManagers(null, null, pageable)).thenReturn(emptyPage);
+        when(managerRepository.findAllManagers(null, null, restaurantId, pageable)).thenReturn(emptyPage);
 
-        Page<Manager> result = service.getAllAdmins(null, null, pageable);
+        Page<Manager> result = service.getAll(null, null, pageable);
 
         assertTrue(result.getContent().isEmpty());
         assertEquals(0, result.getTotalElements());
@@ -352,7 +368,6 @@ class ManagerServiceTest {
 
     @Test
     void getRestaurantNameShouldReturnNameFromRestaurantService() {
-        UUID restaurantId = UUID.randomUUID();
         Restaurant restaurant = mock(Restaurant.class);
         RestaurantName restaurantName = mock(RestaurantName.class);
 

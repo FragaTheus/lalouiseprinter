@@ -23,11 +23,9 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
         var result = authenticationService.authenticate(request.email(), request.password());
-        var userDetails = result.userDetails();
-        var response = AuthenticationMapper.toLoginResponse(userDetails);
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.token())
-                .body(response);
+                .body(AuthenticationMapper.toLoginResponse(result.userDetails()));
     }
-
 }

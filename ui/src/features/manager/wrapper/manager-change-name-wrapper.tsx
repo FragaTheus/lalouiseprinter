@@ -5,8 +5,11 @@ import { useManagerChangeName } from "../hooks/use-manager";
 import AppChangeNameCard from "@/shared/components/app/app-form-card";
 
 export default function ManagerChangeNameWrapper() {
-  const { id } = useParams<{ id: string }>();
-  const { mutate, isPending } = useManagerChangeName(id);
+  const { managerId, id: restaurantId } = useParams<{
+    managerId: string;
+    id: string;
+  }>();
+  const { mutate, isPending } = useManagerChangeName(restaurantId, managerId);
 
   return (
     <AppChangeNameCard

@@ -6,9 +6,9 @@ import { Input } from "@/shared/components/ui/input";
 import useLogin from "../hooks/useLogin";
 
 export default function LoginWrapper() {
-  const { mutate, isLoading } = useLogin();
+  const { mutate, isPending } = useLogin();
   return (
-    <AppForm isPending={isLoading} btnText="Entrar" onSubmit={mutate}>
+    <AppForm isPending={isPending} btnText="Entrar" onSubmit={mutate}>
       <Field>
         <FieldLabel>Email</FieldLabel>
         <FieldContent>

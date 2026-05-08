@@ -10,13 +10,12 @@ import {
 
 export default function RegisterManager() {
   return (
-    <AppRouteGuard allowedRoles={["ADMIN"]}>
+    <AppRouteGuard allowedRoles={["ADMIN", "MANAGER"]}>
       <AppInputPageLayout>
         <CardHeader>
           <CardTitle>Novo Gerente</CardTitle>
           <CardDescription>
-            Configure as credenciais de acesso e vincule o gerente a um
-            restaurante da plataforma.
+            Configure as credenciais de acesso do gerente para este restaurante.
           </CardDescription>
         </CardHeader>
         <CardContent>

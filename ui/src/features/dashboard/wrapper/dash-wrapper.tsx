@@ -1,16 +1,14 @@
 "use client";
 
-import { RiAdminFill, RiUserShared2Fill } from "react-icons/ri";
-import DashCardLayout, {
-  DashCardLayoutProps,
-} from "../layout/dash-card-layout";
-import {
-  MdDashboard,
-  MdInventory,
-  MdLabel,
-  MdRestaurant,
-} from "react-icons/md";
-import { HiUsers } from "react-icons/hi";
+import { RiAdminFill } from "react-icons/ri";
+import { DashCardLayoutProps } from "../layout/dash-card-layout";
+import { MdRestaurant } from "react-icons/md";
+import AppDashboardLayout from "@/shared/components/layouts/app-dashboard-layout";
+import AppPageLayout from "@/shared/components/layouts/app-page-layout";
+import DashboardTitle from "../components/dash-title";
+import AppRouteGuard from "@/shared/components/app/app-route-guard";
+import { useUserStore } from "@/store/user-store";
+import { BiPlus } from "react-icons/bi";
 
 const cards = [
   {
@@ -24,56 +22,46 @@ const cards = [
   },
   {
     roles: ["ADMIN"],
+    href: "/dashboard/admins/register",
+    Icon: BiPlus,
+    title: "Registrar Administrador",
+    description:
+      "Crie perfis de alta hierarquia, defina permissões globais do sistema e monitore logs de segurança crítica.",
+  },
+  {
+    roles: ["ADMIN"],
+    href: "/dashboard/restaurants/register",
+    Icon: BiPlus,
+    title: "Registrar Restaurante",
+    description:
+      "Registre novas unidades, gerencie licenças sanitárias e configure perfis de estabelecimentos parceiros para expandir sua rede de gestão higiênica.",
+  },
+  {
+    className: "md:col-span-2",
+    roles: ["ADMIN"],
     href: "/dashboard/restaurants",
     Icon: MdRestaurant,
     title: "Restaurantes",
     description:
       "Controle de unidades, licenças sanitárias e perfis de estabelecimentos parceiros.",
   },
-  {
-    href: "/dashboard/managers",
-    Icon: RiUserShared2Fill,
-    title: "Gerentes",
-    description:
-      "Coordenação de responsáveis técnicos e gestores operacionais por unidade.",
-  },
-  {
-    href: "/dashboard/staffs",
-    Icon: HiUsers,
-    title: "Colaboradores",
-    description:
-      "Registro de staff, certificados de treinamento e históricos de conduta sanitária.",
-  },
-  {
-    href: "/dashboard/sectors",
-    Icon: MdDashboard,
-    title: "Setores",
-    description:
-      "Sistema de rotulagem, datas de validade e controle de rastreabilidade de insumos.",
-  },
-  {
-    href: "/dashboard/labels",
-    Icon: MdLabel,
-    title: "Etiquetas",
-    description:
-      "Sistema de rotulagem, datas de validade e controle de rastreabilidade de insumos.",
-  },
-  {
-    className: "lg:col-span-2",
-    href: "/dashboard/products",
-    Icon: MdInventory,
-    title: "Produtos",
-    description:
-      "Catálogo técnico de ingredientes, fichas de segurança química e especificações de fornecedores.",
-  },
 ] satisfies DashCardLayoutProps[];
 
 export default function DashboardWrapper() {
+  const { user } = useUserStore();
   return (
-    <div className="w-full h-full grid grid-cols-1 md:grid-cols-3 gap-4">
-      {cards.map((card, index) => (
-        <DashCardLayout key={index} {...card} />
-      ))}
-    </div>
+    <AppRouteGuard
+      allowedRoles={["ADMIN"]}
+      forbiddenPath={`/dashboard/restaurants/${user?.restaurantId}/resources`}
+    >
+      <AppPageLayout>
+        <DashboardTitle
+          label="SISTEMA DE GESTÃO SANITÁRIAs"
+          title="Central de Gestão"
+          description="Bem-vindo à Lalouise. Monitore padrões, gerencie acessos e assegure a excelência higiênica em todos os pontos de operação com nossa interface de alta precisão."
+        />
+        <AppDashboardLayout cards={cards} />
+      </AppPageLayout>
+    </AppRouteGuard>
   );
 }

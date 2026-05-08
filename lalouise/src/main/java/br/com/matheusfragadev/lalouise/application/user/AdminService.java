@@ -113,7 +113,7 @@ public class AdminService implements UserService<Admin> {
     }
 
     @Transactional(readOnly = true)
-    public Page<Admin> getAllAdmins(String term, Boolean active, Pageable pageable) {
+    public Page<Admin> getAll(String term, Boolean active, Pageable pageable) {
         return adminRepository.findAllAdmins(term, active, pageable);
     }
 

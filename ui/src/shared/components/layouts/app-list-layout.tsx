@@ -7,6 +7,8 @@ import AppSummaryCard, { AppSummaryCardProps } from "../app/app-summary-card";
 import AppFilterCard, { AppFilterCardProps } from "../app/app-filter-card";
 import { RefObject } from "react";
 
+type Roles = "ADMIN" | "MANAGER" | "STAFF";
+
 export interface AppListLayoutProps {
   titleLabel: string;
   title: string;
@@ -18,6 +20,8 @@ export interface AppListLayoutProps {
   isListLoading?: boolean;
   sentinelRef?: RefObject<HTMLDivElement | null>;
   filterProps: AppFilterCardProps;
+  roles?: Roles[];
+  currentRole?: string | undefined;
 }
 
 export default function AppListLayout(props: AppListLayoutProps) {
@@ -38,9 +42,13 @@ export default function AppListLayout(props: AppListLayoutProps) {
         label={props.titleLabel}
         description={props.titleDescription}
       />
-      <Link href={props.href}>
-        <Button>{props.registerText}</Button>
-      </Link>
+
+      {(!props.roles || props.roles.includes(props.currentRole as Roles)) && (
+        <Link href={props.href}>
+          <Button>{props.registerText}</Button>
+        </Link>
+      )}
+
       <AppFilterCard {...filterProps} />
       <div className="w-full mt-4">
         {cards.map((card, i) => (

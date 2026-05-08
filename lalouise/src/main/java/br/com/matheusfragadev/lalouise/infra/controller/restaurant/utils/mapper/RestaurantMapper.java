@@ -2,6 +2,7 @@ package br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.mapper
 
 import br.com.matheusfragadev.lalouise.domain.restaurant.entity.Restaurant;
 import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.RestaurantInfo;
+import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.RestaurantLookUp;
 import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.RestaurantSummary;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,12 @@ public final class RestaurantMapper {
                 .createdAt(restaurant.getCreatedAt())
                 .updatedAt(restaurant.getUpdatedAt())
                 .build();
+    }
+
+    public static RestaurantLookUp toRestaurantLookUp(Restaurant restaurant){
+        return new RestaurantLookUp(
+                restaurant.getName().value()
+        );
     }
 
 }

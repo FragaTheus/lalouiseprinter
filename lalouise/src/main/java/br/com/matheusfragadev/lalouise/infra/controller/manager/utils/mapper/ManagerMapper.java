@@ -1,8 +1,10 @@
 package br.com.matheusfragadev.lalouise.infra.controller.manager.utils.mapper;
 
+import br.com.matheusfragadev.lalouise.application.user.utils.ChangeManagerNicknameCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.CreateStaffCommand;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Manager;
+import br.com.matheusfragadev.lalouise.infra.controller.manager.utils.dto.request.ChangeManagerNicknameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.manager.utils.dto.request.CreateManagerRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.manager.utils.dto.request.ManagerChangePasswordRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.manager.utils.dto.response.ManagerInfo;
@@ -21,7 +23,6 @@ public final class ManagerMapper {
                 .email(request.email())
                 .password(request.password())
                 .confirmPassword(request.confirmPassword())
-                .restaurantId(request.restaurantId())
                 .build();
     }
 
@@ -45,6 +46,13 @@ public final class ManagerMapper {
                 .email(manager.getEmail().value())
                 .active(manager.isActive())
                 .restaurantId(manager.getRestaurantId())
+                .build();
+    }
+
+    public static ChangeManagerNicknameCommand toChangeNicknameCommand(ChangeManagerNicknameRequest request, UUID targetId) {
+        return ChangeManagerNicknameCommand.builder()
+                .targetId(targetId)
+                .newNickname(request.newNickname())
                 .build();
     }
 

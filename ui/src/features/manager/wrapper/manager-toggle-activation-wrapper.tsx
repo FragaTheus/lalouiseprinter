@@ -12,9 +12,12 @@ export default function ManagerToggleActivationWrapper({
 }: {
   isActive: boolean;
 }) {
-  const { id } = useParams<{ id: string }>();
-  const deactivate = useDeactivateManager(id);
-  const reactivate = useReactivateManager(id);
+  const { managerId, id: restaurantId } = useParams<{
+    managerId: string;
+    id: string;
+  }>();
+  const deactivate = useDeactivateManager(restaurantId, managerId);
+  const reactivate = useReactivateManager(restaurantId, managerId);
 
   return (
     <AppToggleActivation

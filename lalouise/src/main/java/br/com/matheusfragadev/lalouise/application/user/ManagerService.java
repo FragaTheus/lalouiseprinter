@@ -3,7 +3,6 @@ package br.com.matheusfragadev.lalouise.application.user;
 import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.CreateStaffCommand;
-import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
@@ -13,6 +12,7 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Manager;
 import br.com.matheusfragadev.lalouise.domain.user.staff.exceptions.ManagerAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.staff.repository.ManagerRepository;
+import br.com.matheusfragadev.lalouise.infra.context.restaurant.RestaurantContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -35,8 +35,12 @@ public class ManagerService implements UserService<Manager> {
     @Transactional
     public Manager createManager(CreateStaffCommand command) {
         try {
-            log.info("Creating manager for restaurant: {}", command.restaurantId());
-            var restaurant = restaurantService.getRestaurant(command.restaurantId());
+            var restaurantId = RestaurantContext.get();
+            log.info("Creating manager for restaurant: {}", restaurantId);
+            var restaurant = restaurantService.getRestaurant(restaurantId);
+            if (!restaurant.isActive()) {
+                throw new InactiveResourceException("Não é possível vincular um colaborador a um restaurante inativo.");
+            }
             if (managerRepository.existsByEmail(new Email(command.email()))) {
                 throw new ManagerAlreadyExists("Já existe um manager com esse email.");
             }
@@ -47,17 +51,12 @@ public class ManagerService implements UserService<Manager> {
                     Password.of(command.password(), passwordEncoder::encode),
                     restaurant.getId()
             );
-            log.info("Manager created successfully for restaurant: {}", command.restaurantId());
+            log.info("Manager created successfully for restaurant: {}", restaurantId);
             return managerRepository.save(manager);
         } catch (Exception e) {
             log.error("Error creating manager: {}", e.getMessage());
             throw e;
         }
-    }
-
-    @Override
-    public Manager createUser(CreateUserCommand command) {
-        throw new UnsupportedOperationException("Use createManager(CreateStaffCommand) para criar um manager com restaurante.");
     }
 
     @Override
@@ -124,14 +123,16 @@ public class ManagerService implements UserService<Manager> {
     @Override
     @Transactional(readOnly = true)
     public Manager getUser(UUID id) {
-        return managerRepository.findById(id)
+        var restaurantId = RestaurantContext.get();
+        return managerRepository.findByIdAndRestaurantId(id, restaurantId)
                 .orElseThrow(() -> new RuntimeException("Manager not found with id: " + id));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Manager> getAllAdmins(String term, Boolean active, Pageable pageable) {
-        return managerRepository.findAllManagers(term, active, pageable);
+    public Page<Manager> getAll(String term, Boolean active, Pageable pageable) {
+        var restaurantId = RestaurantContext.get();
+        return managerRepository.findAllManagers(term, active, restaurantId, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -145,4 +146,3 @@ public class ManagerService implements UserService<Manager> {
         }
     }
 }
-

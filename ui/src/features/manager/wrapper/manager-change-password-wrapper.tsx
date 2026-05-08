@@ -9,8 +9,14 @@ export default function ManagerChangePasswordWrapper({
 }: {
   isProfile: boolean;
 }) {
-  const { id } = useParams<{ id: string }>();
-  const { mutate, isPending } = useManagerChangePassword(id);
+  const { managerId, id: restaurantId } = useParams<{
+    managerId: string;
+    id: string;
+  }>();
+  const { mutate, isPending } = useManagerChangePassword(
+    restaurantId,
+    managerId,
+  );
 
   return (
     <AppChangePasswordCard

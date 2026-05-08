@@ -7,6 +7,7 @@ import { useCreateManager } from "../hooks/use-manager";
 
 export default function RegisterManagerWrapper() {
   const { mutate, isPending } = useCreateManager();
+
   return (
     <AppForm btnText="Cadastrar" onSubmit={mutate} isPending={isPending}>
       <Field>
@@ -49,17 +50,6 @@ export default function RegisterManagerWrapper() {
             type="password"
             name="confirmPassword"
             placeholder="******"
-            required
-          />
-        </FieldContent>
-      </Field>
-      <Field>
-        <FieldLabel>ID do Restaurante</FieldLabel>
-        <FieldContent>
-          <Input
-            type="text"
-            name="restaurantId"
-            placeholder="UUID do restaurante"
             required
           />
         </FieldContent>

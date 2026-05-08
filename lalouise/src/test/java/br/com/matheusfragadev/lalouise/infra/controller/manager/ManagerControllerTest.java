@@ -55,7 +55,7 @@ class ManagerControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Manager> page = new PageImpl<>(List.of(m1, m2), pageable, 2);
 
-        when(managerService.getAllAdmins(null, null, pageable)).thenReturn(page);
+        when(managerService.getAll(null, null, pageable)).thenReturn(page);
 
         try (MockedStatic<ManagerMapper> mapper = mockStatic(ManagerMapper.class)) {
             mapper.when(() -> ManagerMapper.toManagerSummary(m1)).thenReturn(s1);
@@ -76,7 +76,7 @@ class ManagerControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Manager> emptyPage = new PageImpl<>(List.of(), pageable, 0);
 
-        when(managerService.getAllAdmins(null, null, pageable)).thenReturn(emptyPage);
+        when(managerService.getAll(null, null, pageable)).thenReturn(emptyPage);
 
         ResponseEntity<Page<ManagerSummary>> response = controller.list(null, null, pageable);
 
@@ -129,12 +129,11 @@ class ManagerControllerTest {
     @Test
     void createShouldReturn201WithManagerId() {
         UUID id = UUID.randomUUID();
-        UUID restaurantId = UUID.randomUUID();
-        CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Alice@123", restaurantId);
+        CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Alice@123");
         CreateStaffCommand command = CreateStaffCommand.builder()
                 .nickname("Alice").email("alice@test.com")
                 .password("Alice@123").confirmPassword("Alice@123")
-                .restaurantId(restaurantId).build();
+                .build();
         Manager manager = mock(Manager.class);
         when(manager.getId()).thenReturn(id);
 
@@ -152,12 +151,11 @@ class ManagerControllerTest {
 
     @Test
     void createShouldPropagateManagerAlreadyExistsException() {
-        UUID restaurantId = UUID.randomUUID();
-        CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Alice@123", restaurantId);
+        CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Alice@123");
         CreateStaffCommand command = CreateStaffCommand.builder()
                 .nickname("Alice").email("alice@test.com")
                 .password("Alice@123").confirmPassword("Alice@123")
-                .restaurantId(restaurantId).build();
+                .build();
 
         try (MockedStatic<ManagerMapper> mapper = mockStatic(ManagerMapper.class)) {
             mapper.when(() -> ManagerMapper.toCreateManagerCommand(request)).thenReturn(command);
@@ -170,12 +168,11 @@ class ManagerControllerTest {
 
     @Test
     void createShouldPropagatePasswordExceptionWhenPasswordsMismatch() {
-        UUID restaurantId = UUID.randomUUID();
-        CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Other@123", restaurantId);
+        CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Other@123");
         CreateStaffCommand command = CreateStaffCommand.builder()
                 .nickname("Alice").email("alice@test.com")
                 .password("Alice@123").confirmPassword("Other@123")
-                .restaurantId(restaurantId).build();
+                .build();
 
         try (MockedStatic<ManagerMapper> mapper = mockStatic(ManagerMapper.class)) {
             mapper.when(() -> ManagerMapper.toCreateManagerCommand(request)).thenReturn(command);
@@ -302,4 +299,3 @@ class ManagerControllerTest {
         assertThrows(ActiveException.class, () -> controller.reactivate(id));
     }
 }
-

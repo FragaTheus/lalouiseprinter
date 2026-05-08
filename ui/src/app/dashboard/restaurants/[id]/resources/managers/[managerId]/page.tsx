@@ -3,7 +3,7 @@ import AppRouteGuard from "@/shared/components/app/app-route-guard";
 
 export default function ManagerInfoPage() {
   return (
-    <AppRouteGuard allowedRoles={["ADMIN"]}>
+    <AppRouteGuard allowedRoles={["ADMIN", "MANAGER"]}>
       <ManagerInfoWrapper />
     </AppRouteGuard>
   );

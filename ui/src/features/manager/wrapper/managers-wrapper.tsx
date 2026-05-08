@@ -9,9 +9,11 @@ import {
 } from "@/shared/components/ui/toggle-group";
 import { useEffect, useRef } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 export default function ManagersWrapper() {
+  const { id: restaurantId } = useParams<{ id: string }>();
+  const base = `/dashboard/restaurants/${restaurantId}/resources/managers`;
   const router = useRouter();
   const searchParams = useSearchParams();
   const term = searchParams.get("term") ?? "";
@@ -20,7 +22,7 @@ export default function ManagersWrapper() {
     activeParam === "true" ? true : activeParam === "false" ? false : undefined;
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useManagerListInfinite({ term: term || undefined, active });
+    useManagerListInfinite(restaurantId, { term: term || undefined, active });
 
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +62,7 @@ export default function ManagersWrapper() {
   const cards: AppSummaryCardProps[] =
     data?.pages.flatMap((p) =>
       p.content.map((manager) => ({
-        href: `/dashboard/managers/${manager.id}`,
+        href: `${base}/${manager.id}`,
         fields: [
           { label: "Nome", children: <span>{manager.nickname}</span> },
           { label: "Email", children: <span>{manager.email}</span> },
@@ -81,7 +83,7 @@ export default function ManagersWrapper() {
       titleLabel="SISTEMA DE GESTÃO"
       title="Gestão de Gerentes"
       titleDescription="Controle centralizado dos gerentes de restaurantes cadastrados na plataforma. Gerencie permissões e vínculos com os estabelecimentos."
-      href="/dashboard/managers/register"
+      href={`${base}/register`}
       registerText="Cadastrar Gerente"
       cards={cards}
       isLoading={isLoading}

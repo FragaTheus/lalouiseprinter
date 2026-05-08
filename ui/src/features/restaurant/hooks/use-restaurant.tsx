@@ -129,3 +129,47 @@ export const useReactiveRestaurant = (restaurantId: string) => {
     },
   });
 };
+
+interface RestaurantLookUpParams {
+  term?: string;
+}
+
+interface RestaurantLookUp {
+  restaurantId: string;
+  restaurantName: string;
+}
+
+export const useRestaurantLookUp = (params?: RestaurantLookUpParams) => {
+  return useInfiniteQuery({
+    queryKey: ["restaurants", "lookup", "infinite", params],
+    queryFn: async ({ pageParam = 0 }) => {
+      const response = await api.get<Page<RestaurantLookUp>>(
+        "/api/v1/restaurants/lookup",
+        {
+          params: { ...params, page: pageParam },
+        },
+      );
+      return response.data;
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.last) return undefined;
+      return lastPage.number + 1;
+    },
+  });
+};
+
+interface RestaurantLookUpInfoResponse {
+  restaurantName: string;
+}
+
+export const useRestaurantLookUpInfo = (restaurantId: string) => {
+  return useQuery({
+    queryKey: ["restaurants", "lookup", restaurantId],
+    queryFn: async () => {
+      const response = await api.get<RestaurantLookUpInfoResponse>(
+        `/api/v1/restaurants/${restaurantId}/lookup`,
+      );
+      return response.data;
+    },
+  });
+};

@@ -1,10 +1,8 @@
 package br.com.matheusfragadev.lalouise.infra.controller.restaurant;
 
 import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
-import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.ChangeRestaurantNameRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.CreateRestaurantRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.RestaurantInfo;
-import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.RestaurantSummary;
+import br.com.matheusfragadev.lalouise.infra.context.restaurant.RestaurantContext;
+import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.dto.*;
 import br.com.matheusfragadev.lalouise.infra.controller.restaurant.utils.mapper.RestaurantMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +68,13 @@ public class RestaurantController {
     public ResponseEntity<Void> reactive(@PathVariable("id") UUID restaurantId){
         restaurantService.reactive(restaurantId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("{restaurantId}/lookup")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
+    public ResponseEntity<RestaurantLookUp> getRestaurantLookUp(){
+        var restaurant = restaurantService.getRestaurant(RestaurantContext.get());
+        return ResponseEntity.ok(RestaurantMapper.toRestaurantLookUp(restaurant));
     }
 
 }

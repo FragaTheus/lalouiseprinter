@@ -19,16 +19,20 @@ public interface ManagerRepository extends JpaRepository<Manager, UUID> {
 
     Optional<Manager> findByEmail(Email email);
 
+    Optional<Manager> findByIdAndRestaurantId(UUID id, UUID restaurantId);
+
     @Query("""
     SELECT m FROM Manager m WHERE
     (:term IS NULL OR
     LOWER(m.nickname.value) LIKE LOWER(CONCAT('%', CAST(:term AS String), '%')) OR
     LOWER(m.email.value) LIKE LOWER(CONCAT('%', CAST(:term AS String), '%')))
     AND (:active IS NULL OR m.active = :active)
+    AND m.restaurantId = :restaurantId
     """)
     Page<Manager> findAllManagers(
             @Param("term") String term,
             @Param("active") Boolean active,
+            @Param("restaurantId") UUID restaurantId,
             Pageable pageable
     );
 }

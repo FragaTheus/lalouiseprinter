@@ -17,6 +17,10 @@ public class UserDetailsImpl implements UserDetails {
 
     private final Credentials credentials;
 
+    public Credentials getCredentials() {
+        return credentials;
+    }
+
     public UUID getId(){
         return credentials.getId();
     }

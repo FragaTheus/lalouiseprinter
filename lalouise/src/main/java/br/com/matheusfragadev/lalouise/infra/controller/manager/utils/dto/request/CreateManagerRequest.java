@@ -2,9 +2,6 @@ package br.com.matheusfragadev.lalouise.infra.controller.manager.utils.dto.reque
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
 
 public record CreateManagerRequest(
         @NotBlank(message = "Nome é obrigatório")
@@ -18,10 +15,7 @@ public record CreateManagerRequest(
         String password,
 
         @NotBlank(message = "Confirmação da senha é obrigatória")
-        String confirmPassword,
-
-        @NotNull(message = "Restaurante é obrigatório")
-        UUID restaurantId
+        String confirmPassword
 ) {
 }
 

@@ -296,7 +296,7 @@ class AdminServiceTest {
 
         when(adminRepository.findAllAdmins(null, null, pageable)).thenReturn(page);
 
-        Page<Admin> result = service.getAllAdmins(null, null, pageable);
+        Page<Admin> result = service.getAll(null, null, pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
@@ -311,7 +311,7 @@ class AdminServiceTest {
 
         when(adminRepository.findAllAdmins(null, null, pageable)).thenReturn(emptyPage);
 
-        Page<Admin> result = service.getAllAdmins(null, null, pageable);
+        Page<Admin> result = service.getAll(null, null, pageable);
 
         assertNotNull(result);
         assertTrue(result.getContent().isEmpty());

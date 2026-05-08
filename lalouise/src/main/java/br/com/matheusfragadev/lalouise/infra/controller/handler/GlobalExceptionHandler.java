@@ -1,15 +1,11 @@
 package br.com.matheusfragadev.lalouise.infra.controller.handler;
 
-import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
-import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.ActiveException;
-import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.EmailException;
-import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
-import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
-import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantActiveException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNameException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNotFoundException;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.*;
 import br.com.matheusfragadev.lalouise.infra.security.details.DisableUserException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -17,12 +13,14 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
 
 @Slf4j
 @ControllerAdvice
@@ -168,6 +166,13 @@ public class GlobalExceptionHandler {
         HandlerResponse response = new HandlerResponse(ex.getMessage());
         log.warn("AdminAlreadyExists: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<HandlerResponse> handleAccessDenied(AccessDeniedException ex){
+        var response = new HandlerResponse("Acesso negado: você não tem permissão para acessar este recurso.");
+        log.warn("AccessDeniedException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
 }

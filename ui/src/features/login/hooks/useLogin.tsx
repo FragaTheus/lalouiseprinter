@@ -16,6 +16,7 @@ interface LoginResponse {
   nickname: string;
   email: string;
   role: string;
+  restaurantId?: string;
 }
 
 export default function useLogin() {
@@ -28,6 +29,7 @@ export default function useLogin() {
         "/api/v1/auth/login",
         data,
       );
+      console.log(data);
       return response.data;
     },
     onSuccess: (data: LoginResponse) => {

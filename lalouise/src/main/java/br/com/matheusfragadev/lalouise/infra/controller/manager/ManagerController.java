@@ -14,12 +14,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/managers")
+@RequestMapping("/api/v1/restaurants/{restaurantId}/managers")
 @RequiredArgsConstructor
 public class ManagerController {
 
@@ -31,7 +32,7 @@ public class ManagerController {
             @RequestParam(required = false) Boolean active,
             @PageableDefault Pageable pageable
     ) {
-        var managers = managerService.getAllAdmins(term, active, pageable);
+        var managers = managerService.getAll(term, active, pageable);
         return ResponseEntity.ok(managers.map(ManagerMapper::toManagerSummary));
     }
 
@@ -49,6 +50,7 @@ public class ManagerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(manager.getId().toString());
     }
 
+    @PreAuthorize("hasAuthority('MANAGER')")
     @PatchMapping("/{targetId}/change-name")
     public ResponseEntity<Void> changeName(
             @PathVariable UUID targetId,
@@ -58,6 +60,7 @@ public class ManagerController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('MANAGER')")
     @PatchMapping("/{targetId}/change-password")
     public ResponseEntity<Void> changePassword(
             @PathVariable UUID targetId,
@@ -68,16 +71,17 @@ public class ManagerController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('MANAGER')")
     @DeleteMapping("/{targetId}")
     public ResponseEntity<Void> delete(@PathVariable UUID targetId) {
         managerService.deleteUser(targetId);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('MANAGER')")
     @PatchMapping("/{targetId}/reactivate")
     public ResponseEntity<Void> reactivate(@PathVariable UUID targetId) {
         managerService.reactivate(targetId);
         return ResponseEntity.noContent().build();
     }
 }
-

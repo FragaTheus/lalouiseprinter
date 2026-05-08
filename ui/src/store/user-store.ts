@@ -8,6 +8,7 @@ export interface AuthUser {
   nickname: string;
   email: string;
   role: string;
+  restaurantId?: string;
 }
 
 interface UserStoreState {

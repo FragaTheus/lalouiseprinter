@@ -33,7 +33,7 @@ public class AdminController {
             @RequestParam(required = false) Boolean active,
             @PageableDefault Pageable pageable
     ) {
-        var admins = adminService.getAllAdmins(term, active, pageable);
+        var admins = adminService.getAll(term, active, pageable);
         return ResponseEntity.ok(admins.map(AdminMapper::toAdminSummary));
     }
 
