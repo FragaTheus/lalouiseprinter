@@ -31,6 +31,7 @@ public class RestaurantController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<RestaurantSummary>> list(
             @RequestParam(required = false) String term,
             @RequestParam(required = false) Boolean active,
@@ -48,6 +49,7 @@ public class RestaurantController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> update(
             @PathVariable("id") UUID restaurantId,
             @Valid @RequestBody ChangeRestaurantNameRequest request
@@ -71,7 +73,6 @@ public class RestaurantController {
     }
 
     @GetMapping("{restaurantId}/lookup")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<RestaurantLookUp> getRestaurantLookUp(){
         var restaurant = restaurantService.getRestaurant(RestaurantContext.get());
         return ResponseEntity.ok(RestaurantMapper.toRestaurantLookUp(restaurant));

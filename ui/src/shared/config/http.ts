@@ -76,7 +76,7 @@ api.interceptors.response.use(
 
 		if (isBrowser && error.response?.status === 403) {
 			toast.error("Acesso negado. Você não tem permissão para acessar este recurso.");
-			//window.location.href = "/forbidden";
+			window.location.href = "/forbidden";
 		}
 
 		if (isBrowser) {

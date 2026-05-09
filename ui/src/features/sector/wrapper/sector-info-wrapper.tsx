@@ -1,19 +1,26 @@
 "use client";
 
-import { useRestaurantInfo } from "../hooks/use-restaurant";
+import { useSectorInfo, STORAGE_LABELS } from "../hook/use-sector";
 import { useParams } from "next/navigation";
-import RestaurantInfoLayout from "../layout/restaurant-info-layout";
-import { useUserStore } from "@/store/user-store";
+import SectorInfoLayout from "../layout/sector-info-layout";
+import { useRouteGuard } from "@/shared/components/app/app-route-guard";
 
-export default function RestaurantInfoWrapper() {
-  const { id } = useParams<{ id: string }>();
-  const { data, isLoading, isError } = useRestaurantInfo(id);
-  const { user } = useUserStore();
+export default function SectorInfoWrapper() {
+  const { sectorId, id: restaurantId } = useParams<{
+    sectorId: string;
+    id: string;
+  }>();
+  const { role } = useRouteGuard();
+  const { data, isLoading, isError } = useSectorInfo(restaurantId, sectorId);
+
+  const storagesLabel =
+    data?.storages?.map((s) => STORAGE_LABELS[s] ?? s).join(", ") ?? "N/A";
 
   const items = [
     { label: "Identificador:", children: data?.id ?? "N/A" },
     { label: "Nome:", children: data?.name ?? "N/A" },
-    { label: "CNPJ:", children: data?.cnpj ?? "N/A" },
+    { label: "Descrição:", children: data?.description ?? "N/A" },
+    { label: "Armazenamentos:", children: storagesLabel },
     {
       label: "Status:",
       children: (
@@ -25,6 +32,8 @@ export default function RestaurantInfoWrapper() {
         </span>
       ),
     },
+    // TODO: implementar vínculo de responsável futuramente
+    // { label: "Responsável:", children: data?.responsibleId ?? "N/A" },
     {
       label: "Criado em:",
       children: data?.createdAt
@@ -40,13 +49,13 @@ export default function RestaurantInfoWrapper() {
   ];
 
   return (
-    <RestaurantInfoLayout
+    <SectorInfoLayout
       title={data?.name ?? "N/A"}
       isLoading={isLoading}
       isError={isError}
       items={items}
       isActive={data?.active ?? false}
-      role={user?.role ?? undefined}
+      role={role ?? undefined}
     />
   );
 }
