@@ -3,9 +3,9 @@
 import AppForm from "@/shared/components/app/app-form";
 import { Field, FieldContent, FieldLabel } from "@/shared/components/ui/field";
 import { Input } from "@/shared/components/ui/input";
-import { Textarea } from "@/shared/components/ui/textarea";
 import { useCreateProduct } from "../hook/use-product";
 import { useParams } from "next/navigation";
+import { CategorySelect } from "../components/product-category-select";
 
 export default function RegisterProductWrapper() {
   const { id: restaurantId } = useParams<{ id: string }>();
@@ -27,11 +27,7 @@ export default function RegisterProductWrapper() {
       <Field>
         <FieldLabel>Descrição</FieldLabel>
         <FieldContent>
-          <Textarea
-            name="description"
-            placeholder="Descrição do produto"
-            required
-          />
+          <CategorySelect name="category" />
         </FieldContent>
       </Field>
     </AppForm>

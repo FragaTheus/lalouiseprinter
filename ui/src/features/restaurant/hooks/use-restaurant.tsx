@@ -25,7 +25,7 @@ export const useCreateRestaurant = () => {
       toast.success("Novo restaurante registrado com sucesso!", {
         action: {
           label: "Ver restaurante",
-          onClick: () => push(`/dashboard/restaurants/${id}`),
+          onClick: () => push(`/dashboard/restaurants/${id}/info`),
         },
       });
       push("/dashboard/restaurants");

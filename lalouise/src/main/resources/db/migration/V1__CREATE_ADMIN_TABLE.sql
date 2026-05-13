@@ -7,5 +7,6 @@ CREATE TABLE admins
     role       VARCHAR(20)  NOT NULL,
     active     BOOLEAN      NOT NULL,
     created_at TIMESTAMP NOT NULL ,
-    updated_at TIMESTAMP NOT NULL
+    updated_at TIMESTAMP NOT NULL,
+    CONSTRAINT chk_admin_role CHECK (role = 'ADMIN')
 );

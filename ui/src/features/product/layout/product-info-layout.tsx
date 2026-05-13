@@ -2,7 +2,7 @@ import { PerfilItem } from "@/shared/components/app/app-info-card";
 import AppInfoLayout from "@/shared/components/layouts/app-info-layout";
 import ProductToggleActivationWrapper from "../wrapper/product-toggle-activation-wrapper";
 import ProductChangeNameWrapper from "../wrapper/product-change-name-wrapper";
-import ProductChangeDescriptionWrapper from "../wrapper/product-change-description-wrapper";
+import ProductChangeDescriptionWrapper from "../wrapper/product-change-category-wrapper";
 
 export default function ProductInfoLayout({
   title,
@@ -17,7 +17,7 @@ export default function ProductInfoLayout({
   isError: boolean;
   items: PerfilItem[];
   isActive: boolean;
-  role?: "ADMIN" | "MANAGER" | "STAFF";
+  role: string | undefined;
 }) {
   return (
     <AppInfoLayout
@@ -27,7 +27,7 @@ export default function ProductInfoLayout({
       isError={isError}
       isLoading={isLoading}
     >
-      {role == "ADMIN" && (
+      {role == "MANAGER" && (
         <>
           <h2 className="font-semibold text-xl">Configurações do produto</h2>
           <ProductChangeNameWrapper />

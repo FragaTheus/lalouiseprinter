@@ -1,10 +1,11 @@
 package br.com.matheusfragadev.lalouise.infra.controller.product;
 
 import br.com.matheusfragadev.lalouise.application.product.ProductService;
+import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.request.ChangeCategoryRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.request.CreateProductRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.request.ProductChangeDescriptionRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.request.ProductChangeNameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.response.ProductInfo;
+import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.response.ProductLookup;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.response.ProductSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.mapper.ProductMapper;
 import jakarta.validation.Valid;
@@ -42,10 +43,19 @@ public class ProductController {
         return ResponseEntity.ok(ProductMapper.toProductInfo(product));
     }
 
+    @GetMapping("/lookup")
+    public ResponseEntity<Page<ProductLookup>> lookup(
+            @RequestParam(required = false) String term,
+            @PageableDefault Pageable pageable
+    ) {
+        var products = productService.getAll(term, true, pageable);
+        return ResponseEntity.ok(products.map(ProductMapper::toLookup));
+    }
+
     @PostMapping
     @PreAuthorize("hasAuthority('MANAGER')")
     public ResponseEntity<String> create(@Valid @RequestBody CreateProductRequest request) {
-        var product = productService.createProduct(request.name(), request.description());
+        var product = productService.createProduct(request.name(), request.category());
         return ResponseEntity.status(HttpStatus.CREATED).body(product.getId().toString());
     }
 
@@ -60,12 +70,12 @@ public class ProductController {
     }
 
     @PreAuthorize("hasAuthority('MANAGER')")
-    @PatchMapping("/{productId}/change-description")
-    public ResponseEntity<Void> updateDescription(
+    @PatchMapping("/{productId}/change-category")
+    public ResponseEntity<Void> updateCategory(
             @PathVariable UUID productId,
-            @Valid @RequestBody ProductChangeDescriptionRequest request
+            @Valid @RequestBody ChangeCategoryRequest request
     ){
-        productService.changeDescription(productId, request.newDescription());
+        productService.changeCategory(productId, request.category());
         return ResponseEntity.noContent().build();
     }
 
@@ -82,5 +92,6 @@ public class ProductController {
         productService.reactivate(productId);
         return ResponseEntity.noContent().build();
     }
+
 }
 

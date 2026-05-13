@@ -6,7 +6,6 @@ import br.com.matheusfragadev.lalouise.domain.product.exception.ProductAlreadyEx
 import br.com.matheusfragadev.lalouise.domain.product.exception.ProductNotFoundException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.request.CreateProductRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.request.ProductChangeDescriptionRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.request.ProductChangeNameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.response.ProductInfo;
 import br.com.matheusfragadev.lalouise.infra.controller.product.utils.dto.response.ProductSummary;

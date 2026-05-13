@@ -2,10 +2,10 @@ package br.com.matheusfragadev.lalouise.application.product;
 
 import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
 import br.com.matheusfragadev.lalouise.domain.product.entity.Product;
+import br.com.matheusfragadev.lalouise.domain.product.enums.Category;
 import br.com.matheusfragadev.lalouise.domain.product.exception.ProductAlreadyExistsException;
 import br.com.matheusfragadev.lalouise.domain.product.exception.ProductNotFoundException;
 import br.com.matheusfragadev.lalouise.domain.product.repository.ProductRepository;
-import br.com.matheusfragadev.lalouise.domain.product.vo.ProductDescription;
 import br.com.matheusfragadev.lalouise.domain.product.vo.ProductName;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.infra.context.restaurant.RestaurantContext;
@@ -27,7 +27,7 @@ public class ProductService {
     private final RestaurantService restaurantService;
 
     @Transactional
-    public Product createProduct(String name, String description) {
+    public Product createProduct(String name, Category category) {
         try {
             var restaurantId = RestaurantContext.get();
             log.info("Creating product for restaurant: {}", restaurantId);
@@ -40,7 +40,7 @@ public class ProductService {
             var productName = new ProductName(name);
             verifyIfNameIsThemSameInRestaurantContext(productName.value(), restaurantId);
 
-            var product = new Product(productName, new ProductDescription(description), restaurantId);
+            var product = new Product(productName, category, restaurantId);
             log.info("Product created successfully for restaurant: {}", restaurantId);
             return productRepository.save(product);
         } catch (Exception e) {
@@ -54,22 +54,15 @@ public class ProductService {
         var restaurantId = RestaurantContext.get();
         verifyIfNameIsThemSameInRestaurantContext(newProductName, restaurantId);
         var product = getProduct(targetId);
-        if (newProductName.equals(product.getName().value())) {
-            return null;
-        }
         var name = new ProductName(newProductName);
         product.changeName(name);
         return productRepository.save(product);
     }
 
     @Transactional
-    public Product changeDescription(UUID targetId, String newProductDescription){
+    public Product changeCategory(UUID targetId, Category category){
         var product = getProduct(targetId);
-        if (newProductDescription.equals(product.getDescription().value())) {
-            return null;
-        }
-        var description = new ProductDescription(newProductDescription);
-        product.changeDescription(description);
+        product.changeCategory(category);
         return productRepository.save(product);
     }
 

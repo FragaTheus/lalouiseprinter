@@ -11,13 +11,14 @@ import { toast } from "sonner";
 
 interface CreateProductRequest {
   name: string;
-  description: string;
+  category: string;
 }
 
 export const useCreateProduct = (restaurantId: string) => {
   const { push } = useRouter();
   return useMutation({
     mutationFn: async (data: CreateProductRequest) => {
+      console.log("Creating product with data:", data);
       const response = await api.post(
         `/api/v1/restaurants/${restaurantId}/products`,
         data,
@@ -78,7 +79,7 @@ export const useProductListInfinite = (
 interface ProductInfo {
   id: string;
   name: string;
-  description: string;
+  category: string;
   active: boolean;
   restaurantId: string;
   createdAt: string;
@@ -121,25 +122,25 @@ export const useProductChangeName = (
   });
 };
 
-interface UpdateProductDescription {
-  newDescription: string;
+interface UpdateProductCategory {
+  category: string;
 }
 
-export const useUpdateProductDescription = (
+export const useUpdateProductCategory = (
   restaurantId: string,
   targetId: string,
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: UpdateProductDescription) => {
+    mutationFn: async (data: UpdateProductCategory) => {
       await api.patch(
-        `/api/v1/restaurants/${restaurantId}/products/${targetId}/change-description`,
+        `/api/v1/restaurants/${restaurantId}/products/${targetId}/change-category`,
         data,
       );
     },
     onSuccess: () => {
-      toast.success("Descrição do produto atualizada com sucesso!");
+      toast.success("Categoria do produto atualizada com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });

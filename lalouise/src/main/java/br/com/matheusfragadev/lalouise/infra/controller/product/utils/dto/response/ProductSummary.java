@@ -8,9 +8,7 @@ import java.util.UUID;
 public record ProductSummary(
         UUID id,
         String name,
-        String description,
-        boolean active,
-        UUID restaurantId
+        boolean active
 ) {
 }
 

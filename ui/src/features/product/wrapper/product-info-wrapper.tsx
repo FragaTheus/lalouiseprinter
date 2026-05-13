@@ -3,18 +3,34 @@
 import { useProductInfo } from "../hook/use-product";
 import { useParams } from "next/navigation";
 import ProductInfoLayout from "../layout/product-info-layout";
+import { useUserStore } from "@/store/user-store";
 
 export default function ProductInfoWrapper() {
+  const { user } = useUserStore();
   const { productId, id: restaurantId } = useParams<{
     productId: string;
     id: string;
   }>();
   const { data, isLoading, isError } = useProductInfo(restaurantId, productId);
 
+  const CATEGORY_LABELS: Record<string, string> = {
+    PROTEIN: "Proteína",
+    SEAFOOD: "Frutos do Mar",
+    VEGETABLE: "Vegetais",
+    GRAINS: "Grãos",
+    SEASONINGS: "Temperos",
+    SAUCES: "Molhos",
+    OILS: "Óleos",
+    PASTA: "Massas",
+  };
+
   const items = [
     { label: "Identificador:", children: data?.id ?? "N/A" },
     { label: "Nome:", children: data?.name ?? "N/A" },
-    { label: "Descrição:", children: data?.description ?? "N/A" },
+    {
+      label: "Categoria:",
+      children: data?.category ? CATEGORY_LABELS[data.category] : "N/A",
+    },
     {
       label: "Status:",
       children: (
@@ -47,6 +63,7 @@ export default function ProductInfoWrapper() {
       isError={isError}
       items={items}
       isActive={data?.active ?? false}
+      role={user?.role}
     />
   );
 }

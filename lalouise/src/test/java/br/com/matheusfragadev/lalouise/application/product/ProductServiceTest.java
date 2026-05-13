@@ -5,7 +5,6 @@ import br.com.matheusfragadev.lalouise.domain.product.entity.Product;
 import br.com.matheusfragadev.lalouise.domain.product.exception.ProductAlreadyExistsException;
 import br.com.matheusfragadev.lalouise.domain.product.exception.ProductNotFoundException;
 import br.com.matheusfragadev.lalouise.domain.product.repository.ProductRepository;
-import br.com.matheusfragadev.lalouise.domain.product.vo.ProductDescription;
 import br.com.matheusfragadev.lalouise.domain.product.vo.ProductName;
 import br.com.matheusfragadev.lalouise.domain.restaurant.entity.Restaurant;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;

@@ -20,9 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     @Query("""
     SELECT p FROM Product p WHERE
-    (:term IS NULL OR
-    LOWER(p.name.value) LIKE LOWER(CONCAT('%', CAST(:term AS String), '%')) OR
-    LOWER(p.description.value) LIKE LOWER(CONCAT('%', CAST(:term AS String), '%')))
+    (:term IS NULL OR LOWER(p.name.value) LIKE LOWER(CONCAT('%', CAST(:term AS String), '%')))
     AND (:active IS NULL OR p.active = :active)
     AND p.restaurantId = :restaurantId
     """)

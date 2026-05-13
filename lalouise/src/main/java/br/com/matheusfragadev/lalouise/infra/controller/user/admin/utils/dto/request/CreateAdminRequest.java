@@ -1,0 +1,20 @@
+package br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
+public record CreateAdminRequest(
+        @NotBlank(message = "Nome é obrigatório")
+        String nickname,
+
+        @Email(message = "Email deve ser válido")
+        @NotBlank(message = "Email é obrigatório")
+        String email,
+
+        @NotBlank(message = "Senha é obrigatória")
+        String password,
+
+        @NotBlank(message = "Confirmação da senha é obrigatória")
+        String confirmPassword
+) {
+}

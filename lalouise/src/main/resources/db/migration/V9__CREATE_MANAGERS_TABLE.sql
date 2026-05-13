@@ -8,6 +8,7 @@ CREATE TABLE managers
     active        BOOLEAN      NOT NULL,
     restaurant_id UUID         NOT NULL,
     created_at    TIMESTAMP    NOT NULL,
-    updated_at    TIMESTAMP    NOT NULL
+    updated_at    TIMESTAMP    NOT NULL,
+    CONSTRAINT chk_manager_role CHECK (role = 'MANAGER')
 );
 
