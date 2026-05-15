@@ -2,7 +2,7 @@ package br.com.matheusfragadev.lalouise.infra.controller.manager;
 
 import br.com.matheusfragadev.lalouise.application.user.ManagerService;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
-import br.com.matheusfragadev.lalouise.application.user.utils.CreateStaffCommand;
+import br.com.matheusfragadev.lalouise.application.user.utils.CreateManagerCommand;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.ActiveException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
@@ -10,11 +10,8 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.Passwor
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Manager;
 import br.com.matheusfragadev.lalouise.domain.user.staff.exceptions.ManagerAlreadyExists;
 import br.com.matheusfragadev.lalouise.infra.controller.user.manager.ManagerController;
-import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.request.ChangeManagerNicknameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.request.CreateManagerRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.request.ManagerChangePasswordRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.response.ManagerInfo;
-import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.response.ManagerSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.mapper.ManagerMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -131,7 +128,7 @@ class ManagerControllerTest {
     void createShouldReturn201WithManagerId() {
         UUID id = UUID.randomUUID();
         CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Alice@123");
-        CreateStaffCommand command = CreateStaffCommand.builder()
+        CreateManagerCommand command = CreateManagerCommand.builder()
                 .nickname("Alice").email("alice@test.com")
                 .password("Alice@123").confirmPassword("Alice@123")
                 .build();
@@ -153,7 +150,7 @@ class ManagerControllerTest {
     @Test
     void createShouldPropagateManagerAlreadyExistsException() {
         CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Alice@123");
-        CreateStaffCommand command = CreateStaffCommand.builder()
+        CreateManagerCommand command = CreateManagerCommand.builder()
                 .nickname("Alice").email("alice@test.com")
                 .password("Alice@123").confirmPassword("Alice@123")
                 .build();
@@ -170,7 +167,7 @@ class ManagerControllerTest {
     @Test
     void createShouldPropagatePasswordExceptionWhenPasswordsMismatch() {
         CreateManagerRequest request = new CreateManagerRequest("Alice", "alice@test.com", "Alice@123", "Other@123");
-        CreateStaffCommand command = CreateStaffCommand.builder()
+        CreateManagerCommand command = CreateManagerCommand.builder()
                 .nickname("Alice").email("alice@test.com")
                 .password("Alice@123").confirmPassword("Other@123")
                 .build();

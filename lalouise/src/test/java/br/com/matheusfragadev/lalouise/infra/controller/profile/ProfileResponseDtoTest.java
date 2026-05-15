@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.controller.profile;
-import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.AdminResponse;
-import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.response.ManagerResponse;
+import br.com.matheusfragadev.lalouise.infra.controller.user.profile.utils.dto.response.AdminResponse;
+import br.com.matheusfragadev.lalouise.infra.controller.user.profile.utils.dto.response.ManagerResponse;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import org.junit.jupiter.api.Test;
 import java.time.Instant;

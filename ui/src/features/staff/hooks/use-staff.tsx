@@ -19,9 +19,8 @@ interface CreateStaffRequest {
 
 export const useCreateStaff = () => {
   const { push } = useRouter();
-  const { id: restaurantId, sectorId } = useParams<{
+  const { id: restaurantId } = useParams<{
     id: string;
-    sectorId: string;
   }>();
   const base = `/dashboard/restaurants/${restaurantId}/resources/staffs`;
   return useMutation({
@@ -30,7 +29,6 @@ export const useCreateStaff = () => {
         `/api/v1/restaurants/${restaurantId}/staffs`,
         data,
       );
-      console.log("CreateStaffResponse:", response.data);
       return response.data;
     },
     onSuccess: (id) => {
@@ -59,40 +57,10 @@ interface StaffSummary {
 
 export const useStaffListInfinite = (
   restaurantId: string,
-  sectorId: string,
   params?: StaffListRequest,
 ) => {
   return useInfiniteQuery({
-    queryKey: ["staffs", "list", "infinite", restaurantId, sectorId, params],
-    queryFn: async ({ pageParam = 0 }) => {
-      const response = await api.get<Page<StaffSummary>>(
-        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/staffs`,
-        {
-          params: { ...params, page: pageParam },
-        },
-      );
-      return response.data;
-    },
-    getNextPageParam: (lastPage) => {
-      if (lastPage.last) return undefined;
-      return lastPage.number + 1;
-    },
-  });
-};
-
-export const useStaffListByRestaurantInfinite = (
-  restaurantId: string,
-  params?: StaffListRequest,
-) => {
-  return useInfiniteQuery({
-    queryKey: [
-      "staffs",
-      "list",
-      "infinite",
-      "restaurant",
-      restaurantId,
-      params,
-    ],
+    queryKey: ["staffs", "list", "infinite", restaurantId, params],
     queryFn: async ({ pageParam = 0 }) => {
       const response = await api.get<Page<StaffSummary>>(
         `/api/v1/restaurants/${restaurantId}/staffs`,
@@ -121,13 +89,9 @@ interface StaffInfo {
   updatedAt: string;
 }
 
-export const useStaffInfo = (
-  restaurantId: string,
-  sectorId: string,
-  targetId: string,
-) => {
+export const useStaffInfo = (restaurantId: string, targetId: string) => {
   return useQuery({
-    queryKey: ["staffs", "info", restaurantId, sectorId, targetId],
+    queryKey: ["staffs", "info", restaurantId, targetId],
     queryFn: async () => {
       const response = await api.get<StaffInfo>(
         `/api/v1/restaurants/${restaurantId}/staffs/${targetId}`,
@@ -141,16 +105,12 @@ interface ChangeStaffNicknameRequest {
   newNickname: string;
 }
 
-export const useStaffChangeName = (
-  restaurantId: string,
-  sectorId: string,
-  targetId: string,
-) => {
+export const useStaffChangeName = (restaurantId: string, targetId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: ChangeStaffNicknameRequest) => {
       await api.patch(
-        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/staffs/${targetId}/change-name`,
+        `/api/v1/restaurants/${restaurantId}/staffs/${targetId}/change-name`,
         data,
       );
     },
@@ -168,13 +128,12 @@ interface StaffChangePasswordRequest {
 
 export const useStaffChangePassword = (
   restaurantId: string,
-  sectorId: string,
   targetId: string,
 ) => {
   return useMutation({
     mutationFn: async (data: StaffChangePasswordRequest) => {
       await api.patch(
-        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/staffs/${targetId}/change-password`,
+        `/api/v1/restaurants/${restaurantId}/staffs/${targetId}/change-password`,
         data,
       );
     },
@@ -184,16 +143,12 @@ export const useStaffChangePassword = (
   });
 };
 
-export const useDeactivateStaff = (
-  restaurantId: string,
-  sectorId: string,
-  targetId: string,
-) => {
+export const useDeactivateStaff = (restaurantId: string, targetId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
       await api.delete(
-        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/staffs/${targetId}`,
+        `/api/v1/restaurants/${restaurantId}/staffs/${targetId}`,
       );
     },
     onSuccess: () => {
@@ -203,16 +158,12 @@ export const useDeactivateStaff = (
   });
 };
 
-export const useReactivateStaff = (
-  restaurantId: string,
-  sectorId: string,
-  targetId: string,
-) => {
+export const useReactivateStaff = (restaurantId: string, targetId: string) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async () => {
       await api.patch(
-        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/staffs/${targetId}/reactivate`,
+        `/api/v1/restaurants/${restaurantId}/staffs/${targetId}/reactivate`,
       );
     },
     onSuccess: () => {

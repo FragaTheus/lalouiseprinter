@@ -18,7 +18,7 @@ export default function StaffsWrapper() {
     id: string;
     sectorId: string;
   }>();
-  const base = `/dashboard/restaurants/${restaurantId}/resources/sectors/${sectorId}/staffs`;
+  const base = `/dashboard/restaurants/${restaurantId}/resources/staffs`;
   const router = useRouter();
   const searchParams = useSearchParams();
   const term = searchParams.get("term") ?? "";
@@ -27,7 +27,7 @@ export default function StaffsWrapper() {
     activeParam === "true" ? true : activeParam === "false" ? false : undefined;
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useStaffListInfinite(restaurantId, sectorId, {
+    useStaffListInfinite(restaurantId, {
       term: term || undefined,
       active,
     });

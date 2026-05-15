@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.context.restaurant;
 
-import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Staff;
+import br.com.matheusfragadev.lalouise.domain.user.staff.entity.BaseStaff;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +29,8 @@ public class RestaurantContextResolver {
 
         var credentials = userDetails.getCredentials();
 
-        if (credentials instanceof Staff staff) {
-            var staffRestaurantId = staff.getRestaurantId();
+        if (credentials instanceof BaseStaff baseStaff) {
+            var staffRestaurantId = baseStaff.getRestaurantId();
             var urlRestaurantId = extractFromUrl(request.getRequestURI());
 
             if (urlRestaurantId != null && !urlRestaurantId.equals(staffRestaurantId)) {

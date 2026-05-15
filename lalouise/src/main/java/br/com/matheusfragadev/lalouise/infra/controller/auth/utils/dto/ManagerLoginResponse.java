@@ -10,8 +10,7 @@ public record ManagerLoginResponse(
         String nickname,
         String email,
         String role,
-        UUID restaurantId,
-        String restaurantName
+        UUID restaurantId
 ) implements LoginResponse {
 }
 

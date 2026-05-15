@@ -3,17 +3,16 @@ import br.com.matheusfragadev.lalouise.application.user.AdminService;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.ActiveException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.AdminController;
-import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.request.AdminChangePasswordRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.request.ChangeAdminNicknameRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserChangeNicknameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.request.CreateAdminRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.response.AdminInfo;
-import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.response.AdminSummary;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.mapper.AdminMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,15 +44,15 @@ class AdminControllerTest {
         Admin a2 = mock(Admin.class);
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
-        AdminSummary s1 = new AdminSummary(id1, "Alice", "alice@test.com", true);
-        AdminSummary s2 = new AdminSummary(id2, "Bob", "bob@test.com", true);
+        UserSummary s1 = new UserSummary(id1, "Alice", "alice@test.com", true);
+        UserSummary s2 = new UserSummary(id2, "Bob", "bob@test.com", true);
         Pageable pageable = PageRequest.of(0, 10);
         Page<Admin> adminPage = new PageImpl<>(List.of(a1, a2), pageable, 2);
         when(adminService.getAll(null, null, pageable)).thenReturn(adminPage);
         try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
             mapper.when(() -> AdminMapper.toAdminSummary(a1)).thenReturn(s1);
             mapper.when(() -> AdminMapper.toAdminSummary(a2)).thenReturn(s2);
-            ResponseEntity<Page<AdminSummary>> response = controller.list(null, null, pageable);
+            ResponseEntity<Page<UserSummary>> response = controller.list(null, null, pageable);
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertNotNull(response.getBody());
             assertEquals(2, response.getBody().getContent().size());
@@ -66,7 +65,7 @@ class AdminControllerTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Admin> emptyPage = new PageImpl<>(List.of(), pageable, 0);
         when(adminService.getAll(null, null, pageable)).thenReturn(emptyPage);
-        ResponseEntity<Page<AdminSummary>> response = controller.list(null, null, pageable);
+        ResponseEntity<Page<UserSummary>> response = controller.list(null, null, pageable);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertTrue(response.getBody().getContent().isEmpty());
@@ -126,8 +125,8 @@ class AdminControllerTest {
                 .build();
         try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
             mapper.when(() -> AdminMapper.toCreateAdminCommand(request)).thenReturn(command);
-            when(adminService.createUser(command)).thenThrow(new AdminAlreadyExists("Ja existe um usuario com esse email."));
-            AdminAlreadyExists ex = assertThrows(AdminAlreadyExists.class, () -> controller.create(request));
+            when(adminService.createUser(command)).thenThrow(new UserAlreadyExists("Ja existe um usuario com esse email."));
+            UserAlreadyExists ex = assertThrows(UserAlreadyExists.class, () -> controller.create(request));
             assertEquals("Ja existe um usuario com esse email.", ex.getMessage());
         }
     }
@@ -149,7 +148,7 @@ class AdminControllerTest {
     @Test
     void changeNameShouldReturn204NoContent() {
         UUID id = UUID.randomUUID();
-        ChangeAdminNicknameRequest request = new ChangeAdminNicknameRequest("New Name");
+        UserChangeNicknameRequest request = new UserChangeNicknameRequest("New Name");
         when(adminService.changeUserNickname(id, "New Name")).thenReturn(mock(Admin.class));
         ResponseEntity<Void> response = controller.changeName(id, request);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
@@ -159,7 +158,7 @@ class AdminControllerTest {
     @Test
     void changeNameShouldPropagateNicknameExceptionWhenNameIsIdentical() {
         UUID id = UUID.randomUUID();
-        ChangeAdminNicknameRequest request = new ChangeAdminNicknameRequest("Same Name");
+        UserChangeNicknameRequest request = new UserChangeNicknameRequest("Same Name");
         when(adminService.changeUserNickname(id, "Same Name"))
                 .thenThrow(new NicknameException("O novo nickname deve ser diferente do atual."));
         NicknameException ex = assertThrows(NicknameException.class, () -> controller.changeName(id, request));
@@ -168,7 +167,7 @@ class AdminControllerTest {
     @Test
     void changeNameShouldPropagateExceptionWhenAdminNotFound() {
         UUID id = UUID.randomUUID();
-        ChangeAdminNicknameRequest request = new ChangeAdminNicknameRequest("New Name");
+        UserChangeNicknameRequest request = new UserChangeNicknameRequest("New Name");
         when(adminService.changeUserNickname(id, "New Name"))
                 .thenThrow(new RuntimeException("Admin not found with id: " + id));
         RuntimeException ex = assertThrows(RuntimeException.class, () -> controller.changeName(id, request));

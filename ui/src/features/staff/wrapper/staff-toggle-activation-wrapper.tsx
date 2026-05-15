@@ -9,13 +9,12 @@ export default function StaffToggleActivationWrapper({
 }: {
   isActive: boolean;
 }) {
-  const { id: restaurantId, sectorId, staffId } = useParams<{
+  const { id: restaurantId, staffId } = useParams<{
     id: string;
-    sectorId: string;
     staffId: string;
   }>();
-  const deactivate = useDeactivateStaff(restaurantId, sectorId, staffId);
-  const reactivate = useReactivateStaff(restaurantId, sectorId, staffId);
+  const deactivate = useDeactivateStaff(restaurantId, staffId);
+  const reactivate = useReactivateStaff(restaurantId, staffId);
 
   return (
     <AppToggleActivation

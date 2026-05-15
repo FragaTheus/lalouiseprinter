@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.application.profile.admin;
-import br.com.matheusfragadev.lalouise.application.profile.AdminProfileServiceImpl;
-import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
+import br.com.matheusfragadev.lalouise.application.user.profile.AdminProfileServiceImpl;
+import br.com.matheusfragadev.lalouise.application.user.profile.utils.ProfileChangePassword;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
 import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;

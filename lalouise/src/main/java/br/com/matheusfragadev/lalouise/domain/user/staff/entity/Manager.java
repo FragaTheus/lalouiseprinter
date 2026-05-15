@@ -7,14 +7,16 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Entity
+@Getter
 @Table(name = "managers")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Manager extends Staff {
+public class Manager extends BaseStaff {
 
     public Manager(Nickname nickname, Email email, Password password, UUID restaurantId) {
         super(nickname, email, password, Role.MANAGER, restaurantId);

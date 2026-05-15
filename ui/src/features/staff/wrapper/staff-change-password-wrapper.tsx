@@ -5,16 +5,12 @@ import { useStaffChangePassword } from "../hooks/use-staff";
 import AppChangePasswordCard from "@/shared/components/app/app-password-card";
 
 export default function StaffChangePasswordWrapper() {
-  const { id: restaurantId, sectorId, staffId } = useParams<{
+  const { id: restaurantId, staffId } = useParams<{
     id: string;
     sectorId: string;
     staffId: string;
   }>();
-  const { mutate, isPending } = useStaffChangePassword(
-    restaurantId,
-    sectorId,
-    staffId,
-  );
+  const { mutate, isPending } = useStaffChangePassword(restaurantId, staffId);
 
   return (
     <AppChangePasswordCard

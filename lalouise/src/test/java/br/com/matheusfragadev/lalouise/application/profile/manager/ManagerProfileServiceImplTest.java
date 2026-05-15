@@ -1,7 +1,7 @@
 package br.com.matheusfragadev.lalouise.application.profile.manager;
 
-import br.com.matheusfragadev.lalouise.application.profile.ManagerProfileServiceImpl;
-import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
+import br.com.matheusfragadev.lalouise.application.user.profile.ManagerProfileServiceImpl;
+import br.com.matheusfragadev.lalouise.application.user.profile.utils.ProfileChangePassword;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;

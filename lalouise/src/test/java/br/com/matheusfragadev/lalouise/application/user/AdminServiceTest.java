@@ -3,7 +3,7 @@ package br.com.matheusfragadev.lalouise.application.user;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
@@ -76,7 +76,7 @@ class AdminServiceTest {
 
         when(adminRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
 
-        AdminAlreadyExists ex = assertThrows(AdminAlreadyExists.class, () -> service.createUser(command));
+        UserAlreadyExists ex = assertThrows(UserAlreadyExists.class, () -> service.createUser(command));
 
         assertEquals("Ja existe um usuario com esse email.", ex.getMessage());
         verify(adminRepository, never()).save(any(Admin.class));

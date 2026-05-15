@@ -4,6 +4,7 @@ import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminReposit
 import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.user.staff.repository.ManagerRepository;
+import br.com.matheusfragadev.lalouise.domain.user.staff.repository.StaffRepository;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final AdminRepository adminRepository;
     private final ManagerRepository managerRepository;
+    private final StaffRepository staffRepository;
 
     @Override
     public @NonNull UserDetails loadUserByUsername(@NonNull String email) throws UsernameNotFoundException {
@@ -43,15 +45,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private Optional<? extends Credentials> findByEmail(Email email) {
-        Optional<? extends Credentials> result = adminRepository.findByEmail(email).map(c -> c);
+        Optional<? extends Credentials> result = staffRepository.findByEmail(email).map(c -> c);
         if (result.isPresent()) return result;
-        return managerRepository.findByEmail(email).map(c -> c);
+        result = managerRepository.findByEmail(email).map(c -> c);
+        if (result.isPresent()) return result;
+        return adminRepository.findByEmail(email).map(c -> c);
     }
 
     private Optional<? extends Credentials> findById(UUID id) {
-        Optional<? extends Credentials> result = adminRepository.findById(id).map(c -> c);
+        Optional<? extends Credentials> result = staffRepository.findById(id).map(c -> c);
         if (result.isPresent()) return result;
-        return managerRepository.findById(id).map(c -> c);
+        result = managerRepository.findById(id).map(c -> c);
+        if (result.isPresent()) return result;
+        return adminRepository.findById(id).map(c -> c);
     }
 
 }

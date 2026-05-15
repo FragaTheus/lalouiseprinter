@@ -1,12 +1,13 @@
 package br.com.matheusfragadev.lalouise.infra.controller.user.manager;
 
 import br.com.matheusfragadev.lalouise.application.user.ManagerService;
-import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.request.ChangeManagerNicknameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.request.CreateManagerRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.request.ManagerChangePasswordRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.response.ManagerInfo;
-import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.dto.response.ManagerSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.user.manager.utils.mapper.ManagerMapper;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserChangeNicknameRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserChangePasswordRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserMapper;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserSummary;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,13 +28,13 @@ public class ManagerController {
     private final ManagerService managerService;
 
     @GetMapping
-    public ResponseEntity<Page<ManagerSummary>> list(
+    public ResponseEntity<Page<UserSummary>> list(
             @RequestParam(required = false) String term,
             @RequestParam(required = false) Boolean active,
             @PageableDefault Pageable pageable
     ) {
         var managers = managerService.getAll(term, active, pageable);
-        return ResponseEntity.ok(managers.map(ManagerMapper::toManagerSummary));
+        return ResponseEntity.ok(managers.map(UserMapper::toSummary));
     }
 
     @GetMapping("/{targetId}")
@@ -54,7 +55,7 @@ public class ManagerController {
     @PatchMapping("/{targetId}/change-name")
     public ResponseEntity<Void> changeName(
             @PathVariable UUID targetId,
-            @Valid @RequestBody ChangeManagerNicknameRequest request
+            @Valid @RequestBody UserChangeNicknameRequest request
     ) {
         managerService.changeUserNickname(targetId, request.newNickname());
         return ResponseEntity.noContent().build();
@@ -64,9 +65,9 @@ public class ManagerController {
     @PatchMapping("/{targetId}/change-password")
     public ResponseEntity<Void> changePassword(
             @PathVariable UUID targetId,
-            @Valid @RequestBody ManagerChangePasswordRequest request
+            @Valid @RequestBody UserChangePasswordRequest request
     ) {
-        var command = ManagerMapper.toChangePasswordCommand(request, targetId);
+        var command = UserMapper.toChangePasswordCommand(request, targetId);
         managerService.changeUserPassword(command);
         return ResponseEntity.noContent().build();
     }

@@ -1,12 +1,11 @@
 package br.com.matheusfragadev.lalouise.infra.controller.handler;
 
-import aj.org.objectweb.asm.Handle;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantActiveException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNameException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNotFoundException;
 import br.com.matheusfragadev.lalouise.domain.sector.exception.StorageException;
-import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.*;
 import br.com.matheusfragadev.lalouise.infra.security.details.DisableUserException;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -163,8 +162,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    @ExceptionHandler(AdminAlreadyExists.class)
-    public ResponseEntity<HandlerResponse> handleAdminAlreadyExists(AdminAlreadyExists ex) {
+    @ExceptionHandler(UserAlreadyExists.class)
+    public ResponseEntity<HandlerResponse> handleAdminAlreadyExists(UserAlreadyExists ex) {
         HandlerResponse response = new HandlerResponse(ex.getMessage());
         log.warn("AdminAlreadyExists: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);

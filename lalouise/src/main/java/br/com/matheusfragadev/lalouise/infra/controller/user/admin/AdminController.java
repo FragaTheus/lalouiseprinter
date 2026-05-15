@@ -1,12 +1,13 @@
 package br.com.matheusfragadev.lalouise.infra.controller.user.admin;
 
 import br.com.matheusfragadev.lalouise.application.user.AdminService;
-import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.request.AdminChangePasswordRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.request.ChangeAdminNicknameRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserChangeNicknameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.request.CreateAdminRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.response.AdminInfo;
-import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.response.AdminSummary;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.mapper.AdminMapper;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserChangePasswordRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,13 +27,13 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping
-    public ResponseEntity<Page<AdminSummary>> list(
+    public ResponseEntity<Page<UserSummary>> list(
             @RequestParam(required = false) String term,
             @RequestParam(required = false) Boolean active,
             @PageableDefault Pageable pageable
     ) {
         var admins = adminService.getAll(term, active, pageable);
-        return ResponseEntity.ok(admins.map(AdminMapper::toAdminSummary));
+        return ResponseEntity.ok(admins.map(UserMapper::toSummary));
     }
 
     @GetMapping("/{targetId}")
@@ -52,7 +53,7 @@ public class AdminController {
     public ResponseEntity<Void> changeName
             (
                     @PathVariable UUID targetId,
-                    @Valid @RequestBody ChangeAdminNicknameRequest request
+                    @Valid @RequestBody UserChangeNicknameRequest request
             ){
         adminService.changeUserNickname(targetId, request.newNickname());
         return ResponseEntity.noContent().build();
@@ -62,9 +63,9 @@ public class AdminController {
     public ResponseEntity<Void> changePassword
             (
                     @PathVariable UUID targetId,
-                    @Valid @RequestBody AdminChangePasswordRequest request
+                    @Valid @RequestBody UserChangePasswordRequest request
             ){
-        var command = AdminMapper.toChangePasswordCommand(request, targetId);
+        var command = UserMapper.toChangePasswordCommand(request, targetId);
         adminService.changeUserPassword(command);
         return ResponseEntity.noContent().build();
     }

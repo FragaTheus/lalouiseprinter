@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.controller.handler;
 
-import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantActiveException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNameException;
@@ -146,7 +146,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void shouldHandleAdminAlreadyExists() {
-        var response = handler.handleAdminAlreadyExists(new AdminAlreadyExists("Ja existe um usuario com esse email."));
+        var response = handler.handleAdminAlreadyExists(new UserAlreadyExists("Ja existe um usuario com esse email."));
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         assertEquals("Ja existe um usuario com esse email.", response.getBody().error());
     }

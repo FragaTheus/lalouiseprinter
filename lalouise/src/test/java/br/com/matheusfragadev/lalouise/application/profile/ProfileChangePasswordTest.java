@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.application.profile;
 
-import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
+import br.com.matheusfragadev.lalouise.application.user.profile.utils.ProfileChangePassword;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

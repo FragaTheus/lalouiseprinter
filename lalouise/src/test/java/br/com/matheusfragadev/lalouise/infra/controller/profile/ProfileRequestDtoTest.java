@@ -1,7 +1,7 @@
 package br.com.matheusfragadev.lalouise.infra.controller.profile;
 
-import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangeNameRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.profile.utils.dto.request.ChangePasswordRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.profile.utils.dto.request.ChangeNameRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.profile.utils.dto.request.ChangePasswordRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

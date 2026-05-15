@@ -2,7 +2,7 @@ package br.com.matheusfragadev.lalouise.application.user;
 
 import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
-import br.com.matheusfragadev.lalouise.application.user.utils.CreateStaffCommand;
+import br.com.matheusfragadev.lalouise.application.user.utils.CreateManagerCommand;
 import br.com.matheusfragadev.lalouise.domain.restaurant.entity.Restaurant;
 import br.com.matheusfragadev.lalouise.domain.restaurant.vo.RestaurantName;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
@@ -59,8 +59,8 @@ class ManagerServiceTest {
         RestaurantContext.clear();
     }
 
-    private CreateStaffCommand validCommand() {
-        return CreateStaffCommand.builder()
+    private CreateManagerCommand validCommand() {
+        return CreateManagerCommand.builder()
                 .nickname("Manager User")
                 .email("manager@test.com")
                 .password("Manager@123")
@@ -72,7 +72,7 @@ class ManagerServiceTest {
 
     @Test
     void createManagerShouldSaveAndReturnManagerWhenInputIsValid() {
-        CreateStaffCommand command = validCommand();
+        CreateManagerCommand command = validCommand();
 
         Restaurant restaurant = mock(Restaurant.class);
         when(restaurant.getId()).thenReturn(restaurantId);
@@ -94,7 +94,7 @@ class ManagerServiceTest {
 
     @Test
     void createManagerShouldThrowWhenEmailAlreadyExists() {
-        CreateStaffCommand command = validCommand();
+        CreateManagerCommand command = validCommand();
 
         Restaurant restaurant = mock(Restaurant.class);
         when(restaurant.isActive()).thenReturn(true);
@@ -109,7 +109,7 @@ class ManagerServiceTest {
 
     @Test
     void createManagerShouldThrowWhenPasswordsDoNotMatch() {
-        CreateStaffCommand command = CreateStaffCommand.builder()
+        CreateManagerCommand command = CreateManagerCommand.builder()
                 .nickname("Manager User").email("manager@test.com")
                 .password("Manager@123").confirmPassword("Different@123")
                 .build();
@@ -127,7 +127,7 @@ class ManagerServiceTest {
 
     @Test
     void createManagerShouldThrowWhenRestaurantNotFound() {
-        CreateStaffCommand command = validCommand();
+        CreateManagerCommand command = validCommand();
 
         when(restaurantService.getRestaurant(restaurantId)).thenThrow(new RuntimeException("Restaurant not found"));
 

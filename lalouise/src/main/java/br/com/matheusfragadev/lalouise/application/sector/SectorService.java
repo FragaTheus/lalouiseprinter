@@ -125,6 +125,13 @@ public class SectorService {
     }
 
     @Transactional(readOnly = true)
+    public Sector getSectorById(UUID id){
+        return sectorRepository.findById(id).orElseThrow(
+                () -> new SectorNotFoundException("Setor não encontrado com id: " + id)
+        );
+    }
+
+    @Transactional(readOnly = true)
     public Page<Sector> getAll(String term, Boolean active, Pageable pageable) {
         var restaurantId = RestaurantContext.get();
         return sectorRepository.findAllSectors(term, active, restaurantId, pageable);

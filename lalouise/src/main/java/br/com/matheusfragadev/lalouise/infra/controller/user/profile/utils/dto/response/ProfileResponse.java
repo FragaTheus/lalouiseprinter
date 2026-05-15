@@ -1,0 +1,16 @@
+package br.com.matheusfragadev.lalouise.infra.controller.user.profile.utils.dto.response;
+
+import java.time.Instant;
+import java.util.UUID;
+
+public sealed interface ProfileResponse permits AdminResponse, ManagerResponse, StaffResponse {
+    UUID id();
+
+    String nickname();
+
+    String email();
+
+    Instant createdAt();
+
+}
+

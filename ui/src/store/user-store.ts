@@ -9,6 +9,7 @@ export interface AuthUser {
   email: string;
   role: string;
   restaurantId?: string;
+  sectorId?:string;
 }
 
 interface UserStoreState {

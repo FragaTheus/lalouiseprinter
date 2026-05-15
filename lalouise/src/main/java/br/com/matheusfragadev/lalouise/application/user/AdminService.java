@@ -3,7 +3,7 @@ package br.com.matheusfragadev.lalouise.application.user;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.AdminAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
@@ -34,7 +34,7 @@ public class AdminService implements UserService<Admin> {
         try {
             log.info("Creating admin user with email: {}", command.email());
             if (adminRepository.existsByEmail(new Email(command.email()))) {
-                throw new AdminAlreadyExists("Ja existe um usuario com esse email.");
+                throw new UserAlreadyExists("Ja existe um usuario com esse email.");
             }
             inputPasswordMatches(command.password(), command.confirmPassword());
             var admin = new Admin(

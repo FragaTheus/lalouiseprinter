@@ -1,7 +1,8 @@
 package br.com.matheusfragadev.lalouise.application.profile;
-import br.com.matheusfragadev.lalouise.application.profile.facade.ProfileFacade;
-import br.com.matheusfragadev.lalouise.application.profile.registry.ProfileServiceRegistry;
-import br.com.matheusfragadev.lalouise.application.profile.utils.ProfileChangePassword;
+import br.com.matheusfragadev.lalouise.application.user.profile.ProfileService;
+import br.com.matheusfragadev.lalouise.application.user.profile.facade.ProfileFacade;
+import br.com.matheusfragadev.lalouise.application.user.profile.registry.ProfileServiceRegistry;
+import br.com.matheusfragadev.lalouise.application.user.profile.utils.ProfileChangePassword;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import org.junit.jupiter.api.Test;

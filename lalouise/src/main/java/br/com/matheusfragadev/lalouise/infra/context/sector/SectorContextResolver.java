@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.context.sector;
 
-import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Staff;
+import br.com.matheusfragadev.lalouise.domain.user.staff.entity.BaseStaff;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -32,12 +32,12 @@ public class SectorContextResolver {
 
         var credentials = userDetails.getCredentials();
 
-        if (credentials instanceof Staff staff) {
+        if (credentials instanceof BaseStaff baseStaff) {
             var urlRestaurantId = extractRestaurantFromUrl(request.getRequestURI());
 
-            if (urlRestaurantId != null && !urlRestaurantId.equals(staff.getRestaurantId())) {
+            if (urlRestaurantId != null && !urlRestaurantId.equals(baseStaff.getRestaurantId())) {
                 log.warn("Staff {} attempted to access sectors of restaurant {} but belongs to {}",
-                        userDetails.getId(), urlRestaurantId, staff.getRestaurantId());
+                        userDetails.getId(), urlRestaurantId, baseStaff.getRestaurantId());
                 throw new AccessDeniedException("Acesso negado: você não pertence a este restaurante");
             }
         }

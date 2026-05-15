@@ -2,7 +2,8 @@ package br.com.matheusfragadev.lalouise.application.user;
 
 import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
-import br.com.matheusfragadev.lalouise.application.user.utils.CreateStaffCommand;
+import br.com.matheusfragadev.lalouise.application.user.utils.CreateManagerCommand;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
@@ -33,7 +34,7 @@ public class ManagerService implements UserService<Manager> {
     private final RestaurantService restaurantService;
 
     @Transactional
-    public Manager createManager(CreateStaffCommand command) {
+    public Manager createManager(CreateManagerCommand command) {
         try {
             var restaurantId = RestaurantContext.get();
             log.info("Creating manager for restaurant: {}", restaurantId);
@@ -42,7 +43,7 @@ public class ManagerService implements UserService<Manager> {
                 throw new InactiveResourceException("Não é possível vincular um colaborador a um restaurante inativo.");
             }
             if (managerRepository.existsByEmail(new Email(command.email()))) {
-                throw new ManagerAlreadyExists("Já existe um manager com esse email.");
+                throw new UserAlreadyExists("Já existe um manager com esse email.");
             }
             inputPasswordMatches(command.password(), command.confirmPassword());
             var manager = new Manager(
