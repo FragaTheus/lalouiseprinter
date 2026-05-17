@@ -6,7 +6,7 @@ import { useUserStore } from "@/store/user-store";
 import DashboardTitle from "../components/dash-title";
 import AppDashboardLayout from "@/shared/components/layouts/app-dashboard-layout";
 import { DashCardLayoutProps } from "../layout/dash-card-layout";
-import { BiInfoCircle, BiLabel, BiPlus } from "react-icons/bi";
+import { BiInfoCircle, BiLabel, BiPlus, BiSearch } from "react-icons/bi";
 import { useParams } from "next/navigation";
 
 export default function DashSectorWrapper() {
@@ -18,19 +18,18 @@ export default function DashSectorWrapper() {
 
   const cards = [
     {
-      className: "md:col-span-2",
-      href: "/dashboard/admins",
-      Icon: BiLabel,
-      title: "Etiquetas",
+      href: `/dashboard/restaurants/${id}/resources/sectors/${sectorId}/resources/labels/sector`,
+      Icon: BiSearch,
+      title: "Etiquetas do Setor",
       description:
-        "Gerencie perfis de alta hierarquia, permissões globais do sistema e logs de segurança crítica.",
+        "Filtre e consulte as etiquetas diretamente pelo contexto deste setor.",
     },
     {
-      href: "",
+      roles: ["MANAGER", "STAFF"],
+      href: `/dashboard/restaurants/${id}/resources/sectors/${sectorId}/resources/labels/print`,
       Icon: BiPlus,
       title: "Nova etiqueta",
-      description:
-        "Gere uma nova etiqueta, defina suas características e monitore logs de segurança crítica.",
+      description: "Imprima uma nova etiqueta para um produto neste setor.",
     },
     {
       roles: ["ADMIN", "MANAGER"],

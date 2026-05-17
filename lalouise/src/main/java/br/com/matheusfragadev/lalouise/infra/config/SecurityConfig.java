@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -42,6 +43,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/restaurants/*/labels/**").authenticated()
+                        .requestMatchers("/api/v1/restaurants/*/labels/**").hasAnyAuthority("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/restaurants/*/products/**").authenticated()
                         .requestMatchers("/api/v1/restaurants/*/sectors/**").hasAnyAuthority("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/restaurants/*/staffs/**").hasAnyAuthority("ADMIN", "MANAGER")

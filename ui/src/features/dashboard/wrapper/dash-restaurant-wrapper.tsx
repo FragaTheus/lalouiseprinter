@@ -53,7 +53,14 @@ export default function DashRestaurantWrapper() {
       Icon: MdLabel,
       title: "Etiquetas",
       description:
-        "Sistema de rotulagem, datas de validade e controle de rastreabilidade de insumos.",
+        "Monitoramento global de etiquetas emitidas, validades e conformidade sanitária.",
+    },
+    {
+      href: `${base}/resources/labels/lot`,
+      Icon: MdLabel,
+      title: "Rastreio",
+      description:
+        "Rastreie todas as etiquetas associadas a um lote específico do restaurante.",
     },
     {
       href: `${base}/resources/products`,

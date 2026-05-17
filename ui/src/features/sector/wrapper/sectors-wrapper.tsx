@@ -64,7 +64,7 @@ export default function SectorsWrapper() {
   const cards: AppSummaryCardProps[] =
     data?.pages.flatMap((p) =>
       p.content.map((sector) => ({
-        href: `${base}/${sector.id}`,
+        href: `${base}/${sector.id}/resources`,
         fields: [
           { label: "Nome", children: <span>{sector.name}</span> },
           {

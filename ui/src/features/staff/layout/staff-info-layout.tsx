@@ -10,14 +10,12 @@ export default function StaffInfoLayout({
   isError,
   items,
   isActive,
-  role,
 }: {
   title: string;
   isLoading: boolean;
   isError: boolean;
   items: PerfilItem[];
   isActive: boolean;
-  role?: string;
 }) {
   return (
     <AppInfoLayout
@@ -27,14 +25,10 @@ export default function StaffInfoLayout({
       isError={isError}
       isLoading={isLoading}
     >
-      {role === "MANAGER" && (
-        <>
-          <h2 className="font-semibold text-xl">Configurações da conta</h2>
-          <StaffChangeNameWrapper />
-          <StaffChangePasswordWrapper />
-          <StaffToggleActivationWrapper isActive={isActive} />
-        </>
-      )}
+      <h2 className="font-semibold text-xl">Configurações da conta</h2>
+      <StaffChangeNameWrapper />
+      <StaffChangePasswordWrapper />
+      <StaffToggleActivationWrapper isActive={isActive} />
     </AppInfoLayout>
   );
 }

@@ -5,8 +5,6 @@ public enum Category {
     SEAFOOD,
     VEGETABLE,
     GRAINS,
-    SEASONINGS,
     SAUCES,
-    OILS,
     PASTA
 }

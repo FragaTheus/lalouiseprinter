@@ -1,0 +1,114 @@
+package br.com.matheusfragadev.lalouise.infra.controller.label;
+
+import br.com.matheusfragadev.lalouise.application.label.LabelService;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.PrintLabelRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintLabelRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintLabelRequestByInput;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelInfo;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelSummary;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.mapper.LabelMapper;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.resolver.LabelInfoResolver;
+import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/restaurants/{restaurantId}")
+@RequiredArgsConstructor
+public class LabelController {
+
+    private final LabelService labelService;
+    private final LabelInfoResolver labelInfoResolver;
+
+    private static final String BASE_PATH = "/labels";
+    private static final String PATH_IN_SECTOR = "/sectors/{sectorId}" + BASE_PATH;
+
+
+    @PostMapping(PATH_IN_SECTOR + "/print")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
+    public ResponseEntity<String> print(
+            @AuthenticationPrincipal UserDetailsImpl principal,
+            @Valid @RequestBody PrintLabelRequest request
+    ){
+        var label = labelService.print(LabelMapper.toPrintCommand(request, principal.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
+    }
+
+//    @PostMapping(BASE_PATH + "/{labelId}/reprint")
+//    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")
+//    public ResponseEntity<String> reprintBySectorContext(
+//            @AuthenticationPrincipal UserDetailsImpl principal,
+//            @PathVariable UUID labelId,
+//            @Valid @RequestBody ReprintLabelRequest request
+//    ){
+//        var command = LabelMapper.toReprintByContextCommand(labelId, principal.getId(), request);
+//        var label = labelService.reprintBySectorContext(command);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
+//    }
+//
+//
+//    @PostMapping(PATH_IN_SECTOR + "/{labelId}/reprint")
+//    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
+//    public ResponseEntity<String> reprintByInputSector(
+//            @AuthenticationPrincipal UserDetailsImpl principal,
+//            @PathVariable UUID labelId,
+//            @PathVariable UUID sectorId,
+//            @Valid @RequestBody ReprintLabelRequestByInput request
+//    ){
+//        var command = LabelMapper.toReprintByInputCommand(labelId, sectorId, principal.getId(), request);
+//        var label = labelService.reprintByInputSector(command);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
+//    }
+
+
+    @GetMapping(BASE_PATH + "/{targetId}")
+    public ResponseEntity<LabelInfo> getLabel(
+            @PathVariable UUID targetId
+    ){
+        var label = labelService.getLabel(targetId);
+        var result = labelInfoResolver.resolver(label);
+        return ResponseEntity.ok(LabelMapper.toInfo(result));
+    }
+
+    @GetMapping(PATH_IN_SECTOR)
+    public ResponseEntity<Page<LabelSummary>> getAllBySector(
+            @RequestParam(required = false) String term,
+            Pageable pageable
+    ){
+        return ResponseEntity.ok(
+                labelService.getAllBySector(term, pageable)
+                        .map(l -> LabelMapper.toSummary(labelInfoResolver.resolver(l)))
+        );
+    }
+
+    @GetMapping(BASE_PATH + "/search")
+    public ResponseEntity<Page<LabelSummary>> searchByRestaurant(
+            @RequestParam(required = false) String term,
+            Pageable pageable
+    ){
+        return ResponseEntity.ok(
+                labelService.getAllByRestaurant(term, pageable)
+                        .map(l -> LabelMapper.toSummary(labelInfoResolver.resolver(l)))
+        );
+    }
+
+    @GetMapping(BASE_PATH + "/search/lot")
+    public ResponseEntity<Page<LabelSummary>> searchByLot(
+            @RequestParam String lotCode,
+            Pageable pageable
+    ){
+        return ResponseEntity.ok(
+                labelService.getAllByLot(lotCode, pageable)
+                        .map(l -> LabelMapper.toSummary(labelInfoResolver.resolver(l)))
+        );
+    }
+}

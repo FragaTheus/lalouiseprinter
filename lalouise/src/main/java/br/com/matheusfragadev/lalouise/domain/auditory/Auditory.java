@@ -2,6 +2,7 @@ package br.com.matheusfragadev.lalouise.domain.auditory;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;

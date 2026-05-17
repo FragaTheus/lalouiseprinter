@@ -8,11 +8,11 @@ import br.com.matheusfragadev.lalouise.domain.restaurant.vo.RestaurantName;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
+import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Manager;
-import br.com.matheusfragadev.lalouise.domain.user.staff.exceptions.ManagerAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.staff.repository.ManagerRepository;
 import br.com.matheusfragadev.lalouise.infra.context.restaurant.RestaurantContext;
 import org.junit.jupiter.api.AfterEach;
@@ -101,7 +101,7 @@ class ManagerServiceTest {
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
         when(managerRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
 
-        ManagerAlreadyExists ex = assertThrows(ManagerAlreadyExists.class, () -> service.createManager(command));
+        UserAlreadyExists ex = assertThrows(UserAlreadyExists.class, () -> service.createManager(command));
 
         assertEquals("Já existe um manager com esse email.", ex.getMessage());
         verify(managerRepository, never()).save(any());

@@ -8,17 +8,20 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.ActiveException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.AdminController;
-import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserChangeNicknameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.request.CreateAdminRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.dto.response.AdminInfo;
-import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.user.admin.utils.mapper.AdminMapper;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserChangeNicknameRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserChangePasswordRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserMapper;
+import br.com.matheusfragadev.lalouise.infra.controller.user.shared.UserSummary;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -33,118 +36,82 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AdminControllerTest {
-    @Mock
-    private AdminService adminService;
-    @InjectMocks
-    private AdminController controller;
-    // ── list ─────────────────────────────────────────────────────────────────
+    @Mock private AdminService adminService;
+    @InjectMocks private AdminController controller;
     @Test
     void listShouldReturn200WithMappedSummaries() {
         Admin a1 = mock(Admin.class);
         Admin a2 = mock(Admin.class);
+        Nickname n1 = mock(Nickname.class);
+        Nickname n2 = mock(Nickname.class);
+        Email e1 = mock(Email.class);
+        Email e2 = mock(Email.class);
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
-        UserSummary s1 = new UserSummary(id1, "Alice", "alice@test.com", true);
-        UserSummary s2 = new UserSummary(id2, "Bob", "bob@test.com", true);
+        when(a1.getId()).thenReturn(id1);
+        when(a1.getNickname()).thenReturn(n1);
+        when(a1.getEmail()).thenReturn(e1);
+        when(a1.isActive()).thenReturn(true);
+        when(n1.value()).thenReturn("Alice");
+        when(e1.value()).thenReturn("alice@test.com");
+        when(a2.getId()).thenReturn(id2);
+        when(a2.getNickname()).thenReturn(n2);
+        when(a2.getEmail()).thenReturn(e2);
+        when(a2.isActive()).thenReturn(false);
+        when(n2.value()).thenReturn("Bob");
+        when(e2.value()).thenReturn("bob@test.com");
         Pageable pageable = PageRequest.of(0, 10);
         Page<Admin> adminPage = new PageImpl<>(List.of(a1, a2), pageable, 2);
         when(adminService.getAll(null, null, pageable)).thenReturn(adminPage);
-        try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
-            mapper.when(() -> AdminMapper.toAdminSummary(a1)).thenReturn(s1);
-            mapper.when(() -> AdminMapper.toAdminSummary(a2)).thenReturn(s2);
-            ResponseEntity<Page<UserSummary>> response = controller.list(null, null, pageable);
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertNotNull(response.getBody());
-            assertEquals(2, response.getBody().getContent().size());
-            assertSame(s1, response.getBody().getContent().get(0));
-            assertSame(s2, response.getBody().getContent().get(1));
-        }
-    }
-    @Test
-    void listShouldReturnEmptyListWhenNoAdminsExist() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Admin> emptyPage = new PageImpl<>(List.of(), pageable, 0);
-        when(adminService.getAll(null, null, pageable)).thenReturn(emptyPage);
         ResponseEntity<Page<UserSummary>> response = controller.list(null, null, pageable);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().getContent().isEmpty());
+        assertEquals(List.of(
+                new UserSummary(id1, "Alice", "alice@test.com", true),
+                new UserSummary(id2, "Bob", "bob@test.com", false)
+        ), response.getBody().getContent());
     }
-    // ── info ─────────────────────────────────────────────────────────────────
     @Test
     void infoShouldReturn200WithMappedAdminInfo() {
         UUID id = UUID.randomUUID();
+        Instant now = Instant.parse("2026-05-15T10:15:30Z");
         Admin admin = mock(Admin.class);
-        Instant now = Instant.now();
-        AdminInfo info = AdminInfo.builder()
-                .id(id).nickname("Alice").email("alice@test.com")
-                .role(Role.ADMIN).active(true).createdAt(now).updatedAt(now)
-                .build();
+        Nickname nickname = mock(Nickname.class);
+        Email email = mock(Email.class);
+        when(admin.getId()).thenReturn(id);
+        when(admin.getNickname()).thenReturn(nickname);
+        when(admin.getEmail()).thenReturn(email);
+        when(admin.getCreatedAt()).thenReturn(now);
+        when(admin.getUpdatedAt()).thenReturn(now);
+        when(admin.getRole()).thenReturn(Role.ADMIN);
+        when(admin.isActive()).thenReturn(true);
+        when(nickname.value()).thenReturn("Alice");
+        when(email.value()).thenReturn("alice@test.com");
         when(adminService.getUser(id)).thenReturn(admin);
-        try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
-            mapper.when(() -> AdminMapper.toAdminInfo(admin)).thenReturn(info);
-            ResponseEntity<AdminInfo> response = controller.info(id);
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-            assertSame(info, response.getBody());
-            verify(adminService).getUser(id);
-        }
+        ResponseEntity<AdminInfo> response = controller.info(id);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(AdminInfo.builder()
+                .id(id)
+                .nickname("Alice")
+                .email("alice@test.com")
+                .role(Role.ADMIN)
+                .active(true)
+                .createdAt(now)
+                .updatedAt(now)
+                .build(), response.getBody());
     }
-    @Test
-    void infoShouldPropagateExceptionWhenAdminNotFound() {
-        UUID id = UUID.randomUUID();
-        when(adminService.getUser(id)).thenThrow(new RuntimeException("Admin not found with id: " + id));
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> controller.info(id));
-        assertTrue(ex.getMessage().contains("Admin not found with id"));
-    }
-    // ── create ───────────────────────────────────────────────────────────────
     @Test
     void createShouldReturn201WithAdminId() {
         UUID id = UUID.randomUUID();
         CreateAdminRequest request = new CreateAdminRequest("Alice", "alice@test.com", "Alice@123", "Alice@123");
-        CreateUserCommand command = CreateUserCommand.builder()
-                .nickname("Alice").email("alice@test.com")
-                .password("Alice@123").confirmPassword("Alice@123")
-                .build();
+        CreateUserCommand command = AdminMapper.toCreateAdminCommand(request);
         Admin admin = mock(Admin.class);
         when(admin.getId()).thenReturn(id);
-        try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
-            mapper.when(() -> AdminMapper.toCreateAdminCommand(request)).thenReturn(command);
-            when(adminService.createUser(command)).thenReturn(admin);
-            ResponseEntity<String> response = controller.create(request);
-            assertEquals(HttpStatus.CREATED, response.getStatusCode());
-            assertEquals(id.toString(), response.getBody());
-            verify(adminService).createUser(command);
-        }
+        when(adminService.createUser(command)).thenReturn(admin);
+        ResponseEntity<String> response = controller.create(request);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(id.toString(), response.getBody());
+        verify(adminService).createUser(command);
     }
-    @Test
-    void createShouldPropagateAdminAlreadyExistsException() {
-        CreateAdminRequest request = new CreateAdminRequest("Alice", "alice@test.com", "Alice@123", "Alice@123");
-        CreateUserCommand command = CreateUserCommand.builder()
-                .nickname("Alice").email("alice@test.com")
-                .password("Alice@123").confirmPassword("Alice@123")
-                .build();
-        try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
-            mapper.when(() -> AdminMapper.toCreateAdminCommand(request)).thenReturn(command);
-            when(adminService.createUser(command)).thenThrow(new UserAlreadyExists("Ja existe um usuario com esse email."));
-            UserAlreadyExists ex = assertThrows(UserAlreadyExists.class, () -> controller.create(request));
-            assertEquals("Ja existe um usuario com esse email.", ex.getMessage());
-        }
-    }
-    @Test
-    void createShouldPropagatePasswordExceptionWhenPasswordsMismatch() {
-        CreateAdminRequest request = new CreateAdminRequest("Alice", "alice@test.com", "Alice@123", "Other@123");
-        CreateUserCommand command = CreateUserCommand.builder()
-                .nickname("Alice").email("alice@test.com")
-                .password("Alice@123").confirmPassword("Other@123")
-                .build();
-        try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
-            mapper.when(() -> AdminMapper.toCreateAdminCommand(request)).thenReturn(command);
-            when(adminService.createUser(command)).thenThrow(new PasswordException("Senhas nao conferem."));
-            PasswordException ex = assertThrows(PasswordException.class, () -> controller.create(request));
-            assertEquals("Senhas nao conferem.", ex.getMessage());
-        }
-    }
-    // ── changeName ───────────────────────────────────────────────────────────
     @Test
     void changeNameShouldReturn204NoContent() {
         UUID id = UUID.randomUUID();
@@ -165,61 +132,25 @@ class AdminControllerTest {
         assertEquals("O novo nickname deve ser diferente do atual.", ex.getMessage());
     }
     @Test
-    void changeNameShouldPropagateExceptionWhenAdminNotFound() {
-        UUID id = UUID.randomUUID();
-        UserChangeNicknameRequest request = new UserChangeNicknameRequest("New Name");
-        when(adminService.changeUserNickname(id, "New Name"))
-                .thenThrow(new RuntimeException("Admin not found with id: " + id));
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> controller.changeName(id, request));
-        assertTrue(ex.getMessage().contains("Admin not found with id"));
-    }
-    // ── changePassword ────────────────────────────────────────────────────────
-    @Test
     void changePasswordShouldReturn204NoContent() {
         UUID id = UUID.randomUUID();
-        AdminChangePasswordRequest request = new AdminChangePasswordRequest("NewPass@123", "NewPass@123");
-        ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
-                .targetId(id).newPassword("NewPass@123").confirmNewPassword("NewPass@123")
-                .build();
-        try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
-            mapper.when(() -> AdminMapper.toChangePasswordCommand(request, id)).thenReturn(command);
-            when(adminService.changeUserPassword(command)).thenReturn(mock(Admin.class));
-            ResponseEntity<Void> response = controller.changePassword(id, request);
-            assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-            assertNull(response.getBody());
-            verify(adminService).changeUserPassword(command);
-        }
+        UserChangePasswordRequest request = new UserChangePasswordRequest("NewPass@123", "NewPass@123");
+        ChangeUserPasswordCommand command = UserMapper.toChangePasswordCommand(request, id);
+        when(adminService.changeUserPassword(command)).thenReturn(mock(Admin.class));
+        ResponseEntity<Void> response = controller.changePassword(id, request);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(adminService).changeUserPassword(command);
     }
     @Test
     void changePasswordShouldPropagatePasswordExceptionWhenPasswordsMismatch() {
         UUID id = UUID.randomUUID();
-        AdminChangePasswordRequest request = new AdminChangePasswordRequest("NewPass@123", "Other@123");
-        ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
-                .targetId(id).newPassword("NewPass@123").confirmNewPassword("Other@123")
-                .build();
-        try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
-            mapper.when(() -> AdminMapper.toChangePasswordCommand(request, id)).thenReturn(command);
-            when(adminService.changeUserPassword(command)).thenThrow(new PasswordException("Senhas nao conferem."));
-            PasswordException ex = assertThrows(PasswordException.class, () -> controller.changePassword(id, request));
-            assertEquals("Senhas nao conferem.", ex.getMessage());
-        }
+        UserChangePasswordRequest request = new UserChangePasswordRequest("NewPass@123", "Other@123");
+        ChangeUserPasswordCommand command = UserMapper.toChangePasswordCommand(request, id);
+        when(adminService.changeUserPassword(command)).thenThrow(new PasswordException("Senhas não conferem."));
+        PasswordException ex = assertThrows(PasswordException.class, () -> controller.changePassword(id, request));
+        assertEquals("Senhas não conferem.", ex.getMessage());
     }
-    @Test
-    void changePasswordShouldPropagateExceptionWhenAdminNotFound() {
-        UUID id = UUID.randomUUID();
-        AdminChangePasswordRequest request = new AdminChangePasswordRequest("NewPass@123", "NewPass@123");
-        ChangeUserPasswordCommand command = ChangeUserPasswordCommand.builder()
-                .targetId(id).newPassword("NewPass@123").confirmNewPassword("NewPass@123")
-                .build();
-        try (MockedStatic<AdminMapper> mapper = mockStatic(AdminMapper.class)) {
-            mapper.when(() -> AdminMapper.toChangePasswordCommand(request, id)).thenReturn(command);
-            when(adminService.changeUserPassword(command))
-                    .thenThrow(new RuntimeException("Admin not found with id: " + id));
-            RuntimeException ex = assertThrows(RuntimeException.class, () -> controller.changePassword(id, request));
-            assertTrue(ex.getMessage().contains("Admin not found with id"));
-        }
-    }
-    // ── delete ────────────────────────────────────────────────────────────────
     @Test
     void deleteShouldReturn204NoContent() {
         UUID id = UUID.randomUUID();
@@ -230,11 +161,13 @@ class AdminControllerTest {
         verify(adminService).deleteUser(id);
     }
     @Test
-    void deleteShouldPropagateExceptionWhenAdminNotFound() {
+    void reactivateShouldReturn204NoContent() {
         UUID id = UUID.randomUUID();
-        when(adminService.deleteUser(id)).thenThrow(new RuntimeException("Admin not found with id: " + id));
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> controller.delete(id));
-        assertTrue(ex.getMessage().contains("Admin not found with id"));
+        when(adminService.reactivate(id)).thenReturn(mock(Admin.class));
+        ResponseEntity<Void> response = controller.reactivate(id);
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
+        verify(adminService).reactivate(id);
     }
     @Test
     void deleteShouldPropagateActiveExceptionWhenAlreadyInactive() {

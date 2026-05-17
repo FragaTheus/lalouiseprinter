@@ -13,8 +13,8 @@ export interface AppListLayoutProps {
   titleLabel: string;
   title: string;
   titleDescription: string;
-  href: string;
-  registerText: string;
+  href?: string;
+  registerText?: string;
   cards: AppSummaryCardProps[];
   isLoading?: boolean;
   isListLoading?: boolean;
@@ -43,11 +43,13 @@ export default function AppListLayout(props: AppListLayoutProps) {
         description={props.titleDescription}
       />
 
-      {(!props.roles || props.roles.includes(props.currentRole as Roles)) && (
-        <Link href={props.href}>
-          <Button>{props.registerText}</Button>
-        </Link>
-      )}
+      {props.href &&
+        props.registerText &&
+        (!props.roles || props.roles.includes(props.currentRole as Roles)) && (
+          <Link href={props.href}>
+            <Button>{props.registerText}</Button>
+          </Link>
+        )}
 
       <AppFilterCard {...filterProps} />
       <div className="w-full mt-4">
