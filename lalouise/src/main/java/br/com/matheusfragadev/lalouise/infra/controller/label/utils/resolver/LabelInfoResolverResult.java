@@ -9,6 +9,6 @@ public record LabelInfoResolverResult(
         String restaurantName,
         String sectorName,
         String productName,
-        String printerdByName
+        String printedByName
 ) {
 }

@@ -5,6 +5,8 @@ import br.com.matheusfragadev.lalouise.application.sector.SectorService;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.CreateStaffCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.repository.CredentialsRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
@@ -34,6 +36,7 @@ public class StaffService implements UserService<Staff>{
     private final PasswordEncoder passwordEncoder;
     private final RestaurantService restaurantService;
     private final SectorService sectorService;
+    private final CredentialsRepository credentialsRepository;
 
 
     @Transactional
@@ -49,7 +52,7 @@ public class StaffService implements UserService<Staff>{
             if (!sector.isActive()) {
                 throw new InactiveResourceException("Não é possível vincular um colaborador a um setor inativo.");
             }
-            if (staffRepository.existsByEmail(new Email(command.email()))) {
+            if (credentialsRepository.existsByEmail(new Email(command.email()))) {
                 throw new UserAlreadyExists("Já existe um colaborador com esse email.");
             }
             inputPasswordMatches(command.password(), command.confirmPassword());
@@ -66,6 +69,11 @@ public class StaffService implements UserService<Staff>{
             log.error("Error creating staff: {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public Role getRole() {
+        return Role.STAFF;
     }
 
     @Override

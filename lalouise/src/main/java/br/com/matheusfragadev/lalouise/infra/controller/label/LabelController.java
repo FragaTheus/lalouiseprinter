@@ -1,9 +1,8 @@
 package br.com.matheusfragadev.lalouise.infra.controller.label;
 
 import br.com.matheusfragadev.lalouise.application.label.LabelService;
+import br.com.matheusfragadev.lalouise.application.print.PrintService;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.PrintLabelRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintLabelRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintLabelRequestByInput;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelInfo;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.mapper.LabelMapper;
@@ -28,6 +27,8 @@ public class LabelController {
 
     private final LabelService labelService;
     private final LabelInfoResolver labelInfoResolver;
+//    private final ZplService zplService;
+    private final PrintService printService;
 
     private static final String BASE_PATH = "/labels";
     private static final String PATH_IN_SECTOR = "/sectors/{sectorId}" + BASE_PATH;
@@ -39,7 +40,7 @@ public class LabelController {
             @AuthenticationPrincipal UserDetailsImpl principal,
             @Valid @RequestBody PrintLabelRequest request
     ){
-        var label = labelService.print(LabelMapper.toPrintCommand(request, principal.getId()));
+        var label = printService.print(LabelMapper.toPrintCommand(request, principal.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
     }
 
@@ -78,6 +79,17 @@ public class LabelController {
         var result = labelInfoResolver.resolver(label);
         return ResponseEntity.ok(LabelMapper.toInfo(result));
     }
+//
+//    @GetMapping(value = BASE_PATH + "/{targetId}/zpl", produces = MediaType.TEXT_PLAIN_VALUE)
+//    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")
+//    public ResponseEntity<String> getZpl(
+//            @PathVariable UUID targetId,
+//            @RequestParam(defaultValue = "1") Integer copies
+//    ){
+//        var label = labelService.getLabel(targetId);
+//        var result = labelInfoResolver.resolver(label);
+//        return ResponseEntity.ok(zplService.generate(result, copies));
+//    }
 
     @GetMapping(PATH_IN_SECTOR)
     public ResponseEntity<Page<LabelSummary>> getAllBySector(

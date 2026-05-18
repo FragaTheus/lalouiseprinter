@@ -1,23 +1,30 @@
 package br.com.matheusfragadev.lalouise.infra.security.jwt;
 
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
+import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET = "minha-chave-super-secreta-com-32bytes!!";
-    private static final javax.crypto.SecretKey KEY = buildKey();
+    @Value("${jwt.secret}")
+    private String secret;
 
-    private static javax.crypto.SecretKey buildKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+    private SecretKey key;
+
+    @PostConstruct
+    private void init() {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String generateToken(String id, String role) {
@@ -26,13 +33,13 @@ public class JwtService {
                 .claim("role", role)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))
-                .signWith(KEY, Jwts.SIG.HS256)
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
 
     public Claims extractClaims(String token) {
         return Jwts.parser()
-                .verifyWith(KEY)
+                .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

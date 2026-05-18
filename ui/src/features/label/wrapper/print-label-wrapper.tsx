@@ -10,6 +10,5 @@ export default function PrintLabelWrapper() {
   if (user?.role === "STAFF") return <PrintLabelStaffWrapper />;
   if (user?.role === "MANAGER") return <PrintLabelManagerWrapper />;
 
-  // ADMIN and others: no access to print
   return null;
 }

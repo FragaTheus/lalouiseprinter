@@ -3,19 +3,20 @@ package br.com.matheusfragadev.lalouise.application.label;
 import br.com.matheusfragadev.lalouise.application.label.utils.PrintLabelCommand;
 import br.com.matheusfragadev.lalouise.application.label.utils.ReprintLabelByContextCommand;
 import br.com.matheusfragadev.lalouise.application.label.utils.ReprintLabelByInputCommand;
+import br.com.matheusfragadev.lalouise.application.print.PrintJobService;
+import br.com.matheusfragadev.lalouise.application.print.ZplService;
 import br.com.matheusfragadev.lalouise.application.product.ProductService;
 import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
 import br.com.matheusfragadev.lalouise.application.sector.SectorService;
-import br.com.matheusfragadev.lalouise.application.user.UserService;
 import br.com.matheusfragadev.lalouise.application.user.profile.registry.UserServiceRegistry;
 import br.com.matheusfragadev.lalouise.domain.label.entity.Label;
 import br.com.matheusfragadev.lalouise.domain.label.exceptions.LabelNotFoundException;
 import br.com.matheusfragadev.lalouise.domain.label.repository.LabelRepository;
 import br.com.matheusfragadev.lalouise.domain.sector.enums.Storage;
-import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.infra.context.restaurant.RestaurantContext;
 import br.com.matheusfragadev.lalouise.infra.context.sector.SectorContext;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.resolver.LabelInfoResolverResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,42 +32,10 @@ import java.util.UUID;
 public class LabelService {
 
     private final LabelRepository labelRepository;
-    private final ProductService productService;
-    private final ValidityCalculatorService validityCalculatorService;
-    private final RestaurantService restaurantService;
-    private final SectorService sectorService;
-    private final UserServiceRegistry userServiceRegistry;
 
     @Transactional
-    public Label print(PrintLabelCommand command) {
-        var restaurantId = RestaurantContext.get();
-        var sectorId = SectorContext.get();
-        log.info("Setor do id {}", sectorId);
-        var restaurant = restaurantService.getRestaurant(restaurantId);
-        var sector = sectorService.getSector(sectorId);
-
-        if (!restaurant.isActive()) {
-            throw new InactiveResourceException("Não é possível imprimir etiqueta em um restaurante inativo.");
-        }
-        if (!sector.isActive()) {
-            throw new InactiveResourceException("Não é possível imprimir etiqueta em um setor inativo.");
-        }
-
-        log.info("Printing label for product {} in sector {}", command.productId(), sectorId);
-
-        var product = productService.getProduct(command.productId());
-        var validateDate = validityCalculatorService.calculate(product.getCategory(), command.storage());
-
-        var label = new Label(
-                restaurantId,
-                sectorId,
-                command.productId(),
-                command.userId(),
-                validateDate
-        );
-
-        log.info("Label printed successfully for product {} with validateDate {}", command.productId(), validateDate);
-        return labelRepository.save(label);
+    public Label save(Label label){
+        return labelRepository.saveAndFlush(label);
     }
 
     @Transactional(readOnly = true)
@@ -79,7 +48,7 @@ public class LabelService {
     @Transactional(readOnly = true)
     public Page<Label> getAllBySector(String term, Pageable pageable) {
         var restaurantId = RestaurantContext.get();
-        var sectorId = SectorContext.get();
+        var sectorId     = SectorContext.get();
         return labelRepository.findAllLabels(restaurantId, sectorId, term, pageable);
     }
 
@@ -95,60 +64,56 @@ public class LabelService {
         return labelRepository.findAllByRestaurantIdAndLotCode(restaurantId, lotCode, pageable);
     }
 
+//    @Transactional
+//    public Label reprintBySectorContext(ReprintLabelByContextCommand command) {
+//        var sectorId = SectorContext.get();
+//        return reprint(command.currentLabelId(), command.userId(), sectorId, command.storage(), 1);
+//    }
+//
+//    @Transactional
+//    public Label reprintByInputSector(ReprintLabelByInputCommand command) {
+//        return reprint(command.currentLabelId(), command.userId(), command.sectorId(), command.storage(), 1);
+//    }
 
-    @Transactional
-    public Label reprintBySectorContext(ReprintLabelByContextCommand command) {
-        var sectorId = SectorContext.get();
-        return reprint(command.currentLabelId(), command.userId(), sectorId, command.storage());
-    }
-
-    @Transactional
-    public Label reprintByInputSector(ReprintLabelByInputCommand command){
-        return reprint(command.currentLabelId(), command.userId(), command.sectorId(), command.storage());
-    }
-
-    public String getRestaurantName(UUID targetId){
-        var label = getLabel(targetId);
-        var restaurant = restaurantService.getRestaurant(label.getRestaurantId());
-        return restaurant.getName().value();
-    }
-
-    public String getSectorName(UUID targetId){
-        var label = getLabel(targetId);
-        var sector = sectorService.getSector(label.getSectorId());
-        return sector.getName().value();
-    }
-
-    public String getWhoPrinted(UUID targetId){
-        var label = getLabel(targetId);
-        return userServiceRegistry.getUserName(label.getUserId());
-    }
-
-
-    private Label reprint(
-            UUID currentLabelId,
-            UUID userId,
-            UUID sectorId,
-            Storage storage
-    ){
-        var restaurantId = RestaurantContext.get();
-
-        var restaurant = restaurantService.getRestaurant(restaurantId);
-        var sector = sectorService.getSector(sectorId);
-
-        if (!restaurant.isActive()) {
-            throw new InactiveResourceException("Não é possível reimprimir etiqueta em um restaurante inativo.");
-        }
-        if (!sector.isActive()) {
-            throw new InactiveResourceException("Não é possível reimprimir etiqueta em um setor inativo.");
-        }
-
-        var original = getLabel(currentLabelId);
-        var product = productService.getProduct(original.getProductId());
-        var validateDate = validityCalculatorService.calculate(product.getCategory(), storage);
-
-        log.info("Reprinting label {} in sector {} by user {}", currentLabelId, sectorId, userId);
-        var reprinted = original.reprint(sectorId, userId, validateDate);
-        return labelRepository.save(reprinted);
-    }
+//    private Label reprint(
+//            UUID currentLabelId,
+//            UUID userId,
+//            UUID sectorId,
+//            Storage storage,
+//            int copies
+//    ) {
+//        var restaurantId = RestaurantContext.get();
+//
+//        var restaurant = restaurantService.getRestaurant(restaurantId);
+//        var sector     = sectorService.getSector(sectorId);
+//
+//        if (!restaurant.isActive()) {
+//            throw new InactiveResourceException("Não é possível reimprimir etiqueta em um restaurante inativo.");
+//        }
+//        if (!sector.isActive()) {
+//            throw new InactiveResourceException("Não é possível reimprimir etiqueta em um setor inativo.");
+//        }
+//
+//        var original     = getLabel(currentLabelId);
+//        var product      = productService.getProduct(original.getProductId());
+//        var validateDate = validityCalculatorService.calculate(product.getCategory(), storage);
+//
+//        log.info("Reprinting label {} in sector {} by user {}", currentLabelId, sectorId, userId);
+//
+//        var reprinted = labelRepository.save(original.reprint(sectorId, userId, validateDate));
+//
+//        var resolverResult = LabelInfoResolverResult.builder()
+//                .label(reprinted)
+//                .restaurantName(restaurant.getName().value())
+//                .sectorName(sector.getName().value())
+//                .productName(product.getName().value())
+//                .printedByName(userServiceRegistry.getUserName(userId))
+//                .build();
+//
+//        var zpl = zplService.generate(resolverResult, copies);
+//
+//        printJobService.queue(zpl, copies, restaurantId);
+//
+//        return reprinted;
+//    }
 }

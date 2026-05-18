@@ -9,6 +9,7 @@ import { LabelStorageSelect } from "../components/label-storage-select";
 import AppLookupModal from "@/shared/components/app/app-lookup-modal";
 import { useProductListInfinite } from "@/features/product/hook/use-product";
 import { useSectorListInfinite } from "@/features/sector/hook/use-sector";
+import { Input } from "@/shared/components/ui/input";
 
 export default function PrintLabelManagerWrapper() {
   const { id: restaurantId, sectorId } = useParams<{
@@ -49,18 +50,10 @@ export default function PrintLabelManagerWrapper() {
     })),
   );
 
-  const handleSubmit = (data: Record<string, string>) => {
-    mutate({
-      productId: data.productId,
-      sectorId: data.sectorId ?? sectorId,
-      storage: data.storage as never,
-    });
-  };
-
   return (
     <AppForm
       btnText="Imprimir Etiqueta"
-      onSubmit={handleSubmit}
+      onSubmit={mutate}
       isPending={isPending}
     >
       <AppLookupModal
@@ -87,6 +80,12 @@ export default function PrintLabelManagerWrapper() {
         <FieldLabel>Armazenamento</FieldLabel>
         <FieldContent>
           <LabelStorageSelect name="storage" />
+        </FieldContent>
+      </Field>
+      <Field>
+        <FieldLabel>Quantidade</FieldLabel>
+        <FieldContent>
+          <Input name="copies" type="number" />
         </FieldContent>
       </Field>
     </AppForm>

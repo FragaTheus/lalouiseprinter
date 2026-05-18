@@ -5,13 +5,18 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+/**
+ * Subclasse de Credentials com role = ADMIN.
+ * Sem @Table — usa a tabela `credentials` da classe pai (SINGLE_TABLE).
+ * @DiscriminatorValue("ADMIN") diz ao Hibernate: "ao ler uma linha com role = 'ADMIN', instancie Admin".
+ */
 @Entity
-@Table(name = "admins")
+@DiscriminatorValue("ADMIN")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Admin extends Credentials {
 

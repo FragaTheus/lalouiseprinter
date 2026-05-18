@@ -4,6 +4,8 @@ import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
 import br.com.matheusfragadev.lalouise.application.user.utils.ChangeUserPasswordCommand;
 import br.com.matheusfragadev.lalouise.application.user.utils.CreateManagerCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.repository.CredentialsRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
@@ -32,6 +34,7 @@ public class ManagerService implements UserService<Manager> {
     private final PasswordEncoder passwordEncoder;
     private final ManagerRepository managerRepository;
     private final RestaurantService restaurantService;
+    private final CredentialsRepository credentialsRepository;
 
     @Transactional
     public Manager createManager(CreateManagerCommand command) {
@@ -42,7 +45,7 @@ public class ManagerService implements UserService<Manager> {
             if (!restaurant.isActive()) {
                 throw new InactiveResourceException("Não é possível vincular um colaborador a um restaurante inativo.");
             }
-            if (managerRepository.existsByEmail(new Email(command.email()))) {
+            if (credentialsRepository.existsByEmail(new Email(command.email()))) {
                 throw new UserAlreadyExists("Já existe um manager com esse email.");
             }
             inputPasswordMatches(command.password(), command.confirmPassword());
@@ -58,6 +61,11 @@ public class ManagerService implements UserService<Manager> {
             log.error("Error creating manager: {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public Role getRole() {
+        return Role.MANAGER;
     }
 
     @Override

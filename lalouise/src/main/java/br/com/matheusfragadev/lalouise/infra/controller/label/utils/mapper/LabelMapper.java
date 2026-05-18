@@ -22,6 +22,7 @@ public class LabelMapper {
                 .userId(userId)
                 .productId(request.productId())
                 .storage(request.storage())
+                .copies(request.copies())
                 .build();
     }
 
@@ -38,7 +39,7 @@ public class LabelMapper {
                 .id(result.label().getId())
                 .restaurantName(result.restaurantName())
                 .sectorName(result.sectorName())
-                .printedBy(result.printerdByName())
+                .printedBy(result.printedByName())
                 .lot(result.label().getLot().code())
                 .createdAt(result.label().getCreatedAt())
                 .updateAt(result.label().getUpdatedAt())

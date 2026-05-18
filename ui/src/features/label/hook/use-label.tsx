@@ -56,6 +56,7 @@ interface PrintLabelRequest {
   productId: string;
   sectorId: string;
   storage: LabelStorageType;
+  copies: number;
 }
 
 interface ReprintLabelRequest {
@@ -80,7 +81,7 @@ export const usePrintLabel = (restaurantId: string, sectorId: string) => {
           label: "Ver etiqueta",
           onClick: () =>
             push(
-              `/dashboard/restaurants/${restaurantId}/resources/sectors/${sectorId}/resources/labels/${id}`,
+              `/dashboard/restaurants/${restaurantId}/resources/labels/${id}`,
             ),
         },
       });

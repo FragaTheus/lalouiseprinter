@@ -5,6 +5,8 @@ import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.repository.CredentialsRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
@@ -28,12 +30,15 @@ public class AdminService implements UserService<Admin> {
 
     private final PasswordEncoder passwordEncoder;
     private final AdminRepository adminRepository;
+    // Verifica unicidade de email em TODA a hierarquia (Admin + Manager + Staff)
+    // Sem isso, poderíamos criar um Admin com email já usado por um Manager
+    private final CredentialsRepository credentialsRepository;
 
     @Transactional
     public Admin createUser(CreateUserCommand command) {
         try {
             log.info("Creating admin user with email: {}", command.email());
-            if (adminRepository.existsByEmail(new Email(command.email()))) {
+            if (credentialsRepository.existsByEmail(new Email(command.email()))) {
                 throw new UserAlreadyExists("Ja existe um usuario com esse email.");
             }
             inputPasswordMatches(command.password(), command.confirmPassword());
@@ -48,6 +53,11 @@ public class AdminService implements UserService<Admin> {
             log.error("Error creating admin user: {}", e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public Role getRole() {
+        return Role.ADMIN;
     }
 
     @Transactional
@@ -111,6 +121,8 @@ public class AdminService implements UserService<Admin> {
     public Admin getUser(UUID id) {
         return adminRepository.findById(id).orElseThrow(() -> new RuntimeException("Admin not found with id: " + id));
     }
+
+
 
     @Transactional(readOnly = true)
     public Page<Admin> getAll(String term, Boolean active, Pageable pageable) {

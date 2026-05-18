@@ -4,17 +4,22 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Entity
+/**
+ * Manager: gerente vinculado a um restaurante.
+ * @DiscriminatorValue("MANAGER") → Hibernate instancia Manager quando role = 'MANAGER'.
+ * Sem @Table — herda a tabela `credentials` (SINGLE_TABLE).
+ */
 @Getter
-@Table(name = "managers")
+@Entity
+@DiscriminatorValue("MANAGER")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Manager extends BaseStaff {
 
@@ -22,4 +27,3 @@ public class Manager extends BaseStaff {
         super(nickname, email, password, Role.MANAGER, restaurantId);
     }
 }
-
