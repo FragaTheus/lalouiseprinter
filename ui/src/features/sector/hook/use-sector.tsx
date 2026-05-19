@@ -50,7 +50,7 @@ export const useCreateSector = (restaurantId: string) => {
           label: "Ver setor",
           onClick: () =>
             push(
-              `/dashboard/restaurants/${restaurantId}/resources/sectors/${id}`,
+              `/dashboard/restaurants/${restaurantId}/resources/sectors/${id}/info`,
             ),
         },
       });
@@ -104,8 +104,6 @@ interface SectorInfo {
   active: boolean;
   storages: StorageType[];
   restaurantId: string;
-  // TODO: implementar vínculo de responsável futuramente
-  // responsibleId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -202,5 +200,24 @@ export const useUpdateSectorStorages = (
       toast.success("Armazenamentos do setor atualizados com sucesso!");
       queryClient.invalidateQueries({ queryKey: ["sectors"] });
     },
+  });
+};
+
+// ─── Get Storages ───────────────────────────────────────────────────────
+
+export const useSectorStorages = (
+  restaurantId: string,
+  sectorId?: string,
+  options?: { enabled?: boolean },
+) => {
+  return useQuery({
+    queryKey: ["sectors", "storages", restaurantId, sectorId],
+    queryFn: async () => {
+      const response = await api.get<StorageType[]>(
+        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/storages`,
+      );
+      return response.data;
+    },
+    enabled: !!sectorId && (options?.enabled ?? true),
   });
 };

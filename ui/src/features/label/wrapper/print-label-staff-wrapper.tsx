@@ -4,17 +4,20 @@ import AppForm from "@/shared/components/app/app-form";
 import { Field, FieldContent, FieldLabel } from "@/shared/components/ui/field";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { usePrintLabel } from "../hook/use-label";
 import { LabelStorageSelect } from "../components/label-storage-select";
 import AppLookupModal from "@/shared/components/app/app-lookup-modal";
 import { useProductListInfinite } from "@/features/product/hook/use-product";
+import { usePrintLabelInSectorContext } from "../hook/use-label";
 
 export default function PrintLabelStaffWrapper() {
   const { id: restaurantId, sectorId } = useParams<{
     id: string;
     sectorId: string;
   }>();
-  const { mutate, isPending } = usePrintLabel(restaurantId, sectorId);
+  const { mutate, isPending } = usePrintLabelInSectorContext(
+    restaurantId,
+    sectorId,
+  );
 
   const [productTerm, setProductTerm] = useState<string | undefined>(undefined);
 
@@ -32,18 +35,10 @@ export default function PrintLabelStaffWrapper() {
     })),
   );
 
-  const handleSubmit = (data: Record<string, string>) => {
-    mutate({
-      productId: data.productId,
-      sectorId,
-      storage: data.storage as never,
-    });
-  };
-
   return (
     <AppForm
       btnText="Imprimir Etiqueta"
-      onSubmit={handleSubmit}
+      onSubmit={mutate}
       isPending={isPending}
     >
       <AppLookupModal
@@ -59,7 +54,11 @@ export default function PrintLabelStaffWrapper() {
       <Field>
         <FieldLabel>Armazenamento</FieldLabel>
         <FieldContent>
-          <LabelStorageSelect name="storage" />
+          <LabelStorageSelect
+            name="storage"
+            sectorId={sectorId}
+            restaurantId={restaurantId}
+          />
         </FieldContent>
       </Field>
     </AppForm>

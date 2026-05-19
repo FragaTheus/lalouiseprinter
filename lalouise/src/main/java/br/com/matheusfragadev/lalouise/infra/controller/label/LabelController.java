@@ -35,7 +35,7 @@ public class LabelController {
 
 
     @PostMapping(PATH_IN_SECTOR + "/print")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'STAFF')")
     public ResponseEntity<String> print(
             @AuthenticationPrincipal UserDetailsImpl principal,
             @Valid @RequestBody PrintLabelRequest request
@@ -43,6 +43,7 @@ public class LabelController {
         var label = printService.print(LabelMapper.toPrintCommand(request, principal.getId()));
         return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
     }
+
 
 //    @PostMapping(BASE_PATH + "/{labelId}/reprint")
 //    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")
@@ -103,6 +104,7 @@ public class LabelController {
     }
 
     @GetMapping(BASE_PATH + "/search")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<Page<LabelSummary>> searchByRestaurant(
             @RequestParam(required = false) String term,
             Pageable pageable
@@ -114,6 +116,7 @@ public class LabelController {
     }
 
     @GetMapping(BASE_PATH + "/search/lot")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<Page<LabelSummary>> searchByLot(
             @RequestParam String lotCode,
             Pageable pageable

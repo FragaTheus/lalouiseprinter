@@ -29,11 +29,6 @@ public class SectorController {
 
     private final SectorService sectorService;
 
-    @GetMapping("/storages")
-    public ResponseEntity<List<Storage>> listStorages() {
-        return ResponseEntity.ok(List.of(Storage.values()));
-    }
-
     @GetMapping
     public ResponseEntity<Page<SectorSummary>> list(
             @RequestParam(required = false) String term,
@@ -99,5 +94,11 @@ public class SectorController {
     public ResponseEntity<Void> reactivate(@PathVariable UUID sectorId) {
         sectorService.reactivate(sectorId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{sectorId}/storages")
+    public ResponseEntity<List<Storage>> storages(@PathVariable UUID sectorId){
+        var storages = sectorService.getStoragesBySectorId(sectorId);
+        return ResponseEntity.ok(storages);
     }
 }

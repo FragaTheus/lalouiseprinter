@@ -1,3 +1,5 @@
+"use client";
+
 import { useFormContext } from "react-hook-form";
 import {
   Select,
@@ -7,36 +9,52 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
+import { useSectorStorages } from "@/features/sector/hook/use-sector";
+import { AiOutlineLoading } from "react-icons/ai";
 
-const STORAGES = [
-  { value: "AMBIENT", label: "Ambiente" },
-  { value: "REFRIGERATED", label: "Refrigerado" },
-  { value: "FROZEN", label: "Congelado" },
-  { value: "DEEP_FROZEN", label: "Ultra-congelado" },
-];
+const STORAGE_LABELS: Record<string, string> = {
+  AMBIENT: "Ambiente",
+  REFRIGERATED: "Refrigerado",
+  FROZEN: "Congelado",
+  DEEP_FROZEN: "Ultra-congelado",
+};
 
 interface LabelStorageSelectProps {
   name: string;
-  placeholder?: string;
+  sectorId?: string;
+  restaurantId: string;
 }
 
 export function LabelStorageSelect({
   name,
-  placeholder = "Selecione o tipo de armazenamento",
+  sectorId,
+  restaurantId,
 }: LabelStorageSelectProps) {
+  const { data, isLoading } = useSectorStorages(restaurantId, sectorId, {
+    enabled: !!sectorId,
+  });
   const { register, setValue } = useFormContext();
   const { ref } = register(name);
 
   return (
-    <Select onValueChange={(value) => setValue(name, value)}>
+    <Select
+      onValueChange={(value) => setValue(name, value)}
+      disabled={isLoading || !sectorId}
+    >
       <SelectTrigger ref={ref}>
-        <SelectValue placeholder={placeholder} />
+        {!sectorId ? (
+          <SelectValue placeholder="Sem setor selecionado" />
+        ) : isLoading ? (
+          <AiOutlineLoading className="animate-spin duration-300" />
+        ) : (
+          <SelectValue placeholder="Selecione um armazenamento" />
+        )}
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {STORAGES.map((s) => (
-            <SelectItem key={s.value} value={s.value}>
-              {s.label}
+          {data?.map((s) => (
+            <SelectItem key={s} value={s}>
+              {STORAGE_LABELS[s] || s}
             </SelectItem>
           ))}
         </SelectGroup>

@@ -137,6 +137,11 @@ public class SectorService {
         return sectorRepository.findAllSectors(term, active, restaurantId, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public List<Storage> getStoragesBySectorId(UUID sectorId){
+        return sectorRepository.findAllStoragesBySectorId(sectorId);
+    }
+
     private void verifyNameUniquenessInRestaurant(String nameValue, UUID restaurantId) {
         if (sectorRepository.existsByNameValueAndRestaurantId(nameValue, restaurantId)) {
             throw new SectorAlreadyExistsException("Já existe um setor com esse nome neste restaurante.");

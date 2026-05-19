@@ -54,7 +54,7 @@ export interface LabelInfo {
 
 interface PrintLabelRequest {
   productId: string;
-  sectorId: string;
+  sectorId?: string;
   storage: LabelStorageType;
   copies: number;
 }
@@ -65,7 +65,10 @@ interface ReprintLabelRequest {
 
 // ─── Print ─────────────────────────────────────────────────────────────────
 
-export const usePrintLabel = (restaurantId: string, sectorId: string) => {
+export const usePrintLabelInSectorContext = (
+  restaurantId: string,
+  sectorId: string,
+) => {
   const { push } = useRouter();
   return useMutation({
     mutationFn: async (data: PrintLabelRequest) => {
@@ -88,6 +91,31 @@ export const usePrintLabel = (restaurantId: string, sectorId: string) => {
       push(
         `/dashboard/restaurants/${restaurantId}/resources/sectors/${sectorId}/resources/labels`,
       );
+    },
+  });
+};
+
+export const usePrintLabelByInputSector = (restaurantId: string) => {
+  const { push } = useRouter();
+  return useMutation({
+    mutationFn: async (data: PrintLabelRequest) => {
+      const response = await api.post(
+        `/api/v1/restaurants/${restaurantId}/sectors/${data.sectorId}/labels/print`,
+        data,
+      );
+      return response.data as string;
+    },
+    onSuccess: (id) => {
+      toast.success("Etiqueta impressa com sucesso!", {
+        action: {
+          label: "Ver etiqueta",
+          onClick: () =>
+            push(
+              `/dashboard/restaurants/${restaurantId}/resources/labels/${id}`,
+            ),
+        },
+      });
+      push(`/dashboard/restaurants/${restaurantId}/resources/labels`);
     },
   });
 };

@@ -43,8 +43,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/restaurants/*/labels/**").authenticated()
-                        .requestMatchers("/api/v1/restaurants/*/labels/**").hasAnyAuthority("ADMIN", "MANAGER")
+                        .requestMatchers("/api/v1/restaurants/*/labels/**").authenticated()
                         .requestMatchers("/api/v1/restaurants/*/products/**").authenticated()
                         .requestMatchers("/api/v1/restaurants/*/sectors/**").hasAnyAuthority("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/restaurants/*/staffs/**").hasAnyAuthority("ADMIN", "MANAGER")

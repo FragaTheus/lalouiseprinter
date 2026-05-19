@@ -1,4 +1,4 @@
-import PrintLabelWrapper from "@/features/label/wrapper/print-label-wrapper";
+import PrintLabelStaffWrapper from "@/features/label/wrapper/print-label-staff-wrapper";
 import AppRouteGuard from "@/shared/components/app/app-route-guard";
 import AppInputPageLayout from "@/shared/components/layouts/app-input-page-layout";
 import {
@@ -19,7 +19,7 @@ export default function PrintLabelPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <PrintLabelWrapper />
+          <PrintLabelStaffWrapper />
         </CardContent>
       </AppInputPageLayout>
     </AppRouteGuard>
