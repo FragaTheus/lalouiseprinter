@@ -106,7 +106,7 @@ export default function ReprintLabelWrapper() {
           <Field>
             <FieldLabel>Armazenamento</FieldLabel>
             <FieldContent>
-              <LabelStorageSelect name="storage" />
+              <LabelStorageSelect name="storage" restaurantId="" sectorId="" />
             </FieldContent>
           </Field>
         </AppForm>

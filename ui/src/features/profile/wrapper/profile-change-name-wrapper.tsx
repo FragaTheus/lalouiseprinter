@@ -11,7 +11,6 @@ export default function ProfileChangeNameWrapper() {
       isPending={isPending}
       title="Alterar o seu nome de usuario"
       description="Seu nome e exibido para o restante dos operadores"
-      placeholder="Nome de exemplo"
     />
   );
 }
