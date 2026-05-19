@@ -9,6 +9,7 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.Inactiv
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.repository.CredentialsRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
@@ -41,6 +42,7 @@ class StaffServiceTest {
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private RestaurantService restaurantService;
     @Mock private SectorService sectorService;
+    @Mock private CredentialsRepository credentialsRepository;
     @InjectMocks private StaffService service;
     private UUID restaurantId;
     private UUID sectorId;
@@ -84,7 +86,7 @@ class StaffServiceTest {
         Sector sector = activeSector();
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
         when(sectorService.getSector(sectorId)).thenReturn(sector);
-        when(staffRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
+        when(credentialsRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
         when(passwordEncoder.encode(command.password())).thenReturn("hashed-password");
         when(staffRepository.save(any(Staff.class))).thenAnswer(inv -> inv.getArgument(0));
         Staff result = service.createStaff(command);
@@ -134,7 +136,7 @@ class StaffServiceTest {
         when(sector.isActive()).thenReturn(true);
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
         when(sectorService.getSector(sectorId)).thenReturn(sector);
-        when(staffRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
+        when(credentialsRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
         UserAlreadyExists ex = assertThrows(
                 UserAlreadyExists.class,
                 () -> service.createStaff(command)
@@ -157,7 +159,7 @@ class StaffServiceTest {
         when(sector.isActive()).thenReturn(true);
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
         when(sectorService.getSector(sectorId)).thenReturn(sector);
-        when(staffRepository.existsByEmail(any())).thenReturn(false);
+        when(credentialsRepository.existsByEmail(any())).thenReturn(false);
         PasswordException ex = assertThrows(
                 PasswordException.class,
                 () -> service.createStaff(command)

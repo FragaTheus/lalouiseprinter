@@ -40,15 +40,19 @@ class SectorControllerTest {
     @Mock private SectorService sectorService;
     @InjectMocks private SectorController controller;
 
-    // ── listStorages ──────────────────────────────────────────────────────────
+    // ── storages ──────────────────────────────────────────────────────────────
 
     @Test
-    void listStoragesShouldReturn200WithAllValues() {
-        ResponseEntity<List<Storage>> response = controller.listStorages();
+    void storagesShouldReturn200WithValuesFromService() {
+        UUID sectorId = UUID.randomUUID();
+        List<Storage> storages = List.of(Storage.REFRIGERATED, Storage.FROZEN);
+        when(sectorService.getStoragesBySectorId(sectorId)).thenReturn(storages);
+
+        ResponseEntity<List<Storage>> response = controller.storages(sectorId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(List.of(Storage.values()), response.getBody());
+        assertEquals(storages, response.getBody());
+        verify(sectorService).getStoragesBySectorId(sectorId);
     }
 
     // ── list ──────────────────────────────────────────────────────────────────

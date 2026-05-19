@@ -10,6 +10,22 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  app:
+    image: eclipse-temurin:21-jre
+    container_name: lalouise-api
+    depends_on:
+      - postgres
+    working_dir: /app
+    volumes:
+      - ./app.jar:/app/app.jar
+    command: ["java", "-jar", "app.jar"]
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    restart: unless-stopped
 
 volumes:
   pgdata:

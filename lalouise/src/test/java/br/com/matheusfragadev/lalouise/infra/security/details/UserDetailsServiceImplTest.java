@@ -1,10 +1,8 @@
 package br.com.matheusfragadev.lalouise.infra.security.details;
 
-import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
-import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.entity.Credentials;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.repository.CredentialsRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
-import br.com.matheusfragadev.lalouise.domain.user.staff.repository.ManagerRepository;
-import br.com.matheusfragadev.lalouise.domain.user.staff.repository.StaffRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,25 +21,19 @@ import static org.mockito.Mockito.when;
 class UserDetailsServiceImplTest {
 
     @Mock
-    private AdminRepository adminRepository;
-    @Mock
-    private ManagerRepository managerRepository;
-    @Mock
-    private StaffRepository staffRepository;
+    private CredentialsRepository credentialsRepository;
 
     @InjectMocks
     private UserDetailsServiceImpl userDetailsService;
 
     @Test
     void shouldLoadActiveUserByUsername() {
-        Admin admin = mock(Admin.class);
+        Credentials credentials = mock(Credentials.class);
         Email email = mock(Email.class);
 
-        when(staffRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.empty());
-        when(managerRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.empty());
-        when(adminRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.of(admin));
-        when(admin.isActive()).thenReturn(true);
-        when(admin.getEmail()).thenReturn(email);
+        when(credentialsRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.of(credentials));
+        when(credentials.isActive()).thenReturn(true);
+        when(credentials.getEmail()).thenReturn(email);
         when(email.value()).thenReturn("admin@lalouise.com");
 
         var userDetails = userDetailsService.loadUserByUsername("admin@lalouise.com");
@@ -51,9 +43,7 @@ class UserDetailsServiceImplTest {
 
     @Test
     void shouldThrowWhenUserDoesNotExist() {
-        when(staffRepository.findByEmail(new Email("none@lalouise.com"))).thenReturn(Optional.empty());
-        when(managerRepository.findByEmail(new Email("none@lalouise.com"))).thenReturn(Optional.empty());
-        when(adminRepository.findByEmail(new Email("none@lalouise.com"))).thenReturn(Optional.empty());
+        when(credentialsRepository.findByEmail(new Email("none@lalouise.com"))).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class,
                 () -> userDetailsService.loadUserByUsername("none@lalouise.com"));
@@ -61,11 +51,9 @@ class UserDetailsServiceImplTest {
 
     @Test
     void shouldThrowWhenUserIsInactive() {
-        Admin admin = mock(Admin.class);
-        when(staffRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.empty());
-        when(managerRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.empty());
-        when(adminRepository.findByEmail( new Email("admin@lalouise.com"))).thenReturn(Optional.of(admin));
-        when(admin.isActive()).thenReturn(false);
+        Credentials credentials = mock(Credentials.class);
+        when(credentialsRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.of(credentials));
+        when(credentials.isActive()).thenReturn(false);
 
         assertThrows(DisableUserException.class,
                 () -> userDetailsService.loadUserByUsername("admin@lalouise.com"));

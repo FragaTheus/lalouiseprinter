@@ -5,6 +5,7 @@ import br.com.matheusfragadev.lalouise.application.user.utils.CreateUserCommand;
 import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.admin.repository.AdminRepository;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.repository.CredentialsRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.InactiveResourceException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
@@ -40,6 +41,9 @@ class AdminServiceTest {
     @Mock
     private AdminRepository adminRepository;
 
+    @Mock
+    private CredentialsRepository credentialsRepository;
+
     @InjectMocks
     private AdminService service;
 
@@ -52,7 +56,7 @@ class AdminServiceTest {
                 .confirmPassword("Admin@123")
                 .build();
 
-        when(adminRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
+        when(credentialsRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
         when(passwordEncoder.encode(command.password())).thenReturn("hashed-password");
         when(adminRepository.save(any(Admin.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -74,7 +78,7 @@ class AdminServiceTest {
                 .confirmPassword("Admin@123")
                 .build();
 
-        when(adminRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
+        when(credentialsRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
 
         UserAlreadyExists ex = assertThrows(UserAlreadyExists.class, () -> service.createUser(command));
 
@@ -91,7 +95,7 @@ class AdminServiceTest {
                 .confirmPassword("Different@123")
                 .build();
 
-        when(adminRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
+        when(credentialsRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
 
         PasswordException ex = assertThrows(PasswordException.class, () -> service.createUser(command));
 
@@ -108,9 +112,9 @@ class AdminServiceTest {
                 .confirmPassword("Admin@123")
                 .build();
 
-        when(adminRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
+        when(credentialsRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
 
-        assertThrows(RuntimeException.class, () -> service.createUser(command));
+        assertThrows(NicknameException.class, () -> service.createUser(command));
         verify(adminRepository, never()).save(any(Admin.class));
     }
 

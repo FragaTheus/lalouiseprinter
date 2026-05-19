@@ -9,6 +9,7 @@ import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.Inactiv
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.NicknameException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.PasswordException;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
+import br.com.matheusfragadev.lalouise.domain.user.credentials.repository.CredentialsRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Nickname;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Password;
@@ -43,6 +44,7 @@ class ManagerServiceTest {
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private ManagerRepository managerRepository;
     @Mock private RestaurantService restaurantService;
+    @Mock private CredentialsRepository credentialsRepository;
 
     @InjectMocks private ManagerService service;
 
@@ -78,7 +80,7 @@ class ManagerServiceTest {
         when(restaurant.getId()).thenReturn(restaurantId);
         when(restaurant.isActive()).thenReturn(true);
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
-        when(managerRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
+        when(credentialsRepository.existsByEmail(new Email(command.email()))).thenReturn(false);
         when(passwordEncoder.encode(command.password())).thenReturn("hashed-password");
         when(managerRepository.save(any(Manager.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -99,7 +101,7 @@ class ManagerServiceTest {
         Restaurant restaurant = mock(Restaurant.class);
         when(restaurant.isActive()).thenReturn(true);
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
-        when(managerRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
+        when(credentialsRepository.existsByEmail(new Email(command.email()))).thenReturn(true);
 
         UserAlreadyExists ex = assertThrows(UserAlreadyExists.class, () -> service.createManager(command));
 
@@ -117,7 +119,7 @@ class ManagerServiceTest {
         Restaurant restaurant = mock(Restaurant.class);
         when(restaurant.isActive()).thenReturn(true);
         when(restaurantService.getRestaurant(restaurantId)).thenReturn(restaurant);
-        when(managerRepository.existsByEmail(any())).thenReturn(false);
+        when(credentialsRepository.existsByEmail(any())).thenReturn(false);
 
         PasswordException ex = assertThrows(PasswordException.class, () -> service.createManager(command));
 
