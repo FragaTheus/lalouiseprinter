@@ -3,6 +3,7 @@ package br.com.matheusfragadev.lalouise.infra.controller.label;
 import br.com.matheusfragadev.lalouise.application.label.LabelService;
 import br.com.matheusfragadev.lalouise.application.print.PrintService;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.PrintLabelRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintLabelRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelInfo;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.mapper.LabelMapper;
@@ -27,8 +28,8 @@ public class LabelController {
 
     private final LabelService labelService;
     private final LabelInfoResolver labelInfoResolver;
-//    private final ZplService zplService;
     private final PrintService printService;
+//  private final ZplService zplService;
 
     private static final String BASE_PATH = "/labels";
     private static final String PATH_IN_SECTOR = "/sectors/{sectorId}" + BASE_PATH;
@@ -45,31 +46,17 @@ public class LabelController {
     }
 
 
-//    @PostMapping(BASE_PATH + "/{labelId}/reprint")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")
-//    public ResponseEntity<String> reprintBySectorContext(
-//            @AuthenticationPrincipal UserDetailsImpl principal,
-//            @PathVariable UUID labelId,
-//            @Valid @RequestBody ReprintLabelRequest request
-//    ){
-//        var command = LabelMapper.toReprintByContextCommand(labelId, principal.getId(), request);
-//        var label = labelService.reprintBySectorContext(command);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
-//    }
-//
-//
-//    @PostMapping(PATH_IN_SECTOR + "/{labelId}/reprint")
-//    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
-//    public ResponseEntity<String> reprintByInputSector(
-//            @AuthenticationPrincipal UserDetailsImpl principal,
-//            @PathVariable UUID labelId,
-//            @PathVariable UUID sectorId,
-//            @Valid @RequestBody ReprintLabelRequestByInput request
-//    ){
-//        var command = LabelMapper.toReprintByInputCommand(labelId, sectorId, principal.getId(), request);
-//        var label = labelService.reprintByInputSector(command);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
-//    }
+    @PostMapping(BASE_PATH + "/{labelId}/reprint")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")
+    public ResponseEntity<String> reprintBySectorContext(
+            @AuthenticationPrincipal UserDetailsImpl principal,
+            @PathVariable UUID labelId,
+            @Valid @RequestBody ReprintLabelRequest request
+    ){
+        var command = LabelMapper.toReprintLabelCommand(request, principal.getId(), labelId);
+        var label = printService.reprint(command);
+        return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
+    }
 
 
     @GetMapping(BASE_PATH + "/{targetId}")

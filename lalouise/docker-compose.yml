@@ -19,7 +19,7 @@ services:
       - postgres
     working_dir: /app
     volumes:
-      - ./app.jar:/app/app.jar
+      - ./build/libs/lalouise-0.0.1-SNAPSHOT.jar:/app/app.jar
     command: ["java", "-jar", "app.jar"]
     ports:
       - "8080:8080"

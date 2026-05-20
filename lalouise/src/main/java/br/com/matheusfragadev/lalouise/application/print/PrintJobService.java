@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.application.print;
 
-import br.com.matheusfragadev.lalouise.application.label.utils.PrintMessageCommand;
+import br.com.matheusfragadev.lalouise.application.print.utils.command.PrintMessageCommand;
 import br.com.matheusfragadev.lalouise.infra.config.RabbitConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

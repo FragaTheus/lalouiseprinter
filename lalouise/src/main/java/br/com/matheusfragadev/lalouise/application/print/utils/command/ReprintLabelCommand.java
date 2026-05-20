@@ -1,13 +1,14 @@
-package br.com.matheusfragadev.lalouise.application.label.utils;
+package br.com.matheusfragadev.lalouise.application.print.utils.command;
 
 import br.com.matheusfragadev.lalouise.domain.sector.enums.Storage;
 
 import java.util.UUID;
 
-public record ReprintLabelByInputCommand(
+public record ReprintLabelCommand(
         UUID currentLabelId,
         UUID userId,
         Storage storage,
-        UUID sectorId
+        int copies
 ) {
 }
+

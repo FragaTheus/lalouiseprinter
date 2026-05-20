@@ -52,6 +52,8 @@ export interface LabelInfo {
   status: LabelStatus;
 }
 
+// ─── Print ─────────────────────────────────────────────────────────────────
+
 interface PrintLabelRequest {
   productId: string;
   sectorId?: string;
@@ -59,26 +61,24 @@ interface PrintLabelRequest {
   copies: number;
 }
 
-interface ReprintLabelRequest {
-  storage: LabelStorageType;
-}
-
-// ─── Print ─────────────────────────────────────────────────────────────────
-
-export const usePrintLabelInSectorContext = (
-  restaurantId: string,
-  sectorId: string,
-) => {
+export const usePrintLabel = (restaurantId: string, sectorId?: string) => {
   const { push } = useRouter();
+
   return useMutation({
     mutationFn: async (data: PrintLabelRequest) => {
+      const resolvedSectorId = sectorId ?? data.sectorId;
+
+      if (!resolvedSectorId) {
+        throw new Error("sectorId is required");
+      }
+
       const response = await api.post(
-        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/labels/print`,
+        `/api/v1/restaurants/${restaurantId}/sectors/${resolvedSectorId}/labels/print`,
         data,
       );
-      return response.data as string;
+      return { id: response.data as string, resolvedSectorId };
     },
-    onSuccess: (id) => {
+    onSuccess: ({ id, resolvedSectorId }) => {
       toast.success("Etiqueta impressa com sucesso!", {
         action: {
           label: "Ver etiqueta",
@@ -88,79 +88,56 @@ export const usePrintLabelInSectorContext = (
             ),
         },
       });
-      push(
-        `/dashboard/restaurants/${restaurantId}/resources/sectors/${sectorId}/resources/labels`,
-      );
-    },
-  });
-};
 
-export const usePrintLabelByInputSector = (restaurantId: string) => {
-  const { push } = useRouter();
-  return useMutation({
-    mutationFn: async (data: PrintLabelRequest) => {
-      const response = await api.post(
-        `/api/v1/restaurants/${restaurantId}/sectors/${data.sectorId}/labels/print`,
-        data,
-      );
-      return response.data as string;
-    },
-    onSuccess: (id) => {
-      toast.success("Etiqueta impressa com sucesso!", {
-        action: {
-          label: "Ver etiqueta",
-          onClick: () =>
-            push(
-              `/dashboard/restaurants/${restaurantId}/resources/labels/${id}`,
-            ),
-        },
-      });
-      push(`/dashboard/restaurants/${restaurantId}/resources/labels`);
+      const redirectPath = sectorId
+        ? `/dashboard/restaurants/${restaurantId}/resources/sectors/${resolvedSectorId}/resources/labels`
+        : `/dashboard/restaurants/${restaurantId}/resources/labels`;
+
+      push(redirectPath);
     },
   });
 };
 
 // ─── Reprint by sector context (STAFF — sectorId from JWT) ─────────────────
 
-export const useReprintBySectorContext = (
+interface ReprintLabelRequest {
+  sectorId?: string;
+  storage: LabelStorageType;
+  copies: number;
+}
+
+export const useReprintLabel = (
   restaurantId: string,
-  sectorId: string,
   labelId: string,
+  sectorId?: string,
 ) => {
   const queryClient = useQueryClient();
+  const { push } = useRouter();
+
   return useMutation({
     mutationFn: async (data: ReprintLabelRequest) => {
+      const resolvedSectorId = sectorId ?? data.sectorId;
+
+      if (!resolvedSectorId) {
+        throw new Error("sectorId is required");
+      }
+
       const response = await api.post(
-        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/labels/${labelId}/reprint`,
+        `/api/v1/restaurants/${restaurantId}/sectors/${resolvedSectorId}/labels/${labelId}/reprint`,
         data,
       );
       return response.data as string;
     },
-    onSuccess: () => {
-      toast.success("Etiqueta reimpressa com sucesso!");
-      queryClient.invalidateQueries({ queryKey: ["labels"] });
-    },
-  });
-};
-
-// ─── Reprint by input sector (MANAGER / ADMIN) ─────────────────────────────
-
-export const useReprintByInputSector = (
-  restaurantId: string,
-  labelId: string,
-  sectorId: string,
-) => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: async (data: ReprintLabelRequest) => {
-      const response = await api.post(
-        `/api/v1/restaurants/${restaurantId}/labels/${labelId}/reprint/${sectorId}`,
-        data,
-      );
-      return response.data as string;
-    },
-    onSuccess: () => {
-      toast.success("Etiqueta reimpressa com sucesso!");
+    onSuccess: (id: string) => {
+      toast.success("Etiqueta impressa com sucesso!", {
+        action: {
+          label: "Ver etiqueta",
+          onClick: () =>
+            push(
+              `/dashboard/restaurants/${restaurantId}/resources/labels/${id}`,
+            ),
+        },
+      });
       queryClient.invalidateQueries({ queryKey: ["labels"] });
     },
   });

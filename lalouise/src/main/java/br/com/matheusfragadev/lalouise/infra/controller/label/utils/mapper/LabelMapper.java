@@ -1,11 +1,9 @@
 package br.com.matheusfragadev.lalouise.infra.controller.label.utils.mapper;
 
-import br.com.matheusfragadev.lalouise.application.label.utils.PrintLabelCommand;
-import br.com.matheusfragadev.lalouise.application.label.utils.ReprintLabelByContextCommand;
-import br.com.matheusfragadev.lalouise.application.label.utils.ReprintLabelByInputCommand;
+import br.com.matheusfragadev.lalouise.application.print.utils.command.PrintLabelCommand;
+import br.com.matheusfragadev.lalouise.application.print.utils.command.ReprintLabelCommand;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.PrintLabelRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintLabelRequest;
-import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintLabelRequestByInput;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelInfo;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.resolver.LabelInfoResolverResult;
@@ -26,12 +24,8 @@ public class LabelMapper {
                 .build();
     }
 
-    public static ReprintLabelByContextCommand toReprintByContextCommand(UUID labelId, UUID userId, ReprintLabelRequest request){
-        return new ReprintLabelByContextCommand(labelId, userId, request.storage());
-    }
-
-    public static ReprintLabelByInputCommand toReprintByInputCommand(UUID labelId, UUID sectorId, UUID userId, ReprintLabelRequestByInput request){
-        return new ReprintLabelByInputCommand(labelId, userId, request.storage(), sectorId);
+    public static ReprintLabelCommand toReprintLabelCommand(ReprintLabelRequest request, UUID userId, UUID labelId){
+        return new ReprintLabelCommand(labelId, userId, request.storage(), request.copies());
     }
 
     public static LabelInfo toInfo(LabelInfoResolverResult result){

@@ -1,6 +1,7 @@
 import { PerfilItem } from "@/shared/components/app/app-info-card";
 import AppInfoLayout from "@/shared/components/layouts/app-info-layout";
-import ReprintLabelWrapper from "../wrapper/reprint-label-wrapper";
+import ReprintLabelManagerWrapper from "../wrapper/reprint-label-manager-wrapper";
+import ReprintLabelStaffWrapper from "../wrapper/reprint-label-staff-wrapper";
 
 export default function LabelInfoLayout({
   title,
@@ -23,10 +24,14 @@ export default function LabelInfoLayout({
       isError={isError}
       isLoading={isLoading}
     >
-      {(role === "MANAGER" || role === "STAFF") && (
+      {role === "MANAGER" && (
         <>
           <h2 className="font-semibold text-xl">Ações</h2>
-          <ReprintLabelWrapper />
+          {role === "MANAGER" ? (
+            <ReprintLabelManagerWrapper />
+          ) : (
+            <ReprintLabelStaffWrapper />
+          )}
         </>
       )}
     </AppInfoLayout>

@@ -1,9 +1,9 @@
-package br.com.matheusfragadev.lalouise.application.print;
+package br.com.matheusfragadev.lalouise.application.print.utils.mapper;
 
+import br.com.matheusfragadev.lalouise.application.print.ZplGenerateCommand;
 import br.com.matheusfragadev.lalouise.domain.label.entity.Label;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PrintMapper {
@@ -23,7 +23,9 @@ public class PrintMapper {
                 restaurantName,
                 sectorName,
                 productName,
-                userNickname
+                userNickname,
+                label.getRestaurantId(),
+                label.getId()
         );
     }
 

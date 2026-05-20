@@ -42,12 +42,9 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/restaurants/*/labels/**").authenticated()
-                        .requestMatchers("/api/v1/restaurants/*/products/**").authenticated()
-                        .requestMatchers("/api/v1/restaurants/*/sectors/**").hasAnyAuthority("ADMIN", "MANAGER")
                         .requestMatchers("/api/v1/restaurants/*/staffs/**").hasAnyAuthority("ADMIN", "MANAGER")
-                        .requestMatchers("/api/v1/restaurants/**").authenticated()
                         .requestMatchers("/api/v1/admins/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -69,8 +66,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000", "https://lalouiseprinter-upsj.vercel.app/"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:3000",
+                "https://lalouiseprinter-upsj.vercel.app",
+                "https://lalouiseprinter-upsj-*.vercel.app"
+        ));
+        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.addExposedHeader(HttpHeaders.AUTHORIZATION);
 

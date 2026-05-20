@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,6 +20,8 @@ class SecurityConfigTest {
 
     private final SecurityConfig securityConfig = new SecurityConfig(mock(JwtFilter.class), mock(CustomEntryPoint.class));
 
+    // ── passwordEncoder ────────────────────────────────────────────────────────
+
     @Test
     void passwordEncoderShouldEncodeAndMatch() {
         PasswordEncoder encoder = securityConfig.passwordEncoder();
@@ -29,29 +32,61 @@ class SecurityConfigTest {
         assertTrue(encoder.matches("Strong@123", encoded));
     }
 
+    // ── corsConfigurationSource ───────────────────────────────────────────────
+
     @Test
     void corsConfigurationSourceShouldExposeAuthorizationHeader() {
+        CorsConfigurationSource source = securityConfig.corsConfigurationSource();
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setRequestURI("/api/v1/auth/login");
 
-        CorsConfiguration configuration = securityConfig.corsConfigurationSource().getCorsConfiguration(request);
+        CorsConfiguration config = source.getCorsConfiguration(request);
 
-        assertNotNull(configuration);
-        assertEquals("http://localhost:3000", configuration.getAllowedOrigins().getFirst());
-        assertTrue(configuration.getAllowedMethods().contains("POST"));
-        assertEquals("*", configuration.getAllowedHeaders().getFirst());
-        assertTrue(configuration.getExposedHeaders().contains("Authorization"));
+        assertNotNull(config);
+        assertTrue(config.getAllowedMethods().contains("POST"));
+        assertTrue(config.getAllowedMethods().contains("GET"));
+        assertEquals("*", config.getAllowedHeaders().getFirst());
+        assertTrue(config.getExposedHeaders().contains("Authorization"));
     }
 
     @Test
-    void authenticationManagerShouldComeFromAuthenticationConfiguration() throws Exception {
-        AuthenticationConfiguration authenticationConfiguration = mock(AuthenticationConfiguration.class);
-        AuthenticationManager manager = mock(AuthenticationManager.class);
-        when(authenticationConfiguration.getAuthenticationManager()).thenReturn(manager);
+    void corsConfigurationSourceShouldAllowLocalhostOrigin() {
+        CorsConfiguration config = securityConfig.corsConfigurationSource()
+                .getCorsConfiguration(new MockHttpServletRequest());
 
-        AuthenticationManager result = securityConfig.authenticationManager(authenticationConfiguration);
+        assertNotNull(config);
+        // allowedOriginPatterns is used — not allowedOrigins
+        assertTrue(config.getAllowedOriginPatterns().contains("http://localhost:3000"));
+    }
+
+    @Test
+    void corsConfigurationSourceShouldAllowVercelProductionOrigin() {
+        CorsConfiguration config = securityConfig.corsConfigurationSource()
+                .getCorsConfiguration(new MockHttpServletRequest());
+
+        assertNotNull(config);
+        assertTrue(config.getAllowedOriginPatterns().contains("https://lalouiseprinter-upsj.vercel.app"));
+    }
+
+    @Test
+    void corsConfigurationSourceShouldAllowVercelPreviewOriginPattern() {
+        CorsConfiguration config = securityConfig.corsConfigurationSource()
+                .getCorsConfiguration(new MockHttpServletRequest());
+
+        assertNotNull(config);
+        assertTrue(config.getAllowedOriginPatterns().contains("https://lalouiseprinter-upsj-*.vercel.app"));
+    }
+
+    // ── authenticationManager ─────────────────────────────────────────────────
+
+    @Test
+    void authenticationManagerShouldComeFromAuthenticationConfiguration() throws Exception {
+        AuthenticationConfiguration authConfig = mock(AuthenticationConfiguration.class);
+        AuthenticationManager manager = mock(AuthenticationManager.class);
+        when(authConfig.getAuthenticationManager()).thenReturn(manager);
+
+        AuthenticationManager result = securityConfig.authenticationManager(authConfig);
 
         assertEquals(manager, result);
     }
 }
-

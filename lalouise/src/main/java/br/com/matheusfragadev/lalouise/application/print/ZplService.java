@@ -1,11 +1,11 @@
 package br.com.matheusfragadev.lalouise.application.print;
 
-import br.com.matheusfragadev.lalouise.infra.controller.label.utils.resolver.LabelInfoResolverResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 /**
  * Serviço responsável por gerar o código ZPL (Zebra Programming Language)
@@ -52,17 +52,14 @@ public class ZplService {
     }
 
     private String buildZplLayout(ZplGenerateCommand command, int copies) {
-        var restaurant = sanitize(command.restaurantName(), 40);
-        var sector     = sanitize(command.sectorName(), 40);
-        var product    = sanitize(command.productName(), 45);
-        var printedBy  = sanitize(command.printedByName(), 40);
-        var lotCode    = sanitize(command.lot().code(), 30);
+        var restaurant = sanitize(command.restaurantName(), 30); // reduzido para caber na esquerda
+        var sector     = sanitize(command.sectorName(), 30);
+        var product    = sanitize(command.productName(), 30);
+        var printedBy  = sanitize(command.printedByName(), 30);
+        var lotCode    = sanitize(command.lot().code(), 20);
         var valDate    = DATE_FMT.format(command.validateDate());
         var fabDate    = DATE_FMT.format(command.createdAt());
         var fabTime    = TIME_FMT.format(command.createdAt());
-
-
-        // ── Cabeçalho ─────────────────────────────────────────────────
 
         return "^XA\n" +
                 "^CI28\n" +
@@ -71,28 +68,32 @@ public class ZplService {
                 "^LL360\n" +
                 "^LS0\n" +
                 String.format("^PQ%d%n%n", copies) +
-                String.format("^FO30,20^A0N,30,30^FD%s^FS%n", restaurant) +
-                "^FO30,55^GB420,2,2^FS\n" +
 
-                // ── Responsável ───────────────────────────────────────────────
-                String.format("^FO30,70^A0N,20,20^FDResp: %s^FS%n", printedBy) +
+                // ── Cabeçalho ────────────────────────────────────────────
+                String.format("^FO30,20^A0N,28,28^FD%s^FS%n", restaurant) +
+                "^FO30,53^GB440,2,2^FS\n" +
 
-                // ── Setor ─────────────────────────────────────────────────────
-                String.format("^FO30,95^A0N,20,20^FDSetor: %s^FS%n", sector) +
-                "^FO30,120^GB420,2,2^FS\n" +
+                // ── Responsável / Setor ──────────────────────────────────
+                String.format("^FO30,65^A0N,20,20^FDResp: %s^FS%n", printedBy) +
+                String.format("^FO30,90^A0N,20,20^FDSetor: %s^FS%n", sector) +
+                "^FO30,115^GB440,2,2^FS\n" +
 
-                // ── Produto ───────────────────────────────────────────────────
-                String.format("^FO30,135^A0N,25,25^FD%s^FS%n", product) +
+                // ── Produto ──────────────────────────────────────────────
+                String.format("^FO30,128^A0N,24,24^FD%s^FS%n", product) +
 
-                // ── Lote ──────────────────────────────────────────────────────
-                String.format("^FO30,170^A0N,22,22^FDLote: %s^FS%n", lotCode) +
+                // ── Lote ─────────────────────────────────────────────────
+                String.format("^FO30,160^A0N,21,21^FDLote: %s^FS%n", lotCode) +
 
-                // ── Validade ──────────────────────────────────────────────────
-                String.format("^FO30,200^A0N,25,25^FDVal: %s^FS%n", valDate) +
+                // ── Validade ─────────────────────────────────────────────
+                String.format("^FO30,190^A0N,24,24^FDVal: %s^FS%n", valDate) +
 
-                // ── Fabricação ────────────────────────────────────────────────
-                String.format("^FO30,230^A0N,20,20^FDFab: %s^FS%n", fabDate) +
-                String.format("^FO30,252^A0N,20,20^FDHora: %s^FS%n", fabTime) +
+                // ── Fabricação ───────────────────────────────────────────
+                String.format("^FO30,222^A0N,20,20^FDFab: %s^FS%n", fabDate) +
+                String.format("^FO30,247^A0N,20,20^FDHora: %s^FS%n", fabTime) +
+
+                // ── QR Code (direita, centralizado verticalmente) ────────
+                buildQrCode(290, 120, command.restaurantId(), command.labelId()) +
+
                 "^XZ";
     }
 
@@ -105,5 +106,17 @@ public class ZplService {
                 .replace("\\", "")
                 .trim();
         return cleaned.length() > maxLength ? cleaned.substring(0, maxLength) : cleaned;
+    }
+
+    private String buildQrCode(int x, int y, UUID restaurantId, UUID labelId) {
+        if (restaurantId == null || labelId == null) {
+            log.warn("restaurantId ou labelId nulos, QR Code não será gerado");
+            return "";
+        }
+        String url = String.format(
+                "https://lalouiseprinter-upsj.vercel.app/dashboard/restaurants/%s/resources/labels/%s",
+                restaurantId, labelId
+        );
+        return String.format("^FO%d,%d^BQN,2,3^FDLA,%s^FS%n", x, y, url);
     }
 }

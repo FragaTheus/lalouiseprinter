@@ -5,7 +5,7 @@ type ApiErrorResponse = {
 	error?: string;
 };
 
-const DEFAULT_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const DEFAULT_API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 const isBrowser = typeof window !== "undefined";
 
 const readAuthorizationHeader = (headers?: Record<string, unknown>) => {

@@ -4,21 +4,19 @@ import AppForm from "@/shared/components/app/app-form";
 import { Field, FieldContent, FieldLabel } from "@/shared/components/ui/field";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { LabelStorageSelect } from "../components/label-storage-select";
 import AppLookupModal from "@/shared/components/app/app-lookup-modal";
 import { useProductListInfinite } from "@/features/product/hook/use-product";
 import { useSectorListInfinite } from "@/features/sector/hook/use-sector";
 import { Input } from "@/shared/components/ui/input";
-import { usePrintLabelByInputSector } from "../hook/use-label";
-import { useFormContext, useWatch } from "react-hook-form";
 import LabelStorageSelectWrapper from "./label-storage-select-wrapper";
+import { usePrintLabel } from "../hook/use-label";
 
 export default function PrintLabelManagerWrapper() {
   const { id: restaurantId } = useParams<{
     id: string;
   }>();
 
-  const { mutate, isPending } = usePrintLabelByInputSector(restaurantId);
+  const { mutate, isPending } = usePrintLabel(restaurantId);
 
   const [productTerm, setProductTerm] = useState<string | undefined>(undefined);
   const [sectorTerm, setSectorTerm] = useState<string | undefined>(undefined);

@@ -1,4 +1,4 @@
-package br.com.matheusfragadev.lalouise.application.label.utils;
+package br.com.matheusfragadev.lalouise.application.print.utils.command;
 
 import lombok.Builder;
 

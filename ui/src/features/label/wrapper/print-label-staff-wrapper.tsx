@@ -7,17 +7,14 @@ import { useState } from "react";
 import { LabelStorageSelect } from "../components/label-storage-select";
 import AppLookupModal from "@/shared/components/app/app-lookup-modal";
 import { useProductListInfinite } from "@/features/product/hook/use-product";
-import { usePrintLabelInSectorContext } from "../hook/use-label";
+import { usePrintLabel } from "../hook/use-label";
 
 export default function PrintLabelStaffWrapper() {
   const { id: restaurantId, sectorId } = useParams<{
     id: string;
     sectorId: string;
   }>();
-  const { mutate, isPending } = usePrintLabelInSectorContext(
-    restaurantId,
-    sectorId,
-  );
+  const { mutate, isPending } = usePrintLabel(restaurantId, sectorId);
 
   const [productTerm, setProductTerm] = useState<string | undefined>(undefined);
 
