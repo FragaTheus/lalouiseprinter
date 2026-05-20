@@ -24,13 +24,13 @@ export default function LabelInfoLayout({
       isError={isError}
       isLoading={isLoading}
     >
-      {role === "MANAGER" && (
+      {role != "ADMIN" && (
         <>
           <h2 className="font-semibold text-xl">Ações</h2>
-          {role === "MANAGER" ? (
-            <ReprintLabelManagerWrapper />
-          ) : (
+          {role === "STAFF" ? (
             <ReprintLabelStaffWrapper />
+          ) : (
+            <ReprintLabelManagerWrapper />
           )}
         </>
       )}

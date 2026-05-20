@@ -46,7 +46,7 @@ public class LabelController {
     }
 
 
-    @PostMapping(BASE_PATH + "/{labelId}/reprint")
+    @PostMapping(PATH_IN_SECTOR + "/{labelId}/reprint")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")
     public ResponseEntity<String> reprintBySectorContext(
             @AuthenticationPrincipal UserDetailsImpl principal,
