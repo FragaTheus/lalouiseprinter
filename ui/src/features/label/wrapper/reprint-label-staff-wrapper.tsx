@@ -11,9 +11,9 @@ import {
 } from "@/shared/components/ui/card";
 import AppForm from "@/shared/components/app/app-form";
 import { Field, FieldContent, FieldLabel } from "@/shared/components/ui/field";
-import LabelStorageSelectWrapper from "./label-storage-select-wrapper";
 import { Input } from "@/shared/components/ui/input";
 import { useUserStore } from "@/store/user-store";
+import { LabelStorageSelect } from "../components/label-storage-select";
 
 export default function ReprintLabelStaffWrapper() {
   const { id: restaurantId, labelId: labelId } = useParams<{
@@ -40,7 +40,16 @@ export default function ReprintLabelStaffWrapper() {
       </CardHeader>
       <CardContent>
         <AppForm btnText="Reimprimir" isPending={isPending} onSubmit={mutate}>
-          <LabelStorageSelectWrapper restaurantId={restaurantId} />
+          <Field>
+            <FieldLabel>Armazenamento</FieldLabel>
+            <FieldContent>
+              <LabelStorageSelect
+                name="storage"
+                restaurantId={restaurantId}
+                sectorId={user?.sectorId}
+              />
+            </FieldContent>
+          </Field>
           <Field>
             <FieldLabel>Quantidade</FieldLabel>
             <FieldContent>
