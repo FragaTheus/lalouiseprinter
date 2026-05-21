@@ -11,6 +11,8 @@ import br.com.matheusfragadev.lalouise.application.restaurant.RestaurantService;
 import br.com.matheusfragadev.lalouise.application.sector.SectorService;
 import br.com.matheusfragadev.lalouise.application.user.profile.registry.UserServiceRegistry;
 import br.com.matheusfragadev.lalouise.domain.label.entity.Label;
+import br.com.matheusfragadev.lalouise.domain.label.enums.Status;
+import br.com.matheusfragadev.lalouise.domain.label.exceptions.InvalidLabelStateException;
 import br.com.matheusfragadev.lalouise.domain.product.exception.ProductActiveException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.entity.Restaurant;
 import br.com.matheusfragadev.lalouise.domain.sector.entity.Sector;
@@ -78,6 +80,7 @@ public class PrintService {
         var result = validateIfRestaurantAndSectorIsActive();
 
         var original = labelService.getLabel(command.currentLabelId());
+
         var product = productService.getProduct(original.getProductId());
         var validateDate = validityCalculatorService.calculate(product.getCategory(), command.storage());
 

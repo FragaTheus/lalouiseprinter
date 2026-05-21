@@ -2,6 +2,7 @@ package br.com.matheusfragadev.lalouise.domain.label.entity;
 
 import br.com.matheusfragadev.lalouise.domain.auditory.Auditory;
 import br.com.matheusfragadev.lalouise.domain.label.enums.Status;
+import br.com.matheusfragadev.lalouise.domain.label.exceptions.InvalidLabelStateException;
 import br.com.matheusfragadev.lalouise.domain.label.vo.Lot;
 import jakarta.persistence.*;
 import lombok.*;
@@ -54,6 +55,9 @@ public class Label extends Auditory {
             UUID userId,
             Instant validateDate
     ) {
+        if (this.status.equals(Status.DISCARDED) || this.status.equals(Status.EXPIRED)) {
+            throw new InvalidLabelStateException("Não é possível reimprimir uma etiqueta descartada ou vencida.");
+        }
         this.status = Status.DISCARDED;
         return new Label(
                 this.restaurantId,

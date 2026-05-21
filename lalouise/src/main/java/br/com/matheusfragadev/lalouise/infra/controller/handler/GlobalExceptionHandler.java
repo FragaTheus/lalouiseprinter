@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.controller.handler;
 
+import br.com.matheusfragadev.lalouise.domain.label.exceptions.InvalidLabelStateException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantActiveException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNameException;
@@ -181,6 +182,13 @@ public class GlobalExceptionHandler {
         var response = new HandlerResponse(ex.getMessage());
         log.warn("StorageException: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(InvalidLabelStateException.class)
+    public ResponseEntity<HandlerResponse> handleInvalidLabelState(InvalidLabelStateException ex){
+        var response = new HandlerResponse(ex.getMessage());
+        log.warn("InvalidLabelStateException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
 }
