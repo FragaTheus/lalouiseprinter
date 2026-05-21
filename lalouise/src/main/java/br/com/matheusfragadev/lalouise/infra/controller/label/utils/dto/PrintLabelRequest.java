@@ -9,7 +9,7 @@ import java.util.UUID;
 public record PrintLabelRequest(
         UUID productId,
         Storage storage,
-        @Min(1) @Max(99)
+        @Max(value = 99, message = "Maximo de copias é 99")
         Integer copies
 ) {
 }

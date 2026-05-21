@@ -2,8 +2,10 @@ package br.com.matheusfragadev.lalouise.infra.controller.label;
 
 import br.com.matheusfragadev.lalouise.application.label.LabelService;
 import br.com.matheusfragadev.lalouise.application.print.PrintService;
+import br.com.matheusfragadev.lalouise.application.print.utils.command.ReprintLabelCommand;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.PrintLabelRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintLabelRequest;
+import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.ReprintSameLabelRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelInfo;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.dto.response.LabelSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.label.utils.mapper.LabelMapper;
@@ -45,16 +47,26 @@ public class LabelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
     }
 
+    @PostMapping(BASE_PATH + "{targetId}/reprint")
+    public ResponseEntity<Void> reprintSameLabel(
+            @PathVariable UUID targetId,
+            @AuthenticationPrincipal UserDetailsImpl principal,
+            @Valid @RequestBody ReprintSameLabelRequest request
+    ){
+        var command = new ReprintLabelCommand(targetId, principal.getId(), request.copies());
+        printService.reprint(command);
+        return ResponseEntity.ok().build();
+    }
 
     @PostMapping(PATH_IN_SECTOR + "/{labelId}/reprint")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")
-    public ResponseEntity<String> reprintBySectorContext(
+    public ResponseEntity<String> printNewLabelForNewLocation(
             @AuthenticationPrincipal UserDetailsImpl principal,
             @PathVariable UUID labelId,
             @Valid @RequestBody ReprintLabelRequest request
     ){
         var command = LabelMapper.toReprintLabelCommand(request, principal.getId(), labelId);
-        var label = printService.reprint(command);
+        var label = printService.generateLabelForNewLocation(command);
         return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
     }
 
@@ -67,6 +79,7 @@ public class LabelController {
         var result = labelInfoResolver.resolver(label);
         return ResponseEntity.ok(LabelMapper.toInfo(result));
     }
+
 //
 //    @GetMapping(value = BASE_PATH + "/{targetId}/zpl", produces = MediaType.TEXT_PLAIN_VALUE)
 //    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")

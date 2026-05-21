@@ -226,3 +226,23 @@ export const useSearchLabelsByLot = (restaurantId: string, lotCode: string) => {
     },
   });
 };
+
+// ─── ReprintSameLabel ─────────────────────────────────────────────────────────
+
+interface ReprintSameLabelRequest {
+  copies: number;
+}
+
+export const useReprintSameLabel = (labelId: string, restaurantId: string) => {
+  return useMutation({
+    mutationFn: async (data: ReprintSameLabelRequest) => {
+      await api.post(
+        `/api/v1/restaurants/${restaurantId}/labels/${labelId}/reprint`,
+        data,
+      );
+    },
+    onSuccess: () => {
+      toast.success("Etiqueta reimpressa com sucesso!");
+    },
+  });
+};

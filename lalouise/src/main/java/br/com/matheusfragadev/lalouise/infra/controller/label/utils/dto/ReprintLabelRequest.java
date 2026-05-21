@@ -11,7 +11,8 @@ import java.util.UUID;
 
 public record ReprintLabelRequest(
         @NotNull Storage storage,
-        @Min(1) @Max(99) Integer copies
+        @Max(value = 99, message = "Maximo de copias é 99")
+        Integer copies
 ) {
 }
 

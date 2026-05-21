@@ -41,7 +41,7 @@ export default function LabelsLotWrapper() {
 
   const handleTermChange = useDebouncedCallback((value: string) => {
     setLotCode(value);
-  }, 500);
+  }, 3000);
 
   const cards: AppSummaryCardProps[] =
     data?.pages.flatMap((p) =>

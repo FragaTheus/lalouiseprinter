@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.application.print;
 
+import br.com.matheusfragadev.lalouise.application.print.utils.command.ZplGenerateCommand;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

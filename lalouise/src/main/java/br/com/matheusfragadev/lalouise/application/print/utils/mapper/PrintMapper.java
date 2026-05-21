@@ -1,6 +1,6 @@
 package br.com.matheusfragadev.lalouise.application.print.utils.mapper;
 
-import br.com.matheusfragadev.lalouise.application.print.ZplGenerateCommand;
+import br.com.matheusfragadev.lalouise.application.print.utils.command.ZplGenerateCommand;
 import br.com.matheusfragadev.lalouise.domain.label.entity.Label;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

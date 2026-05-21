@@ -2,6 +2,7 @@ import { PerfilItem } from "@/shared/components/app/app-info-card";
 import AppInfoLayout from "@/shared/components/layouts/app-info-layout";
 import ReprintLabelManagerWrapper from "../wrapper/reprint-label-manager-wrapper";
 import ReprintLabelStaffWrapper from "../wrapper/reprint-label-staff-wrapper";
+import ReprintLabelWrapper from "../wrapper/reprint-label-wrapper";
 
 export default function LabelInfoLayout({
   title,
@@ -32,6 +33,7 @@ export default function LabelInfoLayout({
           ) : (
             <ReprintLabelManagerWrapper />
           )}
+          <ReprintLabelWrapper />
         </>
       )}
     </AppInfoLayout>

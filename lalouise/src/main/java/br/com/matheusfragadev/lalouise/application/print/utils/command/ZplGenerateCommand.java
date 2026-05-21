@@ -1,4 +1,4 @@
-package br.com.matheusfragadev.lalouise.application.print;
+package br.com.matheusfragadev.lalouise.application.print.utils.command;
 
 import br.com.matheusfragadev.lalouise.domain.label.vo.Lot;
 import lombok.Builder;
