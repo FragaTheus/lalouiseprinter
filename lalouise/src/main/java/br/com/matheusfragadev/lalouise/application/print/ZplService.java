@@ -26,7 +26,6 @@ public class ZplService {
                     ? 1
                     : copies;
 
-            //Copies é o número de etiquetas a serem impressas, o ZPL irá replicar a etiqueta gerada esse número de vezes
 
             log.info("Gerando ZPL para com {} cópia(s)", safeCopies);
 

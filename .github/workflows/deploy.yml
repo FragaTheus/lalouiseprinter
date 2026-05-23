@@ -61,7 +61,7 @@ jobs:
 
       - name: Upload jar to VPS
         run: |
-          echo "${{ secrets.VPS_SSH_KEY }}" > /tmp/ssh_key
+          printf '%s' "${{ secrets.VPS_SSH_KEY }}" > /tmp/ssh_key
           chmod 600 /tmp/ssh_key
           scp -i /tmp/ssh_key \
               -o StrictHostKeyChecking=no \
