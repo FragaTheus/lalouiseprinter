@@ -76,7 +76,7 @@ export default function DashNavBarWrapper() {
   const sectorLinks = [
     {
       label: "Imprimir etiqueta",
-      href: `${sectorBase}/labels/sector`,
+      href: `${sectorBase}/labels/print`,
       Icon: Printer,
     },
     {
