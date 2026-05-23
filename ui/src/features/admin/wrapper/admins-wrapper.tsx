@@ -78,9 +78,9 @@ export default function AdminsWrapper() {
 
   return (
     <AppListLayout
-      titleLabel="SISTEMA DE GESTÃO"
-      title="Gestão de Administradores"
-      titleDescription="Controle centralizado de permissões e acessos para a equipe de consultoria sanitária. Mantenha a integridade dos processos e a hierarquia de auditoria."
+      titleLabel="SISTEMA DE GESTÃO DE ADMINISTRADORES"
+      title="Administradores"
+      titleDescription="Busque, registre ou edite perfis administrativos."
       href="/dashboard/admins/register"
       registerText="Cadastrar Administrador"
       cards={cards}

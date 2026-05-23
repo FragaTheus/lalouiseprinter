@@ -47,7 +47,7 @@ public class LabelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(label.getId().toString());
     }
 
-    @PostMapping(BASE_PATH + "{targetId}/reprint")
+    @PostMapping(BASE_PATH + "/{targetId}/reprint")
     public ResponseEntity<Void> reprintSameLabel(
             @PathVariable UUID targetId,
             @AuthenticationPrincipal UserDetailsImpl principal,

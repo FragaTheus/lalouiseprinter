@@ -14,12 +14,14 @@ export default function DashboardTitle({
       <Label className="mb-4 uppercase text-muted-foreground text-xs">
         {label}
       </Label>
-      <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold mb-2">
+      <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold mb-2 whitespace-pre-line">
         {title}
       </h1>
       <div className="h-1 bg-primary w-1/10 mb-4" />
       {description && (
-        <p className="text-muted-foreground max-w-md">{description}</p>
+        <p className="text-muted-foreground max-w-md whitespace-pre-line">
+          {description}
+        </p>
       )}
     </div>
   );

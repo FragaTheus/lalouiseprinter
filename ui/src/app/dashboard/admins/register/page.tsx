@@ -16,8 +16,7 @@ export default function RegisterAdmin() {
         <CardHeader>
           <CardTitle>Novo Administrador</CardTitle>
           <CardDescription>
-            Configure as credenciais de acesso corporativo e permissões de
-            segurança para o novo membro da equipe de gestão.
+            Insira os dados necessários para registrar um novo administrador.
           </CardDescription>
         </CardHeader>
         <CardContent>

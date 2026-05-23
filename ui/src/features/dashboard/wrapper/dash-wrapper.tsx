@@ -17,8 +17,7 @@ const cards = [
     href: "/dashboard/admins",
     Icon: RiAdminFill,
     title: "Administradores",
-    description:
-      "Gerencie perfis de alta hierarquia, permissões globais do sistema e logs de segurança crítica.",
+    description: "Gerencie os administradores do sistema.",
   },
   {
     roles: ["ADMIN"],
@@ -26,7 +25,7 @@ const cards = [
     Icon: BiPlus,
     title: "Registrar Administrador",
     description:
-      "Crie perfis de alta hierarquia, defina permissões globais do sistema e monitore logs de segurança crítica.",
+      "Crie perfis administrativos para colaborarem com a gestão do sistema.",
   },
   {
     roles: ["ADMIN"],
@@ -34,7 +33,7 @@ const cards = [
     Icon: BiPlus,
     title: "Registrar Restaurante",
     description:
-      "Registre novas unidades, gerencie licenças sanitárias e configure perfis de estabelecimentos parceiros para expandir sua rede de gestão higiênica.",
+      "Registre uma nova unidade parceira para expandir a rede de estabelecimentos do sistema.",
   },
   {
     className: "md:col-span-2",
@@ -56,9 +55,9 @@ export default function DashboardWrapper() {
     >
       <AppPageLayout>
         <DashboardTitle
-          label="SISTEMA DE GESTÃO SANITÁRIAs"
-          title="Central de Gestão"
-          description="Bem-vindo à Lalouise. Monitore padrões, gerencie acessos e assegure a excelência higiênica em todos os pontos de operação com nossa interface de alta precisão."
+          label="SISTEMA DE GESTÃO DE ETIQUETAS"
+          title={"Painel\n Administrativo"}
+          description={`Bem vindo de volta, ${user?.nickname}!\n Gerencie recursos do sistema ou de restaurantes.`}
         />
         <AppDashboardLayout cards={cards} />
       </AppPageLayout>

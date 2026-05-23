@@ -17,7 +17,7 @@ export default function RegisterRestaurant() {
           <CardTitle>Novo Restaurante</CardTitle>
           <CardDescription>
             Preencha as informações do estabelecimento para cadastrá-lo na
-            plataforma de gestão.
+            plataforma.
           </CardDescription>
         </CardHeader>
         <CardContent>

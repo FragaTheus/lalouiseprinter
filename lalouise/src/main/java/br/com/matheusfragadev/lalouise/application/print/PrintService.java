@@ -107,24 +107,31 @@ public class PrintService {
         if (label.getStatus().equals(Status.DISCARDED) || label.getStatus().equals(Status.EXPIRED)) {
             throw new InvalidLabelStateException("Não é possível reimprimir uma etiqueta descartada ou vencida.");
         }
-        var result = validateIfRestaurantAndSectorIsActive();
+        var restaurant = restaurantService.getRestaurant(RestaurantContext.get());
+
+        if (!restaurant.isActive()) {
+            throw new InactiveResourceException("Não é possível imprimir em um restaurante ou setor inativo.");
+        }
+
+        var sector = sectorService.getSector(label.getSectorId());
+
         var product = productService.getProduct(label.getProductId());
         var zplGenerateCommand = PrintMapper.toZplGenerateCommand(
                 label,
-                result.restaurant().getName().value(),
-                result.sector().getName().value(),
+                restaurant.getName().value(),
+                sector.getName().value(),
                 product.getName().value(),
                 userServiceRegistry.getUserName(command.userId())
         );
 
-        sendToPrintJob(command.copies(), zplGenerateCommand, result.restaurant().getId());
+        sendToPrintJob(command.copies(), zplGenerateCommand, restaurant.getId());
 
         return label;
     }
 
     //Metodos auxiliares
 
-    private void sendToPrintJob(int copies, ZplGenerateCommand command, UUID restaurantId){
+    private void sendToPrintJob(Integer copies, ZplGenerateCommand command, UUID restaurantId){
         var resolvedCopies = normalizeCopies(copies);
         printJobService.queue(zplService.generate(command, resolvedCopies), resolvedCopies, restaurantId);
     }

@@ -10,7 +10,7 @@ export default function AppPageLayout({
   return (
     <div
       className={cn(
-        `w-full max-w-7xl h-full px-4 py-4 md:py-6 lg:py-8 mt-14 mx-auto`,
+        `w-full max-w-7xl h-full px-4 py-4 md:py-6 lg:py-8 mt-14 mx-auto mb-16 lg:mb-0`,
         className,
       )}
     >

@@ -77,9 +77,9 @@ export default function RestaurantsWrapper() {
 
   return (
     <AppListLayout
-      titleLabel="SISTEMA DE GESTÃO"
-      title="Gestão de Restaurantes"
-      titleDescription="Controle centralizado dos restaurantes cadastrados na plataforma. Gerencie o status e as informações de cada estabelecimento."
+      titleLabel="GESTÃO DE RESTAURANTES"
+      title="Restaurantes"
+      titleDescription="Busque, registre ou edite informações dos restaurantes."
       href="/dashboard/restaurants/register"
       registerText="Cadastrar Restaurante"
       cards={cards}
