@@ -26,8 +26,8 @@ public class ZplService {
                     ? 1
                     : copies;
 
-            log.info("Gerando ZPL para labelId={}, restaurantId={}, com {} cópia(s)",
-                    result.labelId(), result.restaurantId(), safeCopies);
+            //log.info("Gerando ZPL para labelId={}, restaurantId={}, com {} cópia(s)",
+            //       result.labelId(), result.restaurantId(), safeCopies);
 
             log.info("Gerando ZPL para com {} cópia(s)", safeCopies);
 
