@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'lalouise/**'
 
 jobs:
   test:
@@ -29,6 +31,7 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test
+        working-directory: ./lalouise
 
   deploy:
     runs-on: ubuntu-22.04
@@ -54,6 +57,7 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
+        working-directory: ./lalouise
 
       - name: Upload jar to VPS
         uses: appleboy/scp-action@v0.1.7
@@ -61,9 +65,9 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: 'build/libs/lalouise-0.0.1-SNAPSHOT.jar'
+          source: 'lalouise/build/libs/lalouise-0.0.1-SNAPSHOT.jar'
           target: '/opt/lalouise/'
-          strip_components: 2
+          strip_components: 3
 
       - name: Restart application on VPS
         uses: appleboy/ssh-action@v1.0.3
