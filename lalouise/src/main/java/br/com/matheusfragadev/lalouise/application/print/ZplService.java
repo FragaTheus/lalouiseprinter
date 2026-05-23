@@ -26,7 +26,7 @@ public class ZplService {
                     ? 1
                     : copies;
 
-//
+
             log.info("Gerando ZPL para com {} cópia(s)", safeCopies);
 
             String zpl = buildZplLayout(result, safeCopies);

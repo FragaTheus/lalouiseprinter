@@ -5,7 +5,7 @@ import { useUserStore } from "@/store/user-store";
 import DashboardTitle from "../components/dash-title";
 import AppDashboardLayout from "@/shared/components/layouts/app-dashboard-layout";
 import { DashCardLayoutProps } from "../layout/dash-card-layout";
-import { BiInfoCircle, BiLabel, BiPlus, BiSearch } from "react-icons/bi";
+import { BiInfoCircle, BiPlus, BiSearch } from "react-icons/bi";
 import { useParams } from "next/navigation";
 
 export default function DashSectorWrapper() {

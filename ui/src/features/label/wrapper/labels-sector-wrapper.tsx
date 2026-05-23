@@ -24,7 +24,7 @@ export default function LabelsSectorWrapper() {
     sectorId: string;
   }>();
 
-  const base = `/dashboard/restaurants/${restaurantId}/resources/labels`;
+  const base = `/dashboard/restaurants/${restaurantId}/resources`;
   const router = useRouter();
   const searchParams = useSearchParams();
   const term = searchParams.get("term") ?? "";
@@ -75,7 +75,7 @@ export default function LabelsSectorWrapper() {
   const cards: AppSummaryCardProps[] =
     data?.pages.flatMap((p) =>
       p.content.map((label) => ({
-        href: `${base}/${label.id}`,
+        href: `${base}/labels/${label.id}`,
         fields: [
           { label: "Produto", children: <span>{label.productName}</span> },
           { label: "Lote", children: <span>{label.lot}</span> },
@@ -111,7 +111,7 @@ export default function LabelsSectorWrapper() {
       titleLabel="SISTEMA DE GESTÃO"
       title="Etiquetas do Setor"
       titleDescription="Gerencie e monitore as etiquetas emitidas neste setor."
-      href={`${base}/print`}
+      href={`${base}/sectors/${sectorId}/resources/labels/print`}
       registerText="Nova Etiqueta"
       cards={cards}
       isLoading={isLoading}

@@ -48,6 +48,7 @@ public class LabelController {
     }
 
     @PostMapping(BASE_PATH + "/{targetId}/reprint")
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'STAFF')")
     public ResponseEntity<Void> reprintSameLabel(
             @PathVariable UUID targetId,
             @AuthenticationPrincipal UserDetailsImpl principal,
@@ -59,7 +60,7 @@ public class LabelController {
     }
 
     @PostMapping(PATH_IN_SECTOR + "/{labelId}/reprint")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER', 'STAFF')")
+    @PreAuthorize("hasAnyAuthority('MANAGER', 'STAFF')")
     public ResponseEntity<String> printNewLabelForNewLocation(
             @AuthenticationPrincipal UserDetailsImpl principal,
             @PathVariable UUID labelId,
