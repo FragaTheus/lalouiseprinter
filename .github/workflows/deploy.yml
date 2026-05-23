@@ -60,8 +60,10 @@ jobs:
         working-directory: ./lalouise
 
       - name: Upload jar to VPS
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
         run: |
-          printf '%s' "${{ secrets.VPS_SSH_KEY }}" > /tmp/ssh_key
+          echo "$SSH_KEY" > /tmp/ssh_key
           chmod 600 /tmp/ssh_key
           scp -i /tmp/ssh_key \
               -o StrictHostKeyChecking=no \
