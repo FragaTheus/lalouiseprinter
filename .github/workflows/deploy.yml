@@ -60,20 +60,17 @@ jobs:
         working-directory: ./lalouise
 
       - name: Upload jar to VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          source: 'lalouise/build/libs/lalouise-0.0.1-SNAPSHOT.jar'
-          target: '/opt/lalouise/'
-          strip_components: 3
+        run: |
+          echo "${{ secrets.VPS_SSH_KEY }}" > /tmp/ssh_key
+          chmod 600 /tmp/ssh_key
+          scp -i /tmp/ssh_key \
+              -o StrictHostKeyChecking=no \
+              lalouise/build/libs/lalouise-0.0.1-SNAPSHOT.jar \
+              ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/lalouise/
 
       - name: Restart application on VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            docker restart lalouise-api
+        run: |
+          ssh -i /tmp/ssh_key \
+              -o StrictHostKeyChecking=no \
+              ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+              "docker restart lalouise-api"
