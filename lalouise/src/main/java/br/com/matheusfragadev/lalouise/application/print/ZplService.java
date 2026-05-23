@@ -8,12 +8,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
-/**
- * Serviço responsável por gerar o código ZPL (Zebra Programming Language)
- * a partir dos dados de uma etiqueta, para envio direto a impressoras Zebra.
- *
- * Layout padrão: ~60mm x 45mm (480 x 360 dots @ 203 DPI)
- */
 @Slf4j
 @Service
 public class ZplService {
@@ -26,13 +20,6 @@ public class ZplService {
             .ofPattern("HH:mm")
             .withZone(ZONE);
 
-    /**
-     * Gera o ZPL completo para a etiqueta informada.
-     *
-     * @param result  resultado resolvido com nome do restaurante, setor, produto e responsável
-     * @param copies  número de cópias a imprimir (normalizado entre 1 e 99)
-     * @return String com o código ZPL pronto para envio à impressora
-     */
     public String generate(ZplGenerateCommand result, Integer copies) {
         try {
             int safeCopies = (copies == null || copies < 1)
