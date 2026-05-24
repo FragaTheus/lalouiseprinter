@@ -4,13 +4,14 @@ import { useSectorInfo, STORAGE_LABELS } from "../hook/use-sector";
 import { useParams } from "next/navigation";
 import SectorInfoLayout from "../layout/sector-info-layout";
 import { useRouteGuard } from "@/shared/components/app/app-route-guard";
+import { useUserStore } from "@/store/user-store";
 
 export default function SectorInfoWrapper() {
   const { sectorId, id: restaurantId } = useParams<{
     sectorId: string;
     id: string;
   }>();
-  const { role } = useRouteGuard();
+  const { user } = useUserStore();
   const { data, isLoading, isError } = useSectorInfo(restaurantId, sectorId);
 
   const storagesLabel =
@@ -32,8 +33,6 @@ export default function SectorInfoWrapper() {
         </span>
       ),
     },
-    // TODO: implementar vínculo de responsável futuramente
-    // { label: "Responsável:", children: data?.responsibleId ?? "N/A" },
     {
       label: "Criado em:",
       children: data?.createdAt
@@ -55,7 +54,8 @@ export default function SectorInfoWrapper() {
       isError={isError}
       items={items}
       isActive={data?.active ?? false}
-      role={role ?? undefined}
+      roles={["MANAGER", "STAFF"]}
+      userRole={user?.role ?? "N/A"}
     />
   );
 }

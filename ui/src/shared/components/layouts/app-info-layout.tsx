@@ -10,13 +10,17 @@ export default function AppInfoLayout({
   isLoading,
   isError,
   children,
+  roles,
+  userRole,
 }: {
   title: string;
   description: string;
   items: PerfilItem[];
   isError: boolean;
+  roles: string[];
   isLoading: boolean;
   children: React.ReactNode;
+  userRole: string;
 }) {
   return (
     <AppPageLayout className="min-h-svh max-w-xl! flex flex-col items-center justify-center">
@@ -32,7 +36,7 @@ export default function AppInfoLayout({
           <div className="w-full h-full flex flex-col">
             <ProfileCard items={items} />
             <div className="w-full h-full mt-8 flex flex-col gap-4">
-              {children}
+              {roles.includes(userRole) && children}
             </div>
           </div>
         </div>

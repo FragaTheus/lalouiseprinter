@@ -10,7 +10,8 @@ export default function ProductInfoLayout({
   isError,
   items,
   isActive,
-  role,
+  roles,
+  userRole,
 }: {
   title: string;
   isLoading: boolean;
@@ -18,6 +19,8 @@ export default function ProductInfoLayout({
   items: PerfilItem[];
   isActive: boolean;
   role: string | undefined;
+  roles: string[];
+  userRole: string;
 }) {
   return (
     <AppInfoLayout
@@ -26,15 +29,13 @@ export default function ProductInfoLayout({
       title={title}
       isError={isError}
       isLoading={isLoading}
+      roles={roles}
+      userRole={userRole}
     >
-      {role == "MANAGER" && (
-        <>
-          <h2 className="font-semibold text-xl">Configurações do produto</h2>
-          <ProductChangeNameWrapper />
-          <ProductChangeDescriptionWrapper />
-          <ProductToggleActivationWrapper isActive={isActive} />
-        </>
-      )}
+      <h2 className="font-semibold text-xl">Configurações do produto</h2>
+      <ProductChangeNameWrapper />
+      <ProductChangeDescriptionWrapper />
+      <ProductToggleActivationWrapper isActive={isActive} />
     </AppInfoLayout>
   );
 }

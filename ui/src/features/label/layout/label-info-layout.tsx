@@ -9,13 +9,16 @@ export default function LabelInfoLayout({
   isLoading,
   isError,
   items,
-  role,
+  roles,
+  userRole,
 }: {
   title: string;
   isLoading: boolean;
   isError: boolean;
   items: PerfilItem[];
   role: string | undefined;
+  roles: string[];
+  userRole: string;
 }) {
   return (
     <AppInfoLayout
@@ -24,18 +27,16 @@ export default function LabelInfoLayout({
       title={title}
       isError={isError}
       isLoading={isLoading}
+      roles={roles}
+      userRole={userRole}
     >
-      {role != "ADMIN" && (
-        <>
-          <h2 className="font-semibold text-xl">Ações</h2>
-          {role === "STAFF" ? (
-            <ReprintLabelStaffWrapper />
-          ) : (
-            <ReprintLabelManagerWrapper />
-          )}
-          <ReprintLabelWrapper />
-        </>
+      <h2 className="font-semibold text-xl">Ações</h2>
+      {userRole === "STAFF" ? (
+        <ReprintLabelStaffWrapper />
+      ) : (
+        <ReprintLabelManagerWrapper />
       )}
+      <ReprintLabelWrapper />
     </AppInfoLayout>
   );
 }

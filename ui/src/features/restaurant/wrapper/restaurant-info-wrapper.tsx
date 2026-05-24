@@ -41,6 +41,8 @@ export default function RestaurantInfoWrapper() {
 
   return (
     <RestaurantInfoLayout
+      roles={["MANAGER", "ADMIN"]}
+      userRole={user?.role ?? "N/A"}
       title={data?.name ?? "N/A"}
       isLoading={isLoading}
       isError={isError}

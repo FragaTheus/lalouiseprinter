@@ -43,6 +43,8 @@ export default function AdminInfoWrapper() {
 
   return (
     <AdminInfoLayout
+      roles={["ADMIN"]}
+      userRole={user?.role ?? "N/A"}
       title={data?.nickname ?? "N/A"}
       isLoading={isLoading}
       isError={isError}

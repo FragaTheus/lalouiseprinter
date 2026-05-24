@@ -10,12 +10,16 @@ export default function StaffInfoLayout({
   isError,
   items,
   isActive,
+  roles,
+  userRole,
 }: {
   title: string;
   isLoading: boolean;
   isError: boolean;
   items: PerfilItem[];
   isActive: boolean;
+  roles: string[];
+  userRole: string;
 }) {
   return (
     <AppInfoLayout
@@ -24,6 +28,8 @@ export default function StaffInfoLayout({
       title={title}
       isError={isError}
       isLoading={isLoading}
+      userRole={userRole}
+      roles={roles}
     >
       <h2 className="font-semibold text-xl">Configurações da conta</h2>
       <StaffChangeNameWrapper />

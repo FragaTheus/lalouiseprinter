@@ -11,6 +11,8 @@ export default function AdminInfoLayout({
   isError,
   items,
   isActive,
+  roles,
+  userRole,
 }: {
   title: string;
   isProfile: boolean;
@@ -18,6 +20,8 @@ export default function AdminInfoLayout({
   isError: boolean;
   items: PerfilItem[];
   isActive: boolean;
+  roles: string[];
+  userRole: string;
 }) {
   return (
     <AppInfoLayout
@@ -26,6 +30,8 @@ export default function AdminInfoLayout({
       title={title}
       isError={isError}
       isLoading={isLoading}
+      roles={roles}
+      userRole={userRole}
     >
       <h2 className="font-semibold text-xl">
         Configuracoes da conta administrativa

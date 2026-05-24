@@ -16,7 +16,8 @@ export default function RestaurantInfoLayout({
   isError,
   items,
   isActive,
-  role,
+  roles,
+  userRole,
 }: {
   title: string;
   isLoading: boolean;
@@ -24,6 +25,8 @@ export default function RestaurantInfoLayout({
   items: PerfilItem[];
   role: string | undefined;
   isActive: boolean;
+  roles: string[];
+  userRole: string;
 }) {
   const { id } = useParams<{ id: string }>();
   const { mutate: deactivate } = useDeleteRestaurant(id);
@@ -36,26 +39,22 @@ export default function RestaurantInfoLayout({
       title={title}
       isError={isError}
       isLoading={isLoading}
+      roles={roles}
+      userRole={userRole}
     >
-      {role == "ADMIN" && (
-        <>
-          <h2 className="font-semibold text-xl">
-            Configurações do restaurante
-          </h2>
-          <RestaurantChangeNameCard />
-          <AppToggleActivation
-            isActive={isActive}
-            active={{
-              text: "Desativar restaurante",
-              mutate: deactivate,
-            }}
-            inactive={{
-              text: "Reativar restaurante",
-              mutate: reactive,
-            }}
-          />
-        </>
-      )}
+      <h2 className="font-semibold text-xl">Configurações do restaurante</h2>
+      <RestaurantChangeNameCard />
+      <AppToggleActivation
+        isActive={isActive}
+        active={{
+          text: "Desativar restaurante",
+          mutate: deactivate,
+        }}
+        inactive={{
+          text: "Reativar restaurante",
+          mutate: reactive,
+        }}
+      />
     </AppInfoLayout>
   );
 }

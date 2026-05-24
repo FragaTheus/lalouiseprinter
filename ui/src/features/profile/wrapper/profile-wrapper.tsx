@@ -44,6 +44,8 @@ export default function ProfileWrapper() {
       title={data?.nickname || "Nome"}
       items={items}
       isLoading={isLoading}
+      roles={["ADMIN", "MANAGER"]}
+      userRole={user?.role || "N/A"}
     />
   );
 }

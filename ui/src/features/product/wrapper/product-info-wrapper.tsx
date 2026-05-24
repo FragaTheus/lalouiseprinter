@@ -58,6 +58,8 @@ export default function ProductInfoWrapper() {
 
   return (
     <ProductInfoLayout
+      roles={["MANAGER"]}
+      userRole={user?.role ?? "N/A"}
       title={data?.name ?? "N/A"}
       isLoading={isLoading}
       isError={isError}

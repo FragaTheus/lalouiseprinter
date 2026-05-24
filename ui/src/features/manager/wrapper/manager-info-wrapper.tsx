@@ -45,6 +45,8 @@ export default function ManagerInfoWrapper() {
 
   return (
     <ManagerInfoLayout
+      roles={["MANAGER"]}
+      userRole={user?.role ?? "N/A"}
       title={data?.nickname ?? "N/A"}
       isLoading={isLoading}
       isError={isError}

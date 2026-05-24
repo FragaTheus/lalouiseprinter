@@ -10,12 +10,16 @@ export default function ProfileLayout({
   isLoading,
   isError,
   role,
+  roles,
+  userRole,
 }: {
   title: string;
   items: PerfilItem[];
   isError: boolean;
   isLoading: boolean;
   role: string;
+  roles: string[];
+  userRole: string;
 }) {
   return (
     <AppInfoLayout
@@ -24,16 +28,14 @@ export default function ProfileLayout({
       items={items}
       isLoading={isLoading}
       isError={isError}
+      roles={roles}
+      userRole={userRole}
     >
-      {role != "STAFF" && (
-        <>
-          <h2 className="text-xl font-bold">Configurações da conta</h2>
-          <div className="grid grid-cols-1 gap-4 mt-8">
-            <ProfileChangeNameWrapper />
-            <ProfileChangePasswordWrapper />
-          </div>
-        </>
-      )}
+      <h2 className="text-xl font-bold">Configurações da conta</h2>
+      <div className="grid grid-cols-1 gap-4 mt-8">
+        <ProfileChangeNameWrapper />
+        <ProfileChangePasswordWrapper />
+      </div>
       <span className="flex items-center gap-1 mt-8 text-secondary opacity-70 text-center flex-wrap justify-center">
         <ShieldCheck />
         <small>Seus dados criptografados de ponta a ponta</small>

@@ -10,14 +10,16 @@ export default function SectorInfoLayout({
   isError,
   items,
   isActive,
-  role,
+  roles,
+  userRole,
 }: {
   title: string;
   isLoading: boolean;
   isError: boolean;
   items: PerfilItem[];
   isActive: boolean;
-  role?: "ADMIN" | "MANAGER" | "STAFF";
+  roles: string[];
+  userRole: string;
 }) {
   return (
     <AppInfoLayout
@@ -26,17 +28,17 @@ export default function SectorInfoLayout({
       title={title}
       isError={isError}
       isLoading={isLoading}
+      roles={roles}
+      userRole={userRole}
     >
-      {/* ADMIN não pode alterar dados ou desativar setores */}
-      {(role === "MANAGER" || role === "STAFF") && (
+      {(userRole === "MANAGER" || userRole === "STAFF") && (
         <>
           <h2 className="font-semibold text-xl">Configurações do setor</h2>
           <SectorChangeNameWrapper />
           <SectorChangeStoragesWrapper />
         </>
       )}
-      {/* Somente MANAGER pode ativar/desativar setores */}
-      {role === "MANAGER" && (
+      {userRole === "MANAGER" && (
         <SectorToggleActivationWrapper isActive={isActive} />
       )}
     </AppInfoLayout>

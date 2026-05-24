@@ -56,6 +56,8 @@ export default function LabelInfoWrapper() {
 
   return (
     <LabelInfoLayout
+      roles={["MANAGER", "STAFF"]}
+      userRole={user?.role ?? "N/A"}
       title={data?.productName ?? "Etiqueta"}
       isLoading={isLoading}
       isError={isError}

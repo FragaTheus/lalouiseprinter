@@ -3,6 +3,7 @@
 import { useStaffInfo } from "../hooks/use-staff";
 import { useParams } from "next/navigation";
 import StaffInfoLayout from "../layout/staff-info-layout";
+import { useUserStore } from "@/store/user-store";
 
 export default function StaffInfoWrapper() {
   const { id: restaurantId, staffId } = useParams<{
@@ -10,6 +11,7 @@ export default function StaffInfoWrapper() {
     sectorId: string;
     staffId: string;
   }>();
+  const { user } = useUserStore();
   const { data, isLoading, isError } = useStaffInfo(restaurantId, staffId);
 
   const items = [
@@ -45,6 +47,8 @@ export default function StaffInfoWrapper() {
 
   return (
     <StaffInfoLayout
+      roles={["MANAGER"]}
+      userRole={user?.role ?? "N/A"}
       title={data?.nickname ?? "N/A"}
       isLoading={isLoading}
       isError={isError}
