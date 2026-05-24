@@ -3,7 +3,7 @@ import AppRouteGuard from "@/shared/components/app/app-route-guard";
 
 export default function SectorInfoPage() {
   return (
-    <AppRouteGuard allowedRoles={["ADMIN", "MANAGER", "STAFF"]}>
+    <AppRouteGuard>
       <SectorInfoWrapper />
     </AppRouteGuard>
   );

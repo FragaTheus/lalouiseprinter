@@ -1,7 +1,6 @@
 "use client";
 
 import AppPageLayout from "@/shared/components/layouts/app-page-layout";
-import { useUserStore } from "@/store/user-store";
 import DashboardTitle from "../components/dash-title";
 import AppDashboardLayout from "@/shared/components/layouts/app-dashboard-layout";
 import { DashCardLayoutProps } from "../layout/dash-card-layout";
@@ -9,7 +8,6 @@ import { BiInfoCircle, BiPlus, BiSearch } from "react-icons/bi";
 import { useParams } from "next/navigation";
 
 export default function DashSectorWrapper() {
-  const { user } = useUserStore();
   const { sectorId, id } = useParams<{
     sectorId: string;
     id: string;

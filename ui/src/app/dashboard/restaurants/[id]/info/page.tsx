@@ -3,7 +3,7 @@ import AppRouteGuard from "@/shared/components/app/app-route-guard";
 
 export default function RestaurantInfoPage() {
   return (
-    <AppRouteGuard>
+    <AppRouteGuard allowedRoles={["ADMIN"]}>
       <RestaurantInfoWrapper />
     </AppRouteGuard>
   );

@@ -10,7 +10,7 @@ import {
 
 export default function RegisterProduct() {
   return (
-    <AppRouteGuard allowedRoles={["ADMIN", "MANAGER"]}>
+    <AppRouteGuard allowedRoles={["MANAGER"]}>
       <AppInputPageLayout>
         <CardHeader>
           <CardTitle>Novo Produto</CardTitle>

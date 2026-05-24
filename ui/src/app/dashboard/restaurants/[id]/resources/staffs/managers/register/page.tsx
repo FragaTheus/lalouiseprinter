@@ -10,7 +10,7 @@ import {
 
 export default function RegisterManager() {
   return (
-    <AppRouteGuard allowedRoles={["ADMIN", "MANAGER"]}>
+    <AppRouteGuard allowedRoles={["MANAGER", "ADMIN"]}>
       <AppInputPageLayout>
         <CardHeader>
           <CardTitle>Novo Gerente</CardTitle>

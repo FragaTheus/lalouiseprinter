@@ -5,7 +5,6 @@ import { DashCardLayoutProps } from "@/features/dashboard/layout/dash-card-layou
 import { useRestaurantLookUpInfo } from "@/features/restaurant/hooks/use-restaurant";
 import AppDashboardLayout from "@/shared/components/layouts/app-dashboard-layout";
 import AppPageLayout from "@/shared/components/layouts/app-page-layout";
-import { useUserStore } from "@/store/user-store";
 import { useParams } from "next/navigation";
 import { BiPlus } from "react-icons/bi";
 import { HiUsers } from "react-icons/hi";
@@ -14,8 +13,6 @@ import { RiUserShared2Fill } from "react-icons/ri";
 export default function StaffsPage() {
   const { id } = useParams<{ id: string }>();
   const { data } = useRestaurantLookUpInfo(id);
-  const { user } = useUserStore();
-
   const base = `/dashboard/restaurants/${id}/resources/staffs`;
 
   const cards = [
@@ -28,6 +25,7 @@ export default function StaffsPage() {
         "Registro de staff, certificados de treinamento e históricos de conduta sanitária.",
     },
     {
+      roles: ["MANAGER"],
       href: `${base}/register`,
       Icon: BiPlus,
       title: "Novo colaborador",
@@ -35,6 +33,7 @@ export default function StaffsPage() {
         "Coordenação de colaboradores operacionais para unidade do seu restaurante.",
     },
     {
+      roles: ["MANAGER"],
       href: `${base}/managers/register`,
       Icon: BiPlus,
       title: "Novo Gerente",

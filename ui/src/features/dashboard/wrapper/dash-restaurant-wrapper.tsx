@@ -45,6 +45,7 @@ export default function DashRestaurantWrapper() {
         "Gerencie setores, armazenamentos para controle de qualidade alimentar.",
     },
     {
+      roles: ["MANAGER", "STAFF"],
       href: `${base}/resources/sectors/register`,
       Icon: BiPlus,
       title: "Registrar setor",
@@ -57,6 +58,7 @@ export default function DashRestaurantWrapper() {
       description: "Gerencie os produtos utilizados na unidade",
     },
     {
+      roles: ["MANAGER", "STAFF"],
       href: `${base}/resources/products/register`,
       Icon: BiPlus,
       title: "Registrar produto",
