@@ -3,9 +3,10 @@
 import AppNavBar, {
   ItemNavBarProps,
 } from "@/shared/components/app/app-nav-bar";
-import { useUserStore } from "@/store/user-store";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 import { Printer } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { BiHome, BiLabel, BiRestaurant } from "react-icons/bi";
 import { CgInfo, CgProductHunt } from "react-icons/cg";
 import { LiaBell } from "react-icons/lia";
@@ -17,9 +18,21 @@ export default function DashNavBarWrapper() {
     id: string;
     sectorId: string;
   }>();
-  const { user } = useUserStore();
 
   const pathname = usePathname();
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [resolvedPathname, setResolvedPathname] = useState(pathname);
+
+  useEffect(() => {
+    setIsNavigating(true);
+
+    const timeout = setTimeout(() => {
+      setResolvedPathname(pathname);
+      setIsNavigating(false);
+    }, 150);
+
+    return () => clearTimeout(timeout);
+  }, [pathname]);
 
   const base = "/dashboard";
 
@@ -96,6 +109,16 @@ export default function DashNavBarWrapper() {
     : pathname.includes(`/restaurants/${restaurantId}/resources`)
       ? restaurantLinks
       : dashLinks;
+
+  if (isNavigating) {
+    return (
+      <nav className="w-full h-full flex items-center justify-evenly">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className="h-8 w-16 rounded-md" />
+        ))}
+      </nav>
+    );
+  }
 
   return <AppNavBar links={links} />;
 }
