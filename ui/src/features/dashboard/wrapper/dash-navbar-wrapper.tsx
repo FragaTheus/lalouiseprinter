@@ -29,7 +29,7 @@ export default function DashNavBarWrapper() {
     const timeout = setTimeout(() => {
       setResolvedPathname(pathname);
       setIsNavigating(false);
-    }, 500);
+    }, 1000);
 
     return () => clearTimeout(timeout);
   }, [pathname]);
