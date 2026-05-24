@@ -34,6 +34,8 @@ export default function AppNavBar({ links }: AppNavBarProps) {
     <nav className="w-full h-full flex items-center justify-evenly">
       {links.map((link, index) => (
         <Items
+          role={link.role}
+          userRole={link.userRole}
           key={index}
           href={link.href}
           label={link.label}
