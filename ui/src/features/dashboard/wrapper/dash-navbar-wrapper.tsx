@@ -4,6 +4,7 @@ import AppNavBar, {
   ItemNavBarProps,
 } from "@/shared/components/app/app-nav-bar";
 import { Skeleton } from "@/shared/components/ui/skeleton";
+import { useUserStore } from "@/store/user-store";
 import { Printer } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ export default function DashNavBarWrapper() {
     id: string;
     sectorId: string;
   }>();
+  const { user } = useUserStore();
 
   const pathname = usePathname();
   const [isNavigating, setIsNavigating] = useState(false);
@@ -29,7 +31,7 @@ export default function DashNavBarWrapper() {
     const timeout = setTimeout(() => {
       setResolvedPathname(pathname);
       setIsNavigating(false);
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timeout);
   }, [pathname]);
@@ -58,6 +60,8 @@ export default function DashNavBarWrapper() {
 
   const restaurantLinks = [
     {
+      role: "ADMIN",
+      userRole: user?.role,
       label: "Imprimir",
       href: `${restaurantBase}/labels/print`,
       Icon: Printer,
@@ -84,17 +88,17 @@ export default function DashNavBarWrapper() {
     },
   ] satisfies ItemNavBarProps[];
 
-  const sectorBase = `${restaurantBase}/sectors/${sectorId}/resources`;
+  const sectorBase = `${restaurantBase}/sectors/${sectorId}`;
 
   const sectorLinks = [
     {
       label: "Imprimir etiqueta",
-      href: `${sectorBase}/labels/print`,
+      href: `${sectorBase}/resources/labels/print`,
       Icon: Printer,
     },
     {
       label: "Etiquetas do setor",
-      href: `${sectorBase}/labels/sector`,
+      href: `${sectorBase}/resources/labels/sector`,
       Icon: BiLabel,
     },
     {

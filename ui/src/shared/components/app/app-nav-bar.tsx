@@ -6,11 +6,17 @@ export interface ItemNavBarProps {
   href: string;
   label: string;
   Icon: ElementType;
+  role?: string;
+  userRole?: string;
 }
 
-const Items = ({ href, label, Icon }: ItemNavBarProps) => {
+const Items = ({ href, label, Icon, role, userRole }: ItemNavBarProps) => {
+  if (role != userRole) {
+    return null;
+  }
+
   return (
-    <Link href={href}>
+    <Link href={href} role={role}>
       <Button variant={"link"} className="flex flex-col gap-2 cursor-pointer">
         <Icon className="size-5 lg:hidden" />
         <span className="text-xs hidden lg:block">{label}</span>
