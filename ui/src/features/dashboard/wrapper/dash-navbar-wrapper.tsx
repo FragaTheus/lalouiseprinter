@@ -8,7 +8,13 @@ import { useUserStore } from "@/store/user-store";
 import { Printer } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BiHome, BiLabel, BiRestaurant } from "react-icons/bi";
+import {
+  BiHome,
+  BiLabel,
+  BiPlus,
+  BiPlusCircle,
+  BiRestaurant,
+} from "react-icons/bi";
 import { CgInfo, CgProductHunt } from "react-icons/cg";
 import { LiaBell } from "react-icons/lia";
 import { MdDashboard } from "react-icons/md";
@@ -50,9 +56,19 @@ export default function DashNavBarWrapper() {
       Icon: BiRestaurant,
     },
     {
+      label: "Adicionar restaurante",
+      href: `${base}/restaurants/register`,
+      Icon: BiPlus,
+    },
+    {
       label: "Administradores",
       href: `${base}/admins`,
       Icon: RiAdminFill,
+    },
+    {
+      label: "Adicionar administrador",
+      href: `${base}/admins/register`,
+      Icon: BiPlusCircle,
     },
   ] satisfies ItemNavBarProps[];
 
