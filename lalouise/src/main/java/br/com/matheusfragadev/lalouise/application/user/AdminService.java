@@ -30,8 +30,6 @@ public class AdminService implements UserService<Admin> {
 
     private final PasswordEncoder passwordEncoder;
     private final AdminRepository adminRepository;
-    // Verifica unicidade de email em TODA a hierarquia (Admin + Manager + Staff)
-    // Sem isso, poderíamos criar um Admin com email já usado por um Manager
     private final CredentialsRepository credentialsRepository;
 
     @Transactional

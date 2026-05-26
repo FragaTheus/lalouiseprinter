@@ -31,12 +31,14 @@ class JwtServiceTest {
 
     @Test
     void shouldGenerateTokenAndExtractClaims() {
-        String token = jwtService.generateToken("123", "ADMIN");
+        String token = jwtService.generateToken("123", "ADMIN", "456", "789");
 
         Claims claims = jwtService.extractClaims(token);
 
         assertEquals("123", claims.getSubject());
         assertEquals("ADMIN", claims.get("role", String.class));
+        assertEquals("456", claims.get("restaurantId", String.class));
+        assertEquals("789", claims.get("sectorId", String.class));
         assertTrue(claims.getExpiration().toInstant().isAfter(Instant.now()));
     }
 }

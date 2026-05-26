@@ -41,7 +41,7 @@ class AuthenticationServiceTest {
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn(id);
         when(userDetails.getRole()).thenReturn(Role.ADMIN);
-        when(jwtService.generateToken(id.toString(), "ADMIN")).thenReturn(token);
+        when(jwtService.generateToken(id.toString(), "ADMIN", null, null)).thenReturn(token);
         LoginResult result = authenticationService.authenticate(email, password);
         assertEquals(token, result.token());
         assertSame(userDetails, result.userDetails());

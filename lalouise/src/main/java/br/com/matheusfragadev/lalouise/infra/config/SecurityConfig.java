@@ -1,6 +1,7 @@
 package br.com.matheusfragadev.lalouise.infra.config;
 
 import br.com.matheusfragadev.lalouise.infra.entrypoint.CustomEntryPoint;
+import br.com.matheusfragadev.lalouise.infra.security.access.AccessPolicyFilter;
 import br.com.matheusfragadev.lalouise.infra.security.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,7 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
     private final CustomEntryPoint customEntryPoint;
+    private final AccessPolicyFilter accessPolicyFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -50,6 +52,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(customEntryPoint))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(accessPolicyFilter, JwtFilter.class)
                 .build();
     }
 
