@@ -13,7 +13,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 export default function ManagersWrapper() {
   const { id: restaurantId } = useParams<{ id: string }>();
-  const base = `/dashboard/restaurants/${restaurantId}/resources/managers`;
+  const base = `/dashboard/restaurants/${restaurantId}/resources/staffs/managers`;
   const router = useRouter();
   const searchParams = useSearchParams();
   const term = searchParams.get("term") ?? "";
