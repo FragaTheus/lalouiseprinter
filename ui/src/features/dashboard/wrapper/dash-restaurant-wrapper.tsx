@@ -22,7 +22,7 @@ export default function DashRestaurantWrapper() {
 
   const cards = [
     {
-      roles: ["MANAGER", "STAFF"],
+      roles: ["MANAGER", "ADMIN"],
       href: `${base}/resources/labels`,
       Icon: BiLabel,
       title: "Etiquetas",

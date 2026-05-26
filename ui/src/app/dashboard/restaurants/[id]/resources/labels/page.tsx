@@ -16,6 +16,7 @@ export default function Labels() {
 
   const cards = [
     {
+      roles: ["MANAGER", "STAFF"],
       href: `${base}/print`,
       Icon: BiPrinter,
       title: "Imprimir nova etiqueta",
