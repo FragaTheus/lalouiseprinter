@@ -1,5 +1,7 @@
 package br.com.matheusfragadev.lalouise.application.auth;
 
+import br.com.matheusfragadev.lalouise.application.mail.EmailService;
+import br.com.matheusfragadev.lalouise.application.mail.MailMessageBuilder;
 import br.com.matheusfragadev.lalouise.application.user.profile.registry.UserServiceRegistry;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.BaseStaff;
@@ -25,6 +27,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserServiceRegistry userServiceRegistry;
+    private final EmailService emailService;
 
     public LoginResult authenticate(String email, String password){
         try{
@@ -55,6 +58,9 @@ public class AuthenticationService {
             }
 
             var token = jwtService.generateToken(id, role.name(), restaurantId, sectorId);
+
+            var mailCommand = MailMessageBuilder.buildLoginMail(userDetails.getUsername());
+            emailService.sendSimpleEmail(mailCommand);
 
             log.info("User authenticated successfully, generated token: {}", token);
             return new LoginResult(token, userDetails);
