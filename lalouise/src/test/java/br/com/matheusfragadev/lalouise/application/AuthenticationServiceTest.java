@@ -2,6 +2,7 @@ package br.com.matheusfragadev.lalouise.application;
 import br.com.matheusfragadev.lalouise.application.auth.AuthenticationService;
 import br.com.matheusfragadev.lalouise.application.auth.LoginResult;
 import br.com.matheusfragadev.lalouise.application.mail.EmailService;
+import br.com.matheusfragadev.lalouise.application.user.profile.registry.UserServiceRegistry;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import br.com.matheusfragadev.lalouise.infra.security.jwt.JwtService;
@@ -32,6 +33,8 @@ class AuthenticationServiceTest {
     private AuthenticationService authenticationService;
     @Mock
     private EmailService emailService;
+    @Mock
+    private UserServiceRegistry userServiceRegistry;
 
     @Test
     void authenticateShouldReturnTokenAndUserDetailsWhenCredentialsAreValid() {
@@ -39,14 +42,19 @@ class AuthenticationServiceTest {
         String password = "Strong@123";
         String token = "token-value";
         UUID id = UUID.randomUUID();
+
         Authentication authentication = mock(Authentication.class);
         UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
+
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn(id);
         when(userDetails.getRole()).thenReturn(Role.ADMIN);
+        when(userDetails.getUsername()).thenReturn(email);
         when(jwtService.generateToken(id.toString(), "ADMIN", null, null)).thenReturn(token);
+
         LoginResult result = authenticationService.authenticate(email, password);
+
         assertEquals(token, result.token());
         assertSame(userDetails, result.userDetails());
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
