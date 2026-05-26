@@ -33,7 +33,7 @@ export default function StaffsPage() {
         "Coordenação de colaboradores operacionais para unidade do seu restaurante.",
     },
     {
-      roles: ["MANAGER"],
+      roles: ["MANAGER", "ADMIN"],
       href: `${base}/managers/register`,
       Icon: BiPlus,
       title: "Novo Gerente",

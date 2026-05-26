@@ -6,12 +6,15 @@ import AppDashboardLayout from "@/shared/components/layouts/app-dashboard-layout
 import { DashCardLayoutProps } from "../layout/dash-card-layout";
 import { BiInfoCircle, BiPlus, BiSearch } from "react-icons/bi";
 import { useParams } from "next/navigation";
+import { useSectorLookup } from "@/features/sector/hook/use-sector";
 
 export default function DashSectorWrapper() {
   const { sectorId, id } = useParams<{
     sectorId: string;
     id: string;
   }>();
+
+  const { data } = useSectorLookup(id, sectorId);
 
   const cards = [
     {
@@ -40,9 +43,9 @@ export default function DashSectorWrapper() {
   return (
     <AppPageLayout>
       <DashboardTitle
-        label="SISTEMA DE GESTÃO SANITÁRIAs"
-        title="Central de Gestão"
-        description="Bem-vindo à Lalouise. Monitore padrões, gerencie acessos e assegure a excelência higiênica em todos os pontos de operação com nossa interface de alta precisão."
+        label="GESTÃO DE SETORES"
+        title={data?.sectorName || "Central de Gestão"}
+        description="Gerencie os setores do seu restaurante, visualize informações detalhadas e acompanhe o desempenho de cada unidade."
       />
       <AppDashboardLayout cards={cards} />
     </AppPageLayout>

@@ -221,3 +221,21 @@ export const useSectorStorages = (
     enabled: !!sectorId && (options?.enabled ?? true),
   });
 };
+
+// ─── Get Lookup ───────────────────────────────────────────────────────
+
+interface LookupResponse {
+  sectorName: string;
+}
+
+export const useSectorLookup = (restaurantId: string, sectorId: string) => {
+  return useQuery({
+    queryKey: ["sectors", "lookup", restaurantId, sectorId],
+    queryFn: async () => {
+      const response = await api.get<LookupResponse>(
+        `/api/v1/restaurants/${restaurantId}/sectors/${sectorId}/lookup`,
+      );
+      return response.data;
+    },
+  });
+};

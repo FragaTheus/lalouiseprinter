@@ -2,11 +2,13 @@ package br.com.matheusfragadev.lalouise.infra.controller.sector;
 
 import br.com.matheusfragadev.lalouise.application.sector.SectorService;
 import br.com.matheusfragadev.lalouise.domain.sector.enums.Storage;
+import br.com.matheusfragadev.lalouise.infra.context.sector.SectorContext;
 import br.com.matheusfragadev.lalouise.infra.controller.sector.utils.dto.request.CreateSectorRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.sector.utils.dto.request.SectorChangeDescriptionRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.sector.utils.dto.request.SectorChangeNameRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.sector.utils.dto.request.UpdateSectorStoragesRequest;
 import br.com.matheusfragadev.lalouise.infra.controller.sector.utils.dto.response.SectorInfo;
+import br.com.matheusfragadev.lalouise.infra.controller.sector.utils.dto.response.SectorLookup;
 import br.com.matheusfragadev.lalouise.infra.controller.sector.utils.dto.response.SectorSummary;
 import br.com.matheusfragadev.lalouise.infra.controller.sector.utils.mapper.SectorMapper;
 import jakarta.validation.Valid;
@@ -100,5 +102,11 @@ public class SectorController {
     public ResponseEntity<List<Storage>> storages(@PathVariable UUID sectorId){
         var storages = sectorService.getStoragesBySectorId(sectorId);
         return ResponseEntity.ok(storages);
+    }
+
+    @GetMapping("{sectorId}/lookup")
+    public ResponseEntity<SectorLookup> sectorName(){
+        var sector = sectorService.getSector(SectorContext.get());
+        return ResponseEntity.ok(new SectorLookup(sector.getName().value()));
     }
 }
