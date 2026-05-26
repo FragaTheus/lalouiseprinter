@@ -109,7 +109,7 @@ export default function LabelsWrapper() {
       roles={["MANAGER", "STAFF"]}
       currentRole={user?.role}
       titleLabel="SISTEMA DE GESTÃO"
-      title="Etiquetas do Setor"
+      title="Etiquetas do Restaurante"
       titleDescription="Busque por nome do produto, colaborador ou setor para encontrar sua etiqueta."
       cards={cards}
       isLoading={isLoading}

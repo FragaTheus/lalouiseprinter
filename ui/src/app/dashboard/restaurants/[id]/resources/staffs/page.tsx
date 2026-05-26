@@ -53,9 +53,9 @@ export default function StaffsPage() {
   return (
     <AppPageLayout>
       <DashboardTitle
-        label="SISTEMA DE GESTÃO SANITÁRIA"
+        label="SISTEMA DE GESTÃO DE COLABORADORES"
         title={data?.restaurantName ?? "Restaurante"}
-        description="Bem-vindo à Lalouise. Monitore padrões, gerencie acessos e assegure a excelência higiênica em todos os pontos de operação com nossa interface de alta precisão."
+        description="Gerencie seus colaboradores, cadastre, edite ou avalie as contas dos colaboradores e gerentes do seu restaurante."
       />
       <AppDashboardLayout cards={cards} />
     </AppPageLayout>
