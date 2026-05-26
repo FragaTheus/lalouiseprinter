@@ -1,6 +1,7 @@
 package br.com.matheusfragadev.lalouise.application;
 import br.com.matheusfragadev.lalouise.application.auth.AuthenticationService;
 import br.com.matheusfragadev.lalouise.application.auth.LoginResult;
+import br.com.matheusfragadev.lalouise.application.mail.EmailService;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import br.com.matheusfragadev.lalouise.infra.security.jwt.JwtService;
@@ -29,6 +30,9 @@ class AuthenticationServiceTest {
     private JwtService jwtService;
     @InjectMocks
     private AuthenticationService authenticationService;
+    @Mock
+    private EmailService emailService;
+
     @Test
     void authenticateShouldReturnTokenAndUserDetailsWhenCredentialsAreValid() {
         String email = "admin@lalouise.comabcde";
@@ -46,7 +50,9 @@ class AuthenticationServiceTest {
         assertEquals(token, result.token());
         assertSame(userDetails, result.userDetails());
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(emailService).sendSimpleEmail(any());
     }
+
     @Test
     void authenticateShouldThrowTranslatedMessageWhenAuthenticationFails() {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
