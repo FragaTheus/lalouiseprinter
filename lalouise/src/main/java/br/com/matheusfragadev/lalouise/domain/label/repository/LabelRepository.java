@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,4 +59,14 @@ public interface LabelRepository extends JpaRepository<Label, UUID> {
             String lotCode,
             Pageable pageable
     );
+
+    @Query(
+            """
+            SELECT l from Label l WHERE
+            l.restaurantId = :restaurantId
+            AND l.status IN ('ACTIVE', 'EXPIRING')
+            ORDER BY l.validateDate ASC
+            """
+    )
+    List<Label> findActiveAndExpiringLabels(@Param("restaurantId") UUID restaurantId);
 }

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -50,6 +51,16 @@ public class LabelService {
     public Page<Label> getAllByLot(String lotCode, Pageable pageable) {
         var restaurantId = RestaurantContext.get();
         return labelRepository.findAllByRestaurantIdAndLotCode(restaurantId, lotCode, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Label> getActiveLabelsByRestaurant(UUID restaurantId){
+        return labelRepository.findActiveAndExpiringLabels(restaurantId);
+    }
+
+    @Transactional
+    public void saveAll(List<Label> labels){
+        labelRepository.saveAll(labels);
     }
 
 }

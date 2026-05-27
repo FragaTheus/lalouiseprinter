@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -125,6 +126,11 @@ public class AdminService implements UserService<Admin> {
     @Transactional(readOnly = true)
     public Page<Admin> getAll(String term, Boolean active, Pageable pageable) {
         return adminRepository.findAllAdmins(term, active, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Admin> getAllAdminsList(){
+        return adminRepository.findAllByActiveIsTrue();
     }
 
     private void inputPasswordMatches(String password, String confirmPassword){

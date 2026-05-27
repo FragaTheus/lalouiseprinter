@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -27,5 +28,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
             @Param("active") Boolean active,
             Pageable pageable
     );
+
+    List<Restaurant> findAllByActiveIsTrue();
 
 }

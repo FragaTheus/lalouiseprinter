@@ -3,7 +3,6 @@ package br.com.matheusfragadev.lalouise.application.auth;
 import br.com.matheusfragadev.lalouise.application.mail.EmailService;
 import br.com.matheusfragadev.lalouise.application.mail.MailMessageBuilder;
 import br.com.matheusfragadev.lalouise.application.user.profile.registry.UserServiceRegistry;
-import br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.BaseStaff;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Staff;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
@@ -16,8 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
-
-import static br.com.matheusfragadev.lalouise.domain.user.credentials.enums.Role.*;
 
 @Slf4j
 @Service
@@ -62,7 +59,7 @@ public class AuthenticationService {
             var mailCommand = MailMessageBuilder.buildLoginMail(userDetails.getUsername());
             emailService.sendSimpleEmail(mailCommand);
 
-            log.info("User authenticated successfully, generated token: {}", token);
+            log.info("User authenticated successfully, generated token");
             return new LoginResult(token, userDetails);
         }catch (BadCredentialsException e){
             log.warn("Authentication failed for email: {}, reason: {}", email, e.getMessage());

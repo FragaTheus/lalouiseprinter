@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -147,6 +148,11 @@ public class ManagerService implements UserService<Manager> {
     @Transactional(readOnly = true)
     public String getRestaurantName(UUID restaurantId) {
         return restaurantService.getRestaurant(restaurantId).getName().value();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Manager> getAllActiveManagersByRestaurantId(UUID restaurantId){
+        return managerRepository.findAllByRestaurantIdAndActiveTrue(restaurantId);
     }
 
     private void inputPasswordMatches(String password, String confirmPassword) {

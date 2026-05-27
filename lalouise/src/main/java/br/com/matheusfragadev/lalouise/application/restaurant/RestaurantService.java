@@ -61,7 +61,6 @@ public class RestaurantService {
         try {
             log.info("Deletando restaurante com ID: {}", id);
             Restaurant restaurant = getRestaurant(id);
-            //Implementar desativacao de usuarios e setores futuramente
             restaurant.deactivate();
             restaurantRepository.save(restaurant);
             log.info("Restaurante com ID: {} deletado (desativado)", id);
@@ -97,5 +96,10 @@ public class RestaurantService {
         }
         restaurant.changeName(newName);
         restaurantRepository.save(restaurant);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Restaurant> getActiveRestaurants(){
+        return restaurantRepository.findAllByActiveIsTrue();
     }
 }
