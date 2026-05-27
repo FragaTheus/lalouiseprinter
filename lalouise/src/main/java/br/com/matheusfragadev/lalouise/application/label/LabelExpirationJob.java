@@ -14,7 +14,7 @@ public class LabelExpirationJob {
     private final RestaurantService restaurantService;
     private final CheckUpLabels checkUpLabels;
 
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     public void checkAllRestaurantLabels(){
         log.info("============== Iniciando verificacao de etiquetas ==============");
 
