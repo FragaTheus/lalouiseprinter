@@ -8,7 +8,7 @@ import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNot
 import br.com.matheusfragadev.lalouise.domain.sector.exception.StorageException;
 import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyExists;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.*;
-import br.com.matheusfragadev.lalouise.infra.security.bruteforce.AccountLockedException;
+import br.com.matheusfragadev.lalouise.application.auth.AccountLockedException;
 import br.com.matheusfragadev.lalouise.infra.security.details.DisableUserException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

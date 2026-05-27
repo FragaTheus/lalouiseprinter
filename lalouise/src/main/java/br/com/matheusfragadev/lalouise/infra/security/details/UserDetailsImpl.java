@@ -53,4 +53,9 @@ public class UserDetailsImpl implements UserDetails {
         return credentials.isActive();
     }
 
+    @Override
+    public boolean isAccountNonLocked(){
+        return credentials.isNonLocked();
+    }
+
 }

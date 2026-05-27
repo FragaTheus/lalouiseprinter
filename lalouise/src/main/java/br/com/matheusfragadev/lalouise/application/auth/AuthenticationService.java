@@ -5,6 +5,7 @@ import br.com.matheusfragadev.lalouise.application.mail.MailMessageBuilder;
 import br.com.matheusfragadev.lalouise.application.user.profile.registry.UserServiceRegistry;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.BaseStaff;
 import br.com.matheusfragadev.lalouise.domain.user.staff.entity.Staff;
+import br.com.matheusfragadev.lalouise.infra.security.bruteforce.BruteForceProtection;
 import br.com.matheusfragadev.lalouise.infra.security.details.UserDetailsImpl;
 import br.com.matheusfragadev.lalouise.infra.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +26,23 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final UserServiceRegistry userServiceRegistry;
     private final EmailService emailService;
+    private final BruteForceProtection bruteForceProtection;
 
     public LoginResult authenticate(String email, String password){
         try{
             log.info("Authenticating user with email: {}", email);
+
             var auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
             );
 
             var userDetails = (UserDetailsImpl) auth.getPrincipal();
+            if (!userDetails.getCredentials().isNonLocked()) {
+                throw new AccountLockedException();
+            }
+
+            bruteForceProtection.resetAttempts(email);
+
             var id = userDetails.getId().toString();
             var role = userDetails.getRole();
 
@@ -62,6 +71,7 @@ public class AuthenticationService {
             log.info("User authenticated successfully, generated token");
             return new LoginResult(token, userDetails);
         }catch (BadCredentialsException e){
+            bruteForceProtection.recordFailedAttempt(email);
             log.warn("Authentication failed for email: {}, reason: {}", email, e.getMessage());
             throw new BadCredentialsException("Credenciais inválidas");
         }

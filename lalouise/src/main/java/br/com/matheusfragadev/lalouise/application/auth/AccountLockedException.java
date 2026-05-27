@@ -1,4 +1,4 @@
-package br.com.matheusfragadev.lalouise.infra.security.bruteforce;
+package br.com.matheusfragadev.lalouise.application.auth;
 
 public class AccountLockedException extends RuntimeException {
     public AccountLockedException() {

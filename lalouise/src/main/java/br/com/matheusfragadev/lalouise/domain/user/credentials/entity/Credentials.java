@@ -12,24 +12,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- * Entidade raiz da hierarquia de usuários.
- *
- * Usa SINGLE_TABLE: todas as subclasses (Admin, Manager, Staff) residem
- * na mesma tabela `credentials`, diferenciadas pela coluna discriminadora `role`.
- *
- * Vantagens desta abordagem:
- * - Busca por email/id sem JOIN — uma única query contra uma única tabela.
- * - Sem necessidade de Registry/Facade para saber "em qual tabela buscar".
- * - Repositório unificado (CredentialsRepository) para operações cross-role.
- * - Repositórios tipados (AdminRepository, etc.) continuam funcionando:
- *   Hibernate adiciona WHERE role = 'X' automaticamente.
- */
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 @Getter
 @Entity
 @Table(name = "credentials")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-// `role` é a coluna discriminadora — valor STRING corresponde ao enum Role
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "email", callSuper = false)
@@ -37,23 +27,16 @@ public class Credentials extends Auditory {
 
     @Embedded
     private Nickname nickname;
-
     @Embedded
     private Email email;
-
     @Embedded
     private Password password;
-
-    /**
-     * Mapeado como leitura do discriminador.
-     * insertable/updatable=false: quem escreve o valor é o @DiscriminatorColumn,
-     * não o campo JPA — evita conflito de coluna duplicada no INSERT.
-     */
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", insertable = false, updatable = false)
+    @Column(name = "role")
     protected Role role;
-
     private boolean active;
+    @Column(name = "locked_until")
+    private Instant lockedUntil;
 
     protected Credentials(Nickname nickname, Email email, Password password, Role role, boolean active) {
         this.nickname = nickname;
@@ -72,12 +55,24 @@ public class Credentials extends Auditory {
     }
 
     public void deactivate() {
-        if (!active) throw new ActiveException("Usuário já está inativo");
+        if (!active) return;
         this.active = false;
     }
 
     public void reactivate() {
-        if (active) throw new ActiveException("Usuário já está ativo");
+        if (active) return;
         this.active = true;
+    }
+
+    public boolean isNonLocked(){
+        return lockedUntil == null || Instant.now().isAfter(lockedUntil);
+    }
+
+    public void lockFor(Duration duration){
+        this.lockedUntil = Instant.now().plus(15, ChronoUnit.MINUTES);
+    }
+
+    public void unlock(){
+        this.lockedUntil = null;
     }
 }

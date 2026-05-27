@@ -1,0 +1,1 @@
+ALTER TABLE credentials ADD COLUMN locked_until TIMESTAMP;
