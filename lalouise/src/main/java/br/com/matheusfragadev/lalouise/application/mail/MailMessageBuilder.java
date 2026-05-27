@@ -7,6 +7,9 @@ import br.com.matheusfragadev.lalouise.domain.user.admin.entity.Admin;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -98,7 +101,8 @@ public class MailMessageBuilder {
 
     private static String buildExpiringLabelsText(List<Label> labels) {
         var labelsList = labels.stream()
-                .map(label -> "  • Lote: " + label.getLot().code() + " - Vence em: " + label.getValidateDate())
+                .map(label -> "  • Lote: " + label.getLot().code()
+                        + " - Vence em: " + formatDate(label.getValidateDate()))
                 .collect(Collectors.joining("\n"));
 
         return """
@@ -109,7 +113,8 @@ public class MailMessageBuilder {
 
     private static String buildExpiredLabelsText(List<Label> labels) {
         var labelsList = labels.stream()
-                .map(label -> "  • Lote: " + label.getLot().code() + " - Venceu em: " + label.getValidateDate())
+                .map(label -> "  • Lote: " + label.getLot().code()
+                        + " - Venceu em: " + formatDate(label.getValidateDate()))
                 .collect(Collectors.joining("\n"));
 
         return """
@@ -118,4 +123,9 @@ public class MailMessageBuilder {
                 """ + labelsList + "\n";
     }
 
+    private static String formatDate(Instant instant) {
+        var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                .withZone(ZoneId.of("America/Sao_Paulo"));
+        return formatter.format(instant);
+    }
 }
