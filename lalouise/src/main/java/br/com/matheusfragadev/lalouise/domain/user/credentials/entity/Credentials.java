@@ -32,7 +32,7 @@ public class Credentials extends Auditory {
     @Embedded
     private Password password;
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "role", insertable = false, updatable = false)
     protected Role role;
     private boolean active;
     @Column(name = "locked_until")

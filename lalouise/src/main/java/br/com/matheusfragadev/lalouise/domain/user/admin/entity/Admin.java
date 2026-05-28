@@ -10,11 +10,7 @@ import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-/**
- * Subclasse de Credentials com role = ADMIN.
- * Sem @Table — usa a tabela `credentials` da classe pai (SINGLE_TABLE).
- * @DiscriminatorValue("ADMIN") diz ao Hibernate: "ao ler uma linha com role = 'ADMIN', instancie Admin".
- */
+
 @Entity
 @DiscriminatorValue("ADMIN")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
