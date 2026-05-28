@@ -10,6 +10,7 @@ import br.com.matheusfragadev.lalouise.domain.user.admin.exceptions.UserAlreadyE
 import br.com.matheusfragadev.lalouise.domain.user.credentials.exception.*;
 import br.com.matheusfragadev.lalouise.application.auth.AccountLockedException;
 import br.com.matheusfragadev.lalouise.infra.security.details.DisableUserException;
+import br.com.matheusfragadev.lalouise.infra.security.ratelimit.RateLimitException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -197,6 +198,15 @@ public class GlobalExceptionHandler {
         var response = new HandlerResponse(ex.getMessage());
         log.warn("AccountLockException: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(response);
+    }
+
+    @ExceptionHandler(RateLimitException.class)
+    public ResponseEntity<HandlerResponse> handleRateLimitExceeded(RateLimitException e) {
+        log.warn("⚠️ Rate limit excedido");
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("Retry-After", "60")
+                .body(new HandlerResponse(e.getMessage()));
     }
 
 }
