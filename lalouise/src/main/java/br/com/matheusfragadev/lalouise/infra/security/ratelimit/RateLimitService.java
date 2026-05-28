@@ -32,6 +32,7 @@ public class RateLimitService {
             throw e;
         }catch (Exception e){
             log.error("Erro ao verificar o rate limit para o IP: {} no endpoint: {}. Erro: {}", ip, endpoint, e.getMessage());
+            throw e;
         }
     }
 
