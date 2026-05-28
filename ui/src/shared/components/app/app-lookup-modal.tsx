@@ -84,6 +84,7 @@ export default function AppLookupModal(props: AppLookupModalProps) {
             placeholder={props.placeholder}
             value={search}
             onValueChange={handleInputChange}
+            required
           />
           <CommandList>
             <CommandGroup heading={props.label}>

@@ -19,7 +19,7 @@ interface CreateManagerRequest {
 export const useCreateManager = () => {
   const { push } = useRouter();
   const { id: restaurantId } = useParams<{ id: string }>();
-  const base = `/dashboard/restaurants/${restaurantId}/resources/managers`;
+  const base = `/dashboard/restaurants/${restaurantId}/resources/staffs/managers`;
   return useMutation({
     mutationFn: async (data: CreateManagerRequest) => {
       const response = await api.post(
@@ -35,7 +35,7 @@ export const useCreateManager = () => {
           onClick: () => push(`${base}/${id}`),
         },
       });
-      push(base);
+      push(`${base}/list`);
     },
   });
 };
