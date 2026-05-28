@@ -147,12 +147,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public ResponseEntity<HandlerResponse> handleInternalAuth(InternalAuthenticationServiceException e) {
-        log.error("InternalAuth cause: {}", e.getCause());
+        log.error("InternalAuth cause: {}", e.getCause() != null ? e.getCause().getClass().getSimpleName() : "unknown");
         Throwable cause = e.getCause();
+
         if (cause instanceof DisableUserException) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new HandlerResponse(cause.getMessage()));
         }
+
+        if (cause instanceof org.springframework.security.authentication.LockedException) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(new HandlerResponse("Conta bloqueada por 15 minutos após múltiplas tentativas incorretas"));
+        }
+
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new HandlerResponse("Credenciais inválidas"));
     }
