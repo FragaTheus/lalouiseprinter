@@ -19,7 +19,7 @@ INSERT INTO products (id, name, restaurant_id, category, active, created_at, upd
                                                                                              (gen_random_uuid(), 'Anchova', '08c8aa0d-dce9-4abb-8534-84532767457c', 'SEAFOOD', true, now(), now()),
                                                                                              (gen_random_uuid(), 'Arroz', '08c8aa0d-dce9-4abb-8534-84532767457c', 'GRAINS', true, now(), now()),
                                                                                              (gen_random_uuid(), 'Feijão', '08c8aa0d-dce9-4abb-8534-84532767457c', 'GRAINS', true, now(), now()),
-                                                                                             (gen_random_uuid(), 'Bancha', '08c8aa0d-dce9-4abb-8534-84532767457c', 'GRAINS', true, now(), now()),
+                                                                                             (gen_random_uuid(), 'Ban-cha', '08c8aa0d-dce9-4abb-8534-84532767457c', 'GRAINS', true, now(), now()),
                                                                                              (gen_random_uuid(), 'Cumim', '08c8aa0d-dce9-4abb-8534-84532767457c', 'VEGETABLE', true, now(), now()),
                                                                                              (gen_random_uuid(), 'Pimenta do reino', '08c8aa0d-dce9-4abb-8534-84532767457c', 'VEGETABLE', true, now(), now()),
                                                                                              (gen_random_uuid(), 'Café', '08c8aa0d-dce9-4abb-8534-84532767457c', 'GRAINS', true, now(), now()),
