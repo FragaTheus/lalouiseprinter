@@ -21,7 +21,11 @@ const Item = ({ number, title, description }: ItemProps) => {
 export default function HowTo() {
   return (
     <SectionLayout>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <label className="text-xs font-bold opacity-90 uppercase text-muted-foreground">
+        Simples de contratar
+      </label>
+      <h3 className="text-3xl font-bold mt-2">Etapas do Processo</h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-8">
         {items.map((item) => (
           <Item key={item.number} {...item} />
         ))}
@@ -35,7 +39,7 @@ const items = [
     number: "01",
     title: "Diagnóstico",
     description:
-      "Avaliação minuciosa das condições atuais e identificação de riscos sanitários específicos da operação.",
+      "Avaliação das condições atuais e identificação de riscos sanitários específicos da operação.",
   },
   {
     number: "02",

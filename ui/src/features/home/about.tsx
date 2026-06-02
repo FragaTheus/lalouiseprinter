@@ -4,37 +4,39 @@ import img from "@/shared/assets/home-about.jpg";
 
 export default function About() {
   return (
-    <SectionLayout>
+    <SectionLayout sectionClassName="bg-card">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="flex flex-col items-start justify-center">
           <label className="text-xs font-bold opacity-90 uppercase text-muted-foreground">
             Sobre LaLouise
           </label>
           <h3 className="text-3xl font-bold mt-2">
-            Consultoria especializada em sua cozinha
+            Experiência a serviço da sua cozinha
           </h3>
           <p className="mt-8 opacity-90 text-muted-foreground max-w-md">
-            Somos Biomédica, Consultora e Nutricionista. Essa combinação nos
-            permite entregar segurança alimentar de verdade, sem complicação.
-            Entendemos culinária oriental e sabemos exatamente o que você
-            precisa.
+            LaLouise é uma consultoria em segurança alimentar especializada em
+            restaurantes orientais. Nossa equipe reúne profissionais com mais de
+            15 anos de experiência. Entendemos culinária oriental no detalhe e
+            desenvolvemos soluções específicas para cada operação.
           </p>
           <div className="mt-8 space-y-4">
             <div>
-              <p className="font-bold text-sm">✓ Padrões microbiológicos</p>
+              <p className="font-bold text-sm">Equipe multidisciplinar</p>
               <p className="text-xs opacity-70">
-                Higiene garantida em cada processo
+                Biomédica, Consultora e Nutricionista
               </p>
             </div>
             <div>
-              <p className="font-bold text-sm">✓ Conformidade regulatória</p>
+              <p className="font-bold text-sm">60+ Restaurantes Atendidos</p>
               <p className="text-xs opacity-70">
-                Você em dia com a fiscalização
+                Todos em conformidade com a vigilância regional
               </p>
             </div>
             <div>
-              <p className="font-bold text-sm">✓ Segurança nutricional</p>
-              <p className="text-xs opacity-70">Qualidade do insumo ao prato</p>
+              <p className="font-bold text-sm">Atuação em Toda São Paulo</p>
+              <p className="text-xs opacity-70">
+                Cobrindo todas as regiões da capital
+              </p>
             </div>
           </div>
         </div>

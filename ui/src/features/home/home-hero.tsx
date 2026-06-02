@@ -1,21 +1,8 @@
-import { Button } from "@/shared/components/ui/button";
 import heroImg from "@/shared/assets/home-hero.webp";
 import Image from "next/image";
 import SectionLayout from "@/shared/components/layouts/section-layout";
-
-interface ItemProps {
-  title: string;
-  description: string;
-}
-
-const Item = ({ title, description }: ItemProps) => {
-  return (
-    <div className="flex flex-col items-start text-start w-full m-auto">
-      <h3 className="font-bold uppercase text-sm">{title}</h3>
-      <p className="text-muted-foreground text-xs opacity-90">{description}</p>
-    </div>
-  );
-};
+import { Badge } from "@/shared/components/ui/badge";
+import CtaBtn from "@/shared/components/app/cta-btn";
 
 export default function HomeHero() {
   return (
@@ -26,13 +13,24 @@ export default function HomeHero() {
             Sua cozinha oriental no padrão que ela merece
           </h1>
           <p className="text-secondary mb-10 text-sm">
-            Especialistas em segurança alimentar para culinária japonesa e
-            asiática. Precisão técnica com o respeito que a sua arte exige.
+            Especialistas em segurança alimentar para restaurantes orientais.
+            Rastreabilidade, documentação, controle de qualidade. Tudo que você
+            precisa em um lugar.
           </p>
-          <Button className="p-6">Fale com a nossa equipe</Button>
+          <CtaBtn
+            children="Comece sua consultoria"
+            className="w-full p-6"
+            message="Oi Thaís! Vim pelo site e quero saber mais sobre a consultoria."
+          />
           <div className="flex flex-col md:flex-row items-start gap-2 mt-8 ">
-            {items.map((item) => (
-              <Item key={item.title} {...item} />
+            {items.map((item, index) => (
+              <Badge
+                key={index}
+                className="flex flex-col"
+                variant={"secondary"}
+              >
+                {item.description}
+              </Badge>
             ))}
           </div>
         </div>
@@ -48,15 +46,12 @@ export default function HomeHero() {
 
 const items = [
   {
-    title: "15",
-    description: "Anos de experiência",
+    description: "15+ Anos de experiência",
   },
   {
-    title: "13",
-    description: "Cidades atuantes",
+    description: "13+ Cidades atuantes",
   },
   {
-    title: "100%",
-    description: "Conformidade",
+    description: "100% Conformidade",
   },
-] satisfies ItemProps[];
+];

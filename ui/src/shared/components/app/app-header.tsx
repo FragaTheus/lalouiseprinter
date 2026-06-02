@@ -10,7 +10,7 @@ export default function AppHeader({
   return (
     <header
       className={cn(
-        `fixed h-14 bg-popover/50 backdrop-blur-sm w-full shadow-md left-0 top-0 z-50`,
+        `fixed h-14 bg-popover/80 backdrop-blur-3xl w-full shadow-md left-0 top-0 z-50`,
         className,
       )}
     >

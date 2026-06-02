@@ -1,3 +1,4 @@
+import CtaBtn from "@/shared/components/app/cta-btn";
 import SectionLayout from "@/shared/components/layouts/section-layout";
 import { Button } from "@/shared/components/ui/button";
 
@@ -12,9 +13,10 @@ export default function Cta() {
           Agende uma visita hoje e eleve o patamar de segurança do seu
           restaurante.
         </p>
-        <Button className="bg-white text-black px-12 font-label-caps uppercase tracking-widest hover:opacity-90 hover:bg-white mt-12">
-          Solicitar Diagnóstico
-        </Button>
+        <CtaBtn
+          children="Solicitar Diagnóstico"
+          className="bg-white text-black px-12 font-label-caps uppercase tracking-widest hover:opacity-90 hover:bg-white mt-12"
+        />
       </div>
     </SectionLayout>
   );

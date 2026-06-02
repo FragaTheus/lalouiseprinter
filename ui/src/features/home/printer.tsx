@@ -68,12 +68,12 @@ const items = [
   {
     icon: BiCalendar,
     title: "Controle de\n Qualidade",
-    description: "Acompanhamento preciso de prazos e condições de manipulação.",
+    description: "Automação precisa de prazos e condições de manipulação.",
   },
   {
     icon: CgBell,
     title: "Avisos\n Inteligentes",
     description:
-      "Notificações automáticas de vencimento e perda de produto antes do problema.",
+      "Notificações de vencimento e perda de produto antes do problema.",
   },
 ] satisfies ItemProps[];

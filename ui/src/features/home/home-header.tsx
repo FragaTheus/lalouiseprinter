@@ -1,5 +1,6 @@
 import AppHeader from "@/shared/components/app/app-header";
 import AppLogo from "@/shared/components/app/app-logo";
+import CtaBtn from "@/shared/components/app/cta-btn";
 import { Button } from "@/shared/components/ui/button";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
@@ -16,10 +17,10 @@ export default function HomeHeader() {
             <span className="hidden md:inline">Entrar</span>
           </Button>
         </Link>
-        <Button>
+        <CtaBtn>
           <BsWhatsapp />
           <span className=" hidden md:inline">Fale conosco</span>
-        </Button>
+        </CtaBtn>
       </div>
     </AppHeader>
   );
