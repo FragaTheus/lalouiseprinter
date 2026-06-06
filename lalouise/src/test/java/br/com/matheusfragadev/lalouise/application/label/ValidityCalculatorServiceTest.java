@@ -27,7 +27,7 @@ class ValidityCalculatorServiceTest {
     @Test
     void shouldReturn1DayForAmbientWhenCategoryHasNoSpecificRule() {
         Instant before = Instant.now();
-        Instant result = service.calculate(Category.PROTEIN, Storage.AMBIENT);
+        Instant result = service.calculate(Category.VEGETABLE, Storage.AMBIENT);
         Instant after = Instant.now();
 
         assertBetween(result, before.plus(1, ChronoUnit.DAYS), after.plus(1, ChronoUnit.DAYS));
@@ -36,28 +36,28 @@ class ValidityCalculatorServiceTest {
     @Test
     void shouldReturn3DaysForRefrigeratedWhenCategoryHasNoSpecificRule() {
         Instant before = Instant.now();
-        Instant result = service.calculate(Category.PROTEIN, Storage.REFRIGERATED);
+        Instant result = service.calculate(Category.VEGETABLE, Storage.REFRIGERATED);
         Instant after = Instant.now();
 
         assertBetween(result, before.plus(3, ChronoUnit.DAYS), after.plus(3, ChronoUnit.DAYS));
     }
 
     @Test
-    void shouldReturn30DaysForFrozenWhenCategoryHasNoSpecificRule() {
+    void shouldReturn10DaysForFrozenWhenCategoryHasNoSpecificRule() {
         Instant before = Instant.now();
         Instant result = service.calculate(Category.GRAINS, Storage.FROZEN);
         Instant after = Instant.now();
 
-        assertBetween(result, before.plus(30, ChronoUnit.DAYS), after.plus(30, ChronoUnit.DAYS));
+        assertBetween(result, before.plus(10, ChronoUnit.DAYS), after.plus(10, ChronoUnit.DAYS));
     }
 
     @Test
-    void shouldReturn90DaysForDeepFrozenWhenCategoryHasNoSpecificRule() {
+    void shouldReturn30DaysForDeepFrozenWhenCategoryHasNoSpecificRule() {
         Instant before = Instant.now();
-        Instant result = service.calculate(Category.PASTA, Storage.DEEP_FROZEN);
+        Instant result = service.calculate(Category.VEGETABLE, Storage.DEEP_FROZEN);
         Instant after = Instant.now();
 
-        assertBetween(result, before.plus(90, ChronoUnit.DAYS), after.plus(90, ChronoUnit.DAYS));
+        assertBetween(result, before.plus(30, ChronoUnit.DAYS), after.plus(30, ChronoUnit.DAYS));
     }
 
     // --- Regra específica de categoria: SEAFOOD tem REFRIGERATED=2 ---
@@ -81,27 +81,27 @@ class ValidityCalculatorServiceTest {
     }
 
     @Test
-    void shouldReturn30DaysForSeafoodFrozen() {
+    void shouldReturn7DaysForSeafoodFrozen() {
         Instant before = Instant.now();
         Instant result = service.calculate(Category.SEAFOOD, Storage.FROZEN);
         Instant after = Instant.now();
 
-        assertBetween(result, before.plus(30, ChronoUnit.DAYS), after.plus(30, ChronoUnit.DAYS));
+        assertBetween(result, before.plus(7, ChronoUnit.DAYS), after.plus(7, ChronoUnit.DAYS));
     }
 
     @Test
-    void shouldReturn90DaysForSeafoodDeepFrozen() {
+    void shouldReturn20DaysForSeafoodDeepFrozen() {
         Instant before = Instant.now();
         Instant result = service.calculate(Category.SEAFOOD, Storage.DEEP_FROZEN);
         Instant after = Instant.now();
 
-        assertBetween(result, before.plus(90, ChronoUnit.DAYS), after.plus(90, ChronoUnit.DAYS));
+        assertBetween(result, before.plus(20, ChronoUnit.DAYS), after.plus(20, ChronoUnit.DAYS));
     }
 
     // --- Fallback cobre todas as categorias restantes ---
 
     @ParameterizedTest
-    @EnumSource(value = Category.class, names = {"VEGETABLE", "GRAINS", "SAUCES", "PASTA", "PROTEIN"})
+    @EnumSource(value = Category.class, names = {"VEGETABLE", "GRAINS", "SEASONINGS"})
     void shouldUseFallbackForCategoriesWithoutSpecificRules(Category category) {
         assertDoesNotThrow(() -> service.calculate(category, Storage.AMBIENT));
         assertDoesNotThrow(() -> service.calculate(category, Storage.REFRIGERATED));

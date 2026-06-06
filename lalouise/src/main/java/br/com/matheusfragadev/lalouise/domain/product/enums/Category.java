@@ -6,5 +6,6 @@ public enum Category {
     VEGETABLE,
     GRAINS,
     SAUCES,
-    PASTA
+    PASTA,
+    SEASONINGS
 }
