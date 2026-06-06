@@ -8,6 +8,7 @@ import { LabelStorageSelect } from "../components/label-storage-select";
 import AppLookupModal from "@/shared/components/app/app-lookup-modal";
 import { useProductListInfinite } from "@/features/product/hook/use-product";
 import { usePrintLabel } from "../hook/use-label";
+import { Input } from "@/shared/components/ui/input";
 
 export default function PrintLabelStaffWrapper() {
   const { id: restaurantId, sectorId } = useParams<{
@@ -56,6 +57,11 @@ export default function PrintLabelStaffWrapper() {
             sectorId={sectorId}
             restaurantId={restaurantId}
           />
+        </FieldContent>
+      </Field>
+      <Field>
+        <FieldContent>
+          <Input name="copies" type="number" />
         </FieldContent>
       </Field>
     </AppForm>

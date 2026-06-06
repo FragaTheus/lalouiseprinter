@@ -1,6 +1,7 @@
 package br.com.matheusfragadev.lalouise.infra.controller.handler;
 
 import br.com.matheusfragadev.lalouise.domain.label.exceptions.InvalidLabelStateException;
+import br.com.matheusfragadev.lalouise.domain.product.exception.ProductAlreadyExistsException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.CnpjException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantActiveException;
 import br.com.matheusfragadev.lalouise.domain.restaurant.exception.RestaurantNameException;
@@ -214,6 +215,13 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.TOO_MANY_REQUESTS)
                 .header("Retry-After", "60")
                 .body(new HandlerResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(ProductAlreadyExistsException.class)
+    public ResponseEntity<HandlerResponse> handleProductAlreadyExists(ProductAlreadyExistsException ex){
+        var response = new HandlerResponse(ex.getMessage());
+        log.warn("ProductAlreadyExistsException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
 }
