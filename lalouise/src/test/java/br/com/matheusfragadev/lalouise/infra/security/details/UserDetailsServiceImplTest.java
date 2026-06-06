@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
+import br.com.matheusfragadev.lalouise.application.auth.AccountLockedException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -33,12 +35,24 @@ class UserDetailsServiceImplTest {
 
         when(credentialsRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.of(credentials));
         when(credentials.isActive()).thenReturn(true);
+        when(credentials.isNonLocked()).thenReturn(true);
         when(credentials.getEmail()).thenReturn(email);
         when(email.value()).thenReturn("admin@lalouise.com");
 
         var userDetails = userDetailsService.loadUserByUsername("admin@lalouise.com");
 
         assertEquals("admin@lalouise.com", userDetails.getUsername());
+    }
+
+    @Test
+    void shouldThrowWhenUserIsLocked() {
+        Credentials credentials = mock(Credentials.class);
+        when(credentialsRepository.findByEmail(new Email("admin@lalouise.com"))).thenReturn(Optional.of(credentials));
+        when(credentials.isActive()).thenReturn(true);
+        when(credentials.isNonLocked()).thenReturn(false);
+
+        assertThrows(AccountLockedException.class,
+                () -> userDetailsService.loadUserByUsername("admin@lalouise.com"));
     }
 
     @Test

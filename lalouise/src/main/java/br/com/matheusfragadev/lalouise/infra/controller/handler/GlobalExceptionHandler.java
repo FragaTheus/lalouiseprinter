@@ -156,6 +156,11 @@ public class GlobalExceptionHandler {
                     .body(new HandlerResponse(cause.getMessage()));
         }
 
+        if (cause instanceof AccountLockedException) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(new HandlerResponse(cause.getMessage()));
+        }
+
         if (cause instanceof org.springframework.security.authentication.LockedException) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(new HandlerResponse("Conta bloqueada por 15 minutos após múltiplas tentativas incorretas"));

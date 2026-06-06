@@ -23,33 +23,34 @@ public class ValidityCalculatorService {
         FALLBACK.put(Storage.FROZEN,       10);
         FALLBACK.put(Storage.DEEP_FROZEN,  30);
 
-        Map<Storage, Integer> seafood = new EnumMap<>(Storage.class);
-        seafood.put(Storage.AMBIENT,       1);
-        seafood.put(Storage.REFRIGERATED,  2);
-        seafood.put(Storage.FROZEN,        7);
-        seafood.put(Storage.DEEP_FROZEN,   20);
-        RULES.put(Category.SEAFOOD, seafood);
-
-        Map<Storage, Integer> protein = new EnumMap<>(Storage.class);
-        protein.put(Storage.AMBIENT,       1);
-        protein.put(Storage.REFRIGERATED,  2);
-        protein.put(Storage.FROZEN,        8);
-        protein.put(Storage.DEEP_FROZEN,   25);
-        RULES.put(Category.PROTEIN, protein);
-
-        Map<Storage, Integer> sauces = new EnumMap<>(Storage.class);
-        sauces.put(Storage.AMBIENT,        1);
-        sauces.put(Storage.REFRIGERATED,   3);
-        sauces.put(Storage.FROZEN,         15);
-        sauces.put(Storage.DEEP_FROZEN,    30);
-        RULES.put(Category.SAUCES, sauces);
-
-        Map<Storage, Integer> pasta = new EnumMap<>(Storage.class);
-        pasta.put(Storage.AMBIENT,         1);
-        pasta.put(Storage.REFRIGERATED,    2);
-        pasta.put(Storage.FROZEN,          10);
-        pasta.put(Storage.DEEP_FROZEN,     30);
-        RULES.put(Category.PASTA, pasta);
+//----- DEIXANDO SOMENTE FALLBACK EM FUNCIONAMENTO ATE RETORNO DE NOVOS PRAZOS DA CONSULTORA -----
+//        Map<Storage, Integer> seafood = new EnumMap<>(Storage.class);
+//        seafood.put(Storage.AMBIENT,       1);
+//        seafood.put(Storage.REFRIGERATED,  2);
+//        seafood.put(Storage.FROZEN,        7);
+//        seafood.put(Storage.DEEP_FROZEN,   20);
+//        RULES.put(Category.SEAFOOD, seafood);
+//
+//        Map<Storage, Integer> protein = new EnumMap<>(Storage.class);
+//        protein.put(Storage.AMBIENT,       1);
+//        protein.put(Storage.REFRIGERATED,  2);
+//        protein.put(Storage.FROZEN,        8);
+//        protein.put(Storage.DEEP_FROZEN,   25);
+//        RULES.put(Category.PROTEIN, protein);
+//
+//        Map<Storage, Integer> sauces = new EnumMap<>(Storage.class);
+//        sauces.put(Storage.AMBIENT,        1);
+//        sauces.put(Storage.REFRIGERATED,   3);
+//        sauces.put(Storage.FROZEN,         15);
+//        sauces.put(Storage.DEEP_FROZEN,    30);
+//        RULES.put(Category.SAUCES, sauces);
+//
+//        Map<Storage, Integer> pasta = new EnumMap<>(Storage.class);
+//        pasta.put(Storage.AMBIENT,         1);
+//        pasta.put(Storage.REFRIGERATED,    2);
+//        pasta.put(Storage.FROZEN,          10);
+//        pasta.put(Storage.DEEP_FROZEN,     30);
+//        RULES.put(Category.PASTA, pasta);
     }
 
     public Instant calculate(Category category, Storage storage) {

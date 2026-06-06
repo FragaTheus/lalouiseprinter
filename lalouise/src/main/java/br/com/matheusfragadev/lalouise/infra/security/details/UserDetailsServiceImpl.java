@@ -1,5 +1,6 @@
 package br.com.matheusfragadev.lalouise.infra.security.details;
 
+import br.com.matheusfragadev.lalouise.application.auth.AccountLockedException;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.repository.CredentialsRepository;
 import br.com.matheusfragadev.lalouise.domain.user.credentials.vo.Email;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         var userDetails = new UserDetailsImpl(credentials);
         if (!userDetails.isEnabled()) {
             throw new DisableUserException("Usuário inativo");
+        }
+        if (!userDetails.isAccountNonLocked()) {
+            throw new AccountLockedException();
         }
         return userDetails;
     }

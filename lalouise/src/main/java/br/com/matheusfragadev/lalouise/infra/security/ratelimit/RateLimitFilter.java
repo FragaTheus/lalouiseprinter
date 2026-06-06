@@ -4,29 +4,38 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private final RateLimitService rateLimitService;
+    private final HandlerExceptionResolver handlerExceptionResolver;
+
+    @Autowired
+    public RateLimitFilter(
+            RateLimitService rateLimitService,
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver
+    ) {
+        this.rateLimitService = rateLimitService;
+        this.handlerExceptionResolver = handlerExceptionResolver;
+    }
 
     @Override
-    protected void doFilterInternal
-            (
-                    @NonNull HttpServletRequest request,
-                    @NonNull HttpServletResponse response,
-                    @NonNull FilterChain filterChain
-            )
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
         String clientIp = getClientIp(request);
         String requestPath = request.getRequestURI();
@@ -35,9 +44,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         try {
             rateLimitService.validateRateLimit(clientIp, requestPath, maxRequests);
         } catch (RateLimitException e) {
-            response.setStatus(429);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"mensagem\": \"" + e.getMessage() + "\"}");
+            handlerExceptionResolver.resolveException(request, response, null, e);
             return;
         }
         filterChain.doFilter(request, response);
