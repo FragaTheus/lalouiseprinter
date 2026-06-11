@@ -1,0 +1,53 @@
+# =============================================
+# ROOT MONOREPO .gitignore
+# =============================================
+
+# --- Sensitive environment files (NEVER commit) ---
+**/.env
+**/.env.*
+!**/.env.example
+**/application-env.properties
+**/application-local.properties
+**/*.local.properties
+
+# --- Java / Spring Boot / Gradle ---
+**/build/
+**/.gradle/
+**/.idea/
+**/*.iws
+**/*.iml
+**/*.ipr
+**/out/
+**/bin/
+**/HELP.md
+**/nbproject/private/
+**/nbbuild/
+**/dist/
+**/nbdist/
+**/.nb-gradle/
+
+# --- IDE ---
+.vscode/
+.DS_Store
+
+# --- Node / Next.js (ui/) ---
+ui/node_modules/
+ui/.next/
+ui/out/
+ui/build/
+ui/.pnpm-debug.log*
+ui/npm-debug.log*
+ui/yarn-debug.log*
+ui/yarn-error.log*
+ui/.pnp/
+ui/.pnp.*
+ui/.yarn/*
+!ui/.yarn/patches
+!ui/.yarn/plugins
+!ui/.yarn/releases
+!ui/.yarn/versions
+ui/coverage/
+ui/*.pem
+ui/tsconfig.tsbuildinfo
+ui/next-env.d.ts
+

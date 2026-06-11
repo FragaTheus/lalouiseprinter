@@ -36,4 +36,10 @@ out/
 ### VS Code ###
 .vscode/
 
+# Sensitive environment files - NEVER commit these
+.env
+.env.*
+!.env.example
+application-env.properties
 application-local.properties
+*.local.properties
