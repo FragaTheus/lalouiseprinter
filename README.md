@@ -13,7 +13,6 @@ Se você é desenvolvedor ou precisa entender a arquitetura técnica:
 | **Backend**     | [📄 Documentação Técnica do Backend](./lalouise/README.md)    | Spring Boot 4 · Java 21 · PostgreSQL · Redis · RabbitMQ        |
 | **Frontend**    | [📄 Documentação Técnica do Frontend](./ui/README.md)         | Next.js 16 · React 19 · TypeScript · Tailwind · TanStack Query |
 | **Print Agent** | [📄 Documentação Técnica do Print Agent](./printer/README.md) | Spring Boot 3 · AMQP · ZPL / Zebra · Windows Service           |
-| **Releases**    | [📄 Guia de Versionamento](./RELEASE.md)                      | Tags, deploy e workflow de release                             |
 
 ---
 
@@ -23,11 +22,11 @@ Se você é desenvolvedor ou precisa entender a arquitetura técnica:
 
 Redes de restaurantes enfrentam desafios críticos no controle de validade de alimentos:
 
-- **Falta de padronização** — cada unidade usa métodos diferentes para rastrear vencimento
+- **Falta de rastreamento** — unidades nao tinham como rastrear em caso de uma visita da vigilancia local
 - **Erros manuais** — etiquetas escritas à mão, datas ilegíveis, perda de lotes
 - **Perda de rastreabilidade** — impossível auditar qual produto foi descartado e quando
 - **Conformidade regulatória** — dificuldade em comprovar conformidade com normas de segurança alimentar
-- **Desperdício elevado** — produtos descartados sem registro, impossível analisar padrões
+- **Desperdício elevado** — produtos descartados sem registro, impossível analisar padrões e acompanhar validade dos mesmos
 
 ### A Solução
 
@@ -60,30 +59,30 @@ A **LaLouise** automatiza o ciclo de vida completo das etiquetas de validade —
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        CLOUD (VPS Linux)                     │
+│                        CLOUD (VPS Linux)                    │
 │                                                             │
-│  ┌──────────────┐    HTTPS/SSL    ┌─────────────────────┐  │
-│  │  Next.js UI  │ ◄──── Nginx ────► │  Spring Boot API   │  │
-│  │  (Vercel)    │                 │  (Docker · :8080)   │  │
-│  └──────────────┘                 └──────────┬──────────┘  │
+│  ┌──────────────┐    HTTPS/SSL    ┌─────────────────────┐   │
+│  │  Next.js UI  │ ◄── Nginx ──►   │  Spring Boot API    │   │
+│  │  (Vercel)    │                 │  (Docker · :8080)   │   │
+│  └──────────────┘                 └──────────┬──────────┘   │
 │                                              │              │
 │                        ┌─────────────────────┤              │
 │                        │                     │              │
-│              ┌─────────▼──────┐  ┌───────────▼─────────┐  │
-│              │  PostgreSQL 16  │  │  Redis (Rate Limit)  │  │
-│              │  (Docker)       │  │  (Docker)            │  │
-│              └────────────────┘  └────────────────────── ┘  │
+│              ┌─────────▼──────┐  ┌───────────▼─────────┐    │
+│              │  PostgreSQL 16 │  │  Redis (Rate Limit) │    │
+│              │  (Docker)      │  │  (Docker)           │    │
+│              └────────────────┘  └─────────────────────┘    │
 │                                                             │
-│              ┌──────────────────────────────────────────┐  │
-│              │           RabbitMQ (AMQP)                  │  │
-│              │   exchange: label.exchange                  │  │
-│              │   routing: print.{restaurantId}             │  │
-│              └──────────────────┬───────────────────────┘  │
+│              ┌──────────────────────────────────────────┐   │
+│              │           RabbitMQ (AMQP)                │   │
+│              │   exchange: label.exchange               │   │
+│              │   routing: print.{restaurantId}          │   │
+│              └──────────────────┬───────────────────────┘   │
 └─────────────────────────────────┼───────────────────────────┘
                                   │ AMQP
               ┌───────────────────▼───────────────────┐
-              │   Print Agent (Windows Service)        │
-              │   Spring Boot · ZPL → Zebra Printer    │
+              │   Print Agent (Windows Service)       │
+              │   Spring Boot · ZPL → Zebra Printer   │
               └───────────────────────────────────────┘
 ```
 
@@ -103,9 +102,9 @@ A **LaLouise** automatiza o ciclo de vida completo das etiquetas de validade —
 - 🔐 **JWT** — Autenticação stateless com tokens assinados
 - 🛡️ **Spring Security** — Controle de acesso declarativo por roles (Admin, Manager, Staff)
 - ⏱️ **Redis Rate Limiting** — Proteção contra abuso por endpoint
-- 🔒 **Brute Force Protection** — Bloqueio automático de conta após tentativas suspeitas
+- 🔒 **Brute Force Protection** — Bloqueio automático de conta após tentativas suspeitas em endpoints de autenticacao
 - 🌐 **Nginx + SSL/HTTPS** — Terminação TLS com certificado válido
-- ✅ **Validação em Camadas** — Frontend (Zod), Controller (Bean Validation), Domain (Value Objects)
+- ✅ **Validação em Camadas** — Controller (Bean Validation), Domain (Value Objects)
 - 🏗️ **Multi-tenancy** — Isolamento garantido de dados por `restaurant_id`
 
 ---
