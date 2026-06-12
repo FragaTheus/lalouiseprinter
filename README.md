@@ -221,6 +221,17 @@ lalouiseprinter/
 
 ---
 
+# ️ LaLouise — Controle de Qualidade e Validade para Restaurantes
+
+> Plataforma multi-tenant de rastreamento de validade de etiquetas, controle de qualidade e impressão automática para redes de alimentação.
+
+**🏢 Projeto proprietário da LaLouise**  
+**👨‍💻 Desenvolvido por: Matheus Fraga**
+
+> Este repositório é disponibilizado publicamente para fins de portfólio técnico. Para mais informações, veja [`LICENSE.md`](./LICENSE.md).
+
+---
+
 <div align="center">
   <sub>LaLouise — Qualidade e Validade sob controle.</sub>
 </div>
