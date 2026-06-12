@@ -1,10 +1,10 @@
-# 🚀 LaLouise — Guia de Releases
+#  LaLouise — Guia de Releases
 
 > Versionamento semântico, tags Git e publicação de releases com GitHub CLI (`gh`)
 
 ---
 
-## 📋 Sumário
+##  Sumário
 
 - [Convenção de Versionamento](#convenção-de-versionamento)
 - [Estratégia de Branches](#estratégia-de-branches)
@@ -120,10 +120,10 @@ gh release create api/v1.2.0 \
 - Descrição da feature 1
 - Descrição da feature 2
 
-### 🐛 Correções
+###  Correções
 - Correção do bug X
 
-### 🔒 Segurança
+###  Segurança
 - Atualização de dependências
 
 ### ⚠️ Breaking Changes
@@ -176,10 +176,10 @@ gh release create ui/v1.1.0 \
 - Nova tela de dashboard
 - Filtros avançados de etiquetas
 
-### 🐛 Correções
+###  Correções
 - Correção de layout em mobile
 
-### 🎨 Melhorias de UX
+###  Melhorias de UX
 - Redesign do fluxo de emissão de etiquetas" \
   --target main
 
@@ -206,7 +206,7 @@ gh release create printer/v1.0.0 \
   --title "LaLouise Print Agent v1.0.0" \
   --notes "## Print Agent v1.0.0
 
-### 🖨️ Notas de instalação
+### ️ Notas de instalação
 1. Baixe o JAR anexo neste release
 2. Siga o guia em printer/README.md para instalação como Windows Service
 3. Configure restaurant.id e printer.name antes de instalar
@@ -217,7 +217,7 @@ gh release create printer/v1.0.0 \
 - Retry automático em erros transitórios
 - Rejeição permanente em falhas físicas de impressora
 
-### 🔧 Configuração obrigatória
+###  Configuração obrigatória
 \`\`\`properties
 restaurant.id=<UUID-DO-RESTAURANTE>
 printer.name=<NOME-DA-IMPRESSORA>
@@ -312,4 +312,3 @@ Antes de criar um release de produção, verifique:
 <div align="center">
   <sub>LaLouise · Releases e Versionamento · Semantic Versioning 2.0.0</sub>
 </div>
-
