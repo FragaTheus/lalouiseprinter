@@ -1,161 +1,151 @@
-# 🏷️ LaLouise — Controle de Qualidade e Validade para Restaurantes
+# 🖨️ LaLouise — Print Agent
 
-Plataforma multi-tenant de rastreamento de validade de etiquetas, controle de qualidade e impressão automática para redes de alimentação.
-
----
-
-## 📚 Documentação Técnica
-
-Se você é desenvolvedor ou precisa entender a arquitetura técnica:
-
-| Componente      | Link                                                          | Responsabilidade                                               |
-| --------------- | ------------------------------------------------------------- | -------------------------------------------------------------- |
-| **Backend**     | [📄 Documentação Técnica do Backend](./lalouise/README.md)    | Spring Boot 4 · Java 21 · PostgreSQL · Redis · RabbitMQ        |
-| **Frontend**    | [📄 Documentação Técnica do Frontend](./ui/README.md)         | Next.js 16 · React 19 · TypeScript · Tailwind · TanStack Query |
-| **Print Agent** | [📄 Documentação Técnica do Print Agent](./printer/README.md) | Spring Boot 3 · AMQP · ZPL / Zebra · Windows Service           |
-| **Releases**    | [📄 Guia de Versionamento](./RELEASE.md)                      | Tags, deploy e workflow de release                             |
+Microsserviço de impressão assíncrona · Spring Boot 3.5.10 · Java 21 · AMQP / RabbitMQ · ZPL / Zebra
 
 ---
 
-## 🎯 Visão Geral do Negócio
+## 📚 Sumário Técnico
 
-### O Problema
-
-Redes de restaurantes enfrentam desafios críticos no controle de validade de alimentos:
-
-- **Falta de padronização** — cada unidade usa métodos diferentes para rastrear vencimento
-- **Erros manuais** — etiquetas escritas à mão, datas ilegíveis, perda de lotes
-- **Perda de rastreabilidade** — impossível auditar qual produto foi descartado e quando
-- **Conformidade regulatória** — dificuldade em comprovar conformidade com normas de segurança alimentar
-- **Desperdício elevado** — produtos descartados sem registro, impossível analisar padrões
-
-### A Solução
-
-A **LaLouise** automatiza o ciclo de vida completo das etiquetas de validade — da emissão ao descarte —, garantindo:
-
-✅ **Padronização** — todas as unidades usam o mesmo sistema
-✅ **Rastreabilidade completa** — cada etiqueta, lote e descarte é registrado
-✅ **Conformidade** — pronto para auditorias e certificações
-✅ **Inteligência de dados** — visibilidade em tempo real sobre status de produtos
-✅ **Eficiência operacional** — impressão automática, sem erros manuais
+- [Visão Geral](#visão-geral)
+- [Stack Tecnológica](#stack-tecnológica)
+- [Arquitetura & Fluxo AMQP](#arquitetura--fluxo-amqp)
+- [Configuração](#configuração)
+- [Variáveis de Ambiente](#variáveis-de-ambiente)
+- [Estrutura de Pastas](#estrutura-de-pastas)
+- [Build](#build)
+- [Execução](#execução)
+- [Windows Service com WinSW](#windows-service-com-winsw)
+- [Observações Técnicas](#observações-técnicas)
 
 ---
 
-## ✅ O que a Plataforma Oferece
+## Visão Geral
 
-| Funcionalidade           | Descrição                                                            |
-| ------------------------ | -------------------------------------------------------------------- |
-| **Gestão de Etiquetas**  | Emissão, reimpressão, rastreamento de lotes e ciclo de vida completo |
-| **Gestão de Produtos**   | Cadastro de produtos por categoria com validades padrão              |
-| **Impressão Automática** | Envio direto para impressoras Zebra via agente local                 |
-| **Controle por Setor**   | Isolamento de dados por setor (cozinha, confeitaria, açougue, etc.)  |
-| **Dashboard Gerencial**  | Visão consolidada do status de validade por unidade e setor          |
-| **Controle de Acesso**   | Três perfis (Admin, Manager, Staff) com permissões granulares        |
-| **Alertas Automáticos**  | Notificações de produtos próximos ao vencimento                      |
-| **Multi-tenancy**        | Suporte nativo para múltiplas unidades com isolamento completo       |
+O **Print Agent** é um microsserviço que roda **localmente em cada unidade de restaurante** (Windows). Ele consome jobs de impressão publicados pelo backend via **RabbitMQ (AMQP)** e envia comandos **ZPL** diretamente para impressoras **Zebra** locais via `javax.print`.
+
+Cada instância do agente é configurada com o `restaurantId` da unidade correspondente, garantindo que apenas os jobs daquela unidade sejam consumidos — sem conflito entre diferentes restaurantes da rede.
 
 ---
 
-## 📦 Arquitetura
+## 🛠️ Stack Tecnológica
+
+| Categoria | Tecnologia |
+|---|---|
+| Runtime | Java 21 |
+| Framework | Spring Boot 3.5.10 |
+| Mensageria | Spring AMQP (RabbitMQ) |
+| Serialização | Jackson Databind |
+| Boilerplate | Lombok |
+| Build | Gradle 8+ |
+| Implantação | WinSW (Windows Service Wrapper) |
+| Protocolo de impressão | ZPL (Zebra Programming Language) via `javax.print` |
+
+---
+
+## 📐 Arquitetura & Fluxo AMQP
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        CLOUD (VPS Linux)                     │
-│                                                             │
-│  ┌──────────────┐    HTTPS/SSL    ┌─────────────────────┐  │
-│  │  Next.js UI  │ ◄──── Nginx ────► │  Spring Boot API   │  │
-│  │  (Vercel)    │                 │  (Docker · :8080)   │  │
-│  └──────────────┘                 └──────────┬──────────┘  │
-│                                              │              │
-│                        ┌─────────────────────┤              │
-│                        │                     │              │
-│              ┌─────────▼──────┐  ┌───────────▼─────────┐  │
-│              │  PostgreSQL 16  │  │  Redis (Rate Limit)  │  │
-│              │  (Docker)       │  │  (Docker)            │  │
-│              └────────────────┘  └────────────────────── ┘  │
-│                                                             │
-│              ┌──────────────────────────────────────────┐  │
-│              │           RabbitMQ (AMQP)                  │  │
-│              │   exchange: label.exchange                  │  │
-│              │   routing: print.{restaurantId}             │  │
-│              └──────────────────┬───────────────────────┘  │
-└─────────────────────────────────┼───────────────────────────┘
-                                  │ AMQP
-              ┌───────────────────▼───────────────────┐
-              │   Print Agent (Windows Service)        │
-              │   Spring Boot · ZPL → Zebra Printer    │
-              └───────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│                    VPS Cloud                          │
+│                                                      │
+│   Spring Boot API                                    │
+│   POST /api/v1/labels                                │
+│         │                                            │
+│         ▼                                            │
+│   RabbitMQ                                           │
+│   Exchange: label.exchange (direct)                  │
+│   Routing Key: print.{restaurantId}                  │
+└──────────────────────┬───────────────────────────────┘
+                       │ AMQPS
+         ┌─────────────▼────────────────────┐
+         │  Print Agent (Windows local)      │
+         │  Queue: label.print.{restaurantId}│
+         │         │                         │
+         │         ▼                         │
+         │  javax.print → ZPL → Zebra 🖨️    │
+         └───────────────────────────────────┘
 ```
 
-| Camada      | Tecnologia                                        | Local                 |
-| ----------- | ------------------------------------------------- | --------------------- |
-| Frontend    | Next.js 16 + React 19 + Tailwind + TanStack Query | Vercel                |
-| API Backend | Spring Boot 4 + Java 21 + PostgreSQL + Redis      | VPS Linux (Docker)    |
-| Mensageria  | RabbitMQ (AMQP)                                   | Nuvem                 |
-| Impressão   | Spring Boot 3 + ZPL / Zebra                       | Windows (por unidade) |
-| Proxy / SSL | Nginx + HTTPS                                     | VPS Linux             |
-| CI/CD       | GitHub Actions                                    | GitHub                |
+**Detalhes do roteamento:**
+- Backend publica no exchange `label.exchange` com routing key `print.{restaurantId}`
+- Print Agent declara a fila `label.print.{restaurantId}` e a vincula ao exchange
+- Cada unidade consome apenas sua própria fila, identificada pelo `restaurantId` configurado
 
 ---
 
-## 🔐 Segurança em Camadas
+## 🔧 Configuração
 
-- 🔐 **JWT** — Autenticação stateless com tokens assinados
-- 🛡️ **Spring Security** — Controle de acesso declarativo por roles (Admin, Manager, Staff)
-- ⏱️ **Redis Rate Limiting** — Proteção contra abuso por endpoint
-- 🔒 **Brute Force Protection** — Bloqueio automático de conta após tentativas suspeitas
-- 🌐 **Nginx + SSL/HTTPS** — Terminação TLS com certificado válido
-- ✅ **Validação em Camadas** — Frontend (Zod), Controller (Bean Validation), Domain (Value Objects)
-- 🏗️ **Multi-tenancy** — Isolamento garantido de dados por `restaurant_id`
+Configure `src/main/resources/application.properties` com os dados da unidade:
+
+```properties
+# Identificador único do restaurante (obtido no painel admin)
+restaurant.id=<UUID-DO-RESTAURANTE>
+
+# Nome exato da impressora Zebra como aparece no Windows
+# (Painel de Controle > Dispositivos e Impressoras)
+printer.name=<NOME-EXATO-DA-IMPRESSORA>
+
+# Conexão com RabbitMQ
+spring.rabbitmq.addresses=amqps://user:pass@host:5671/vhost
+```
 
 ---
 
-## 🚀 Como Rodar Localmente
+| Propriedade | Descrição | Exemplo |
+|---|---|---|
+| `restaurant.id` | UUID do restaurante (tenant) | `3fa85f64-5717-...` |
+| `printer.name` | Nome da impressora no Windows | `ZebraZD421` |
+| `spring.rabbitmq.addresses` | URI de conexão AMQP/AMQPS | `amqps://u:p@host/vhost` |
 
-### Backend
+---
+
+## 📁 Estrutura de Pastas
+
+```
+printer/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── (pacotes Spring Boot)
+│       │       ├── config/         # Configuração AMQP (queue, exchange, binding)
+│       │       ├── consumer/       # Listener RabbitMQ (consome jobs)
+│       │       ├── service/        # Lógica de envio ZPL via javax.print
+│       │       └── dto/            # DTO do job de impressão
+│       └── resources/
+│           └── application.properties
+├── build.gradle
+├── gradlew
+└── lalouise-print-agent.xml        # Configuração WinSW (Windows Service)
+```
+
+---
+
+## 🚀 Execução
+
+### Execução Direta (dev/teste)
 
 ```bash
-cd lalouise
-cp .env.example .env  # Configure variáveis
-./gradlew clean bootJar
-docker compose up -d
+#Apos configurar application.properties, e ja ter o server RabbitMQ rodando, execute:
+./gradlew clean bootrun
 ```
 
-### Frontend
+## 📝 Observações Técnicas
 
-```bash
-cd ui
-pnpm install
-pnpm dev
-```
+### Cópias ZPL
+O envio para a Zebra não faz loop de cópias no código — o próprio ZPL carrega a quantidade via `^PQ`. Não altere essa lógica sem ajustar o payload.
 
-Acesse em `http://localhost:3000`.
-
-### Print Agent (por unidade Windows)
-
-```bash
-cd printer
-./gradlew clean bootJar
-# Siga o guia em printer/README.md para instalar como Windows Service
-```
+### Erros Transitórios e Físicos da Impressora
+Conexão e timeout — a exceção é relançada normalmente, permitindo que o RabbitMQ faça retry automático conforme a política de dead-letter configurada.
 
 ---
 
-## 🌍 Acesse a Plataforma
+## 🔗 Componentes Vinculados
 
-Em desenvolvimento ou produção, consulte o README técnico correspondente.
-
----
-
-## 📞 Links Úteis
-
-- **Backend**: [lalouise/README.md](./lalouise/README.md) — API, endpoints, segurança
-- **Frontend**: [ui/README.md](./ui/README.md) — Interface, componentes, deploy Vercel
-- **Print Agent**: [printer/README.md](./printer/README.md) — Impressão, Windows Service, configuração
-- **Releases**: [RELEASE.md](./RELEASE.md) — Versionamento e deploy
+- **Backend**: [lalouise/README.md](../lalouise/README.md) — Publica jobs de impressão
+- **Frontend**: [ui/README.md](../ui/README.md) — Interface de gerenciamento
 
 ---
 
 <div align="center">
-  <sub>LaLouise — Qualidade e Validade sob controle.</sub>
+  <sub>LaLouise Print Agent · Spring Boot 3.5.10 · Java 21 · RabbitMQ · ZPL</sub>
 </div>

@@ -59,5 +59,5 @@ Este repositório é disponibilizado publicamente para fins de portfólio profis
 
 ---
 
-**Última atualização:** 2024-06-12
+**Última atualização:** 2026-06-12
 **Versão:** 1.0.0

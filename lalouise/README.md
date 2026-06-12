@@ -54,7 +54,6 @@ O backend da LaLouise é uma API REST construída com **Spring Boot 4.0.6** e **
 ### 🔐 Autenticação JWT
 
 - Tokens assinados com segredo via `jwt.secret`
-- Biblioteca `jjwt 0.12.6` para geração e validação
 - Tokens stateless — sem sessão no servidor
 
 ### 🛡️ Spring Security
@@ -78,7 +77,7 @@ O backend da LaLouise é uma API REST construída com **Spring Boot 4.0.6** e **
 ### 🌐 Nginx + SSL/HTTPS
 
 - Terminação TLS no servidor com certificado
-- Backend expõe porta 8080 internamente; Nginx faz proxy reverso com HTTPS
+- Backend expõe porta internamente; Nginx faz proxy reverso com HTTPS
 
 ### ✅ Validação em Camadas
 
@@ -201,7 +200,7 @@ O sistema usa **isolamento por `restaurant_id`** em todas as entidades de negóc
 3. Filtro de segurança extrai o contexto e injeta o `RestaurantContext`
 4. Todos os queries são automaticamente filtrados pelo `restaurant_id` do tenant
 
-**Não há necessidade de passar `restaurantId` explicitamente** — o contexto é resolvido por quem está autenticado.
+**Não há necessidade de passar `restaurantId` explicitamente** — o contexto é resolvido por quem está autenticado através de um interceptor que captura a url de requisição e seta numa thread.
 
 ---
 
@@ -209,17 +208,15 @@ O sistema usa **isolamento por `restaurant_id`** em todas as entidades de negóc
 
 Migrações gerenciadas com **Flyway** em `src/main/resources/db/migration/`:
 
-| Versão | Arquivo                           | Descrição                                               |
-| ------ | --------------------------------- | ------------------------------------------------------- |
-| V1     | `CREATE_CREDENTIALS_TABLE`        | Tabela de usuários com role (`ADMIN`/`MANAGER`/`STAFF`) |
-| V2     | `INSERT_FIRST_ADMIN`              | Seed do primeiro administrador                          |
-| V3     | `CREATE_RESTAURANTS_TABLE`        | Tabela de restaurantes (tenants) com CNPJ               |
-| V4     | `CREATE_SECTORS_TABLE`            | Tabela de setores por restaurante                       |
-| V5     | `CREATE_PRODUCTS_TABLE`           | Tabela de produtos por restaurante                      |
-| V6     | `CREATE_LABELS_TABLE`             | Tabela de etiquetas com status e lote                   |
-| V7     | `ADD_LOCKED_UNTIL_TO_CREDENTIALS` | Campo de bloqueio por força bruta                       |
-| V8     | `ADD_PRODUCTS_TO_IZANAMI_TENANT`  | Seed de produtos para tenant                            |
-| V9     | `ALTER_PRODUCT_NAME_FOR_IZANAMI`  | Ajuste de nomes de produtos                             |
+| Versão | Arquivo                           | Descrição                                 |
+| ------ | --------------------------------- |-------------------------------------------|
+| V1     | `CREATE_CREDENTIALS_TABLE`        | Tabela de usuários com role               |
+| V2     | `INSERT_FIRST_ADMIN`              | Seed do primeiro administrador            |
+| V3     | `CREATE_RESTAURANTS_TABLE`        | Tabela de restaurantes (tenants) com CNPJ |
+| V4     | `CREATE_SECTORS_TABLE`            | Tabela de setores por restaurante         |
+| V5     | `CREATE_PRODUCTS_TABLE`           | Tabela de produtos por restaurante        |
+| V6     | `CREATE_LABELS_TABLE`             | Tabela de etiquetas com status e lote     |
+| V7     | `ADD_LOCKED_UNTIL_TO_CREDENTIALS` | Campo de bloqueio por força bruta         |
 
 ---
 
@@ -247,19 +244,19 @@ Crie um arquivo `.env` na raiz de `lalouise/`:
 
 ```dotenv
 # Banco de dados
-DB_NAME=lalouise
-DB_USERNAME=postgres
+DB_NAME=nome_do_banco
+DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha_segura
 
 # JWT
 JWT_SECRET=sua_chave_jwt_minimo_256bits
 
 # RabbitMQ
-RABBIT_URI=amqps://user:pass@host:5671/vhost
+RABBIT_URI=uri_do_rabbitmq
 
 # Redis
 REDIS_HOST=redis_host
-REDIS_PORT=6379
+REDIS_PORT=redis_port
 REDIS_PASSWORD=sua_senha_redis
 
 # E-mail SMTP
@@ -311,23 +308,6 @@ lalouise/
 ---
 
 ## 🚀 Como Executar
-
-### Com Docker Compose (recomendado)
-
-```bash
-# 1. Configure o ambiente
-cp .env.example .env
-# Edite .env com suas credenciais
-
-# 2. Build do JAR
-./gradlew clean bootJar
-
-# 3. Suba os containers
-docker compose up -d
-
-# 4. Acompanhe os logs
-docker compose logs -f app
-```
 
 A API estará disponível em `http://localhost:8080`.
 

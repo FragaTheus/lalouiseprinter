@@ -1,161 +1,159 @@
-# 🏷️ LaLouise — Controle de Qualidade e Validade para Restaurantes
+# 🌐 LaLouise — Frontend
 
-Plataforma multi-tenant de rastreamento de validade de etiquetas, controle de qualidade e impressão automática para redes de alimentação.
-
----
-
-## 📚 Documentação Técnica
-
-Se você é desenvolvedor ou precisa entender a arquitetura técnica:
-
-| Componente      | Link                                                          | Responsabilidade                                               |
-| --------------- | ------------------------------------------------------------- | -------------------------------------------------------------- |
-| **Backend**     | [📄 Documentação Técnica do Backend](./lalouise/README.md)    | Spring Boot 4 · Java 21 · PostgreSQL · Redis · RabbitMQ        |
-| **Frontend**    | [📄 Documentação Técnica do Frontend](./ui/README.md)         | Next.js 16 · React 19 · TypeScript · Tailwind · TanStack Query |
-| **Print Agent** | [📄 Documentação Técnica do Print Agent](./printer/README.md) | Spring Boot 3 · AMQP · ZPL / Zebra · Windows Service           |
-| **Releases**    | [📄 Guia de Versionamento](./RELEASE.md)                      | Tags, deploy e workflow de release                             |
+Interface Web do sistema LaLouise · Next.js 16 · React 19 · TypeScript · Tailwind CSS · TanStack Query
 
 ---
 
-## 🎯 Visão Geral do Negócio
+## 📚 Sumário Técnico
 
-### O Problema
-
-Redes de restaurantes enfrentam desafios críticos no controle de validade de alimentos:
-
-- **Falta de padronização** — cada unidade usa métodos diferentes para rastrear vencimento
-- **Erros manuais** — etiquetas escritas à mão, datas ilegíveis, perda de lotes
-- **Perda de rastreabilidade** — impossível auditar qual produto foi descartado e quando
-- **Conformidade regulatória** — dificuldade em comprovar conformidade com normas de segurança alimentar
-- **Desperdício elevado** — produtos descartados sem registro, impossível analisar padrões
-
-### A Solução
-
-A **LaLouise** automatiza o ciclo de vida completo das etiquetas de validade — da emissão ao descarte —, garantindo:
-
-✅ **Padronização** — todas as unidades usam o mesmo sistema
-✅ **Rastreabilidade completa** — cada etiqueta, lote e descarte é registrado
-✅ **Conformidade** — pronto para auditorias e certificações
-✅ **Inteligência de dados** — visibilidade em tempo real sobre status de produtos
-✅ **Eficiência operacional** — impressão automática, sem erros manuais
+- [Visão Geral](#visão-geral)
+- [Stack Tecnológica](#stack-tecnológica)
+- [Funcionalidades & Módulos](#funcionalidades--módulos)
+- [Autenticação & Controle de Acesso](#autenticação--controle-de-acesso)
+- [Estrutura de Pastas](#estrutura-de-pastas)
+- [Variáveis de Ambiente](#variáveis-de-ambiente)
+- [Como Executar](#como-executar)
 
 ---
 
-## ✅ O que a Plataforma Oferece
+## Visão Geral
 
-| Funcionalidade           | Descrição                                                            |
-| ------------------------ | -------------------------------------------------------------------- |
-| **Gestão de Etiquetas**  | Emissão, reimpressão, rastreamento de lotes e ciclo de vida completo |
-| **Gestão de Produtos**   | Cadastro de produtos por categoria com validades padrão              |
-| **Impressão Automática** | Envio direto para impressoras Zebra via agente local                 |
-| **Controle por Setor**   | Isolamento de dados por setor (cozinha, confeitaria, açougue, etc.)  |
-| **Dashboard Gerencial**  | Visão consolidada do status de validade por unidade e setor          |
-| **Controle de Acesso**   | Três perfis (Admin, Manager, Staff) com permissões granulares        |
-| **Alertas Automáticos**  | Notificações de produtos próximos ao vencimento                      |
-| **Multi-tenancy**        | Suporte nativo para múltiplas unidades com isolamento completo       |
+O frontend da LaLouise é uma aplicação web construída com **Next.js 16 App Router** e **React 19**, fornecendo uma interface intuitiva para gestão de etiquetas de validade, produtos, setores e usuários em contexto multi-tenant.
 
 ---
 
-## 📦 Arquitetura
+## 🛠️ Stack Tecnológica
+
+| Categoria | Tecnologia | Uso |
+|---|---|---|
+| Framework | Next.js 16.2.4 (App Router) | Roteamento, SSR, otimização |
+| UI Library | React 19.2.4 | Componentes e estado |
+| Linguagem | TypeScript 5 | Tipagem estática |
+| Estilo | Tailwind CSS 4 | Estilização utilitária |
+| Componentes | shadcn/ui + Radix UI | Componentes acessíveis |
+| Ícones | React Icons | Ícones vetoriais |
+| Data Fetching | TanStack Query v4 | Requisições, cache, sincronização |
+| Formulários | React Hook Form v7 | Gerenciamento de formulários |
+| HTTP Client | Axios 1.x | Requisições HTTP com interceptors |
+| Estado Global | Zustand 5 | Store do usuário autenticado |
+| Notificações | Sonner | Toasts e notificações |
+| Build | pnpm + Next.js | Gerenciador de pacotes e compilação |
+| Deploy | Vercel | Hospedagem e CI/CD |
+
+---
+
+## 📋 Funcionalidades & Módulos
+
+O projeto segue uma organização por **feature modules** em `src/features/`:
+
+| Módulo | Rota | Acesso | Descrição |
+|---|---|---|---|
+| `login` | `/auth` | Público | Tela de autenticação com JWT |
+| `dashboard` | `/dashboard` | Todos | Visão geral do status de etiquetas |
+| `home` | `/` | Todos | Página inicial / landing |
+| `label` | `/dashboard/labels` | STAFF+ | Emissão, consulta e reimpressão de etiquetas |
+| `product` | `/dashboard/products` | MANAGER+ | Gestão de produtos e categorias |
+| `sector` | `/dashboard/sectors` | MANAGER+ | Gestão de setores do restaurante |
+| `restaurant` | `/dashboard/restaurants` | ADMIN | Gestão de tenants/restaurantes |
+| `staff` | `/dashboard/staff` | MANAGER+ | Gestão de usuários operacionais |
+| `manager` | `/dashboard/manager` | ADMIN | Gestão de gerentes |
+| `admin` | `/dashboard/admin` | ADMIN | Painel de administração global |
+| `profile` | `/dashboard/profile` | Todos | Perfil do usuário autenticado |
+| `forbidden` | `/forbidden` | — | Página de acesso não autorizado |
+
+---
+
+### Roles e Permissões
+
+| Role | Capacidades |
+|---|---|
+| `ADMIN` | Acesso total — gestão de tenants, usuários, relatórios globais |
+| `MANAGER` | Gestão do restaurante — produtos, setores, equipe |
+| `STAFF` | Operacional — emissão e consulta de etiquetas |
+
+---
+
+## 📁 Estrutura de Pastas
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                        CLOUD (VPS Linux)                     │
-│                                                             │
-│  ┌──────────────┐    HTTPS/SSL    ┌─────────────────────┐  │
-│  │  Next.js UI  │ ◄──── Nginx ────► │  Spring Boot API   │  │
-│  │  (Vercel)    │                 │  (Docker · :8080)   │  │
-│  └──────────────┘                 └──────────┬──────────┘  │
-│                                              │              │
-│                        ┌─────────────────────┤              │
-│                        │                     │              │
-│              ┌─────────▼──────┐  ┌───────────▼─────────┐  │
-│              │  PostgreSQL 16  │  │  Redis (Rate Limit)  │  │
-│              │  (Docker)       │  │  (Docker)            │  │
-│              └────────────────┘  └────────────────────── ┘  │
-│                                                             │
-│              ┌──────────────────────────────────────────┐  │
-│              │           RabbitMQ (AMQP)                  │  │
-│              │   exchange: label.exchange                  │  │
-│              │   routing: print.{restaurantId}             │  │
-│              └──────────────────┬───────────────────────┘  │
-└─────────────────────────────────┼───────────────────────────┘
-                                  │ AMQP
-              ┌───────────────────▼───────────────────┐
-              │   Print Agent (Windows Service)        │
-              │   Spring Boot · ZPL → Zebra Printer    │
-              └───────────────────────────────────────┘
+ui/
+├── src/
+│   ├── app/                          # Next.js App Router
+│   │   ├── layout.tsx                # Layout raiz (providers, fontes)
+│   │   ├── page.tsx                  # Página inicial
+│   │   ├── providers.tsx             # React Query, Theme providers
+│   │   ├── globals.css               # Estilos globais + variáveis CSS
+│   │   ├── auth/                     # Rota de autenticação
+│   │   ├── dashboard/                # Área protegida autenticada
+│   │   └── forbidden/                # Página de acesso negado
+│   │
+│   ├── features/                     # Módulos de funcionalidade
+│   │   ├── admin/                    # Painel admin
+│   │   ├── dashboard/                # Dashboard com métricas
+│   │   ├── home/                     # Página home
+│   │   ├── label/                    # Gestão de etiquetas
+│   │   ├── login/                    # Formulário de login
+│   │   ├── manager/                  # Gestão de gerentes
+│   │   ├── product/                  # Gestão de produtos
+│   │   ├── profile/                  # Perfil do usuário
+│   │   ├── restaurant/               # Gestão de restaurantes
+│   │   ├── sector/                   # Gestão de setores
+│   │   └── staff/                    # Gestão de staff
+│   │
+│   ├── shared/
+│   │   ├── components/               # Componentes reutilizáveis (shadcn/ui)
+│   │   ├── assets/                   # Imagens, ícones estáticos
+│   │   ├── config/                   # Configurações (axios instance, etc.)
+│   │   ├── stores/                   # Stores Zustand compartilhadas
+│   │   └── type/                     # Types TypeScript compartilhados
+│   │
+│   ├── store/
+│   │   └── user-store.ts             # Store do usuário autenticado (Zustand)
+│   │
+│   └── lib/
+│       └── utils.ts                  # Utilitários (cn, formatters, etc.)
+│
+├── next.config.ts                    # Configuração do Next.js
+├── tailwind.config.ts                # Configuração do Tailwind CSS
+├── tsconfig.json                     # Configuração TypeScript
+├── components.json                   # Configuração shadcn/ui
+├── package.json
+└── pnpm-lock.yaml
 ```
 
-| Camada      | Tecnologia                                        | Local                 |
-| ----------- | ------------------------------------------------- | --------------------- |
-| Frontend    | Next.js 16 + React 19 + Tailwind + TanStack Query | Vercel                |
-| API Backend | Spring Boot 4 + Java 21 + PostgreSQL + Redis      | VPS Linux (Docker)    |
-| Mensageria  | RabbitMQ (AMQP)                                   | Nuvem                 |
-| Impressão   | Spring Boot 3 + ZPL / Zebra                       | Windows (por unidade) |
-| Proxy / SSL | Nginx + HTTPS                                     | VPS Linux             |
-| CI/CD       | GitHub Actions                                    | GitHub                |
-
 ---
 
-## 🔐 Segurança em Camadas
+## 🚀 Como Executar
 
-- 🔐 **JWT** — Autenticação stateless com tokens assinados
-- 🛡️ **Spring Security** — Controle de acesso declarativo por roles (Admin, Manager, Staff)
-- ⏱️ **Redis Rate Limiting** — Proteção contra abuso por endpoint
-- 🔒 **Brute Force Protection** — Bloqueio automático de conta após tentativas suspeitas
-- 🌐 **Nginx + SSL/HTTPS** — Terminação TLS com certificado válido
-- ✅ **Validação em Camadas** — Frontend (Zod), Controller (Bean Validation), Domain (Value Objects)
-- 🏗️ **Multi-tenancy** — Isolamento garantido de dados por `restaurant_id`
+### Pré-requisitos
 
----
+- Node.js 20+
+- pnpm (`npm install`)
 
-## 🚀 Como Rodar Localmente
-
-### Backend
+### Desenvolvimento
 
 ```bash
-cd lalouise
-cp .env.example .env  # Configure variáveis
-./gradlew clean bootJar
-docker compose up -d
-```
-
-### Frontend
-
-```bash
-cd ui
+# Instalar dependências
 pnpm install
-pnpm dev
+
+# Configurar api para requisição do localhost
+http://localhost:8080/
+
+# Iniciar servidor de desenvolvimento
+pnpm run dev
 ```
 
-Acesse em `http://localhost:3000`.
+A aplicação estará disponível em `http://localhost:3000`.
 
-### Print Agent (por unidade Windows)
+> Para autenticação funcionar, o backend [`lalouise`](../lalouise/README.md) precisa estar rodando em `http://localhost:8080`.
 
-```bash
-cd printer
-./gradlew clean bootJar
-# Siga o guia em printer/README.md para instalar como Windows Service
-```
+## 🔗 Backend Vinculado
 
----
-
-## 🌍 Acesse a Plataforma
-
-Em desenvolvimento ou produção, consulte o README técnico correspondente.
-
----
-
-## 📞 Links Úteis
-
-- **Backend**: [lalouise/README.md](./lalouise/README.md) — API, endpoints, segurança
-- **Frontend**: [ui/README.md](./ui/README.md) — Interface, componentes, deploy Vercel
-- **Print Agent**: [printer/README.md](./printer/README.md) — Impressão, Windows Service, configuração
-- **Releases**: [RELEASE.md](./RELEASE.md) — Versionamento e deploy
+Este frontend depende da API do LaLouise:
+👉 [`lalouise` — Documentação Técnica do Backend](../lalouise/README.md)
 
 ---
 
 <div align="center">
-  <sub>LaLouise — Qualidade e Validade sob controle.</sub>
+  <sub>LaLouise Frontend · Next.js 16.2.4 · React 19 · Vercel</sub>
 </div>
