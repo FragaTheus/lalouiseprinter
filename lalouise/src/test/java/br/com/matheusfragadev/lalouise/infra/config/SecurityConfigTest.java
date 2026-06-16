@@ -61,7 +61,7 @@ class SecurityConfigTest {
 
         assertNotNull(config);
         // allowedOriginPatterns is used — not allowedOrigins
-        assertTrue(config.getAllowedOriginPatterns().contains("http://localhost:3000"));
+        assertTrue(config.getAllowedOriginPatterns().contains("https://lalouiseconsultoria.com.br"));
     }
 
     @Test
@@ -70,7 +70,7 @@ class SecurityConfigTest {
                 .getCorsConfiguration(new MockHttpServletRequest());
 
         assertNotNull(config);
-        assertTrue(config.getAllowedOriginPatterns().contains("https://lalouiseprinter-upsj.vercel.app"));
+        assertTrue(config.getAllowedOriginPatterns().contains("https://lalouiseconsultoria.com.br"));
     }
 
     @Test
@@ -79,7 +79,7 @@ class SecurityConfigTest {
                 .getCorsConfiguration(new MockHttpServletRequest());
 
         assertNotNull(config);
-        assertTrue(config.getAllowedOriginPatterns().contains("https://lalouiseprinter-upsj-*.vercel.app"));
+        assertTrue(config.getAllowedOriginPatterns().contains("https://www.lalouiseconsultoria.com.br"));
     }
 
     // ── authenticationManager ─────────────────────────────────────────────────
