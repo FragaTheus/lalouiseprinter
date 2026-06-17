@@ -28,84 +28,85 @@
 | ️ **Backend** | API REST · Spring Boot 4 · Java 21 · PostgreSQL · Redis · RabbitMQ | [`lalouise/README.md`](./lalouise/README.md) |
 |  **Frontend** | Interface Web · Next.js 16 · React 19 · TypeScript · Tailwind | [`ui/README.md`](./ui/README.md) |
 | ️ **Print Agent** | Microsserviço de impressão · Spring Boot 3 · AMQP · ZPL / Zebra | [`printer/README.md`](./printer/README.md) |
-|  **Releases** | Versionamento, tags e deploy | [`RELEASE.md`](./RELEASE.md) |
 
 ---
 
 ## O que é a LaLouise?
 
-A **LaLouise** é uma solução SaaS de controle de qualidade e validade de alimentos desenvolvida para redes de restaurantes e estabelecimentos de alimentação. O sistema automatiza o ciclo de vida das etiquetas de validade — da impressão ao descarte —, garantindo conformidade com as normas de segurança alimentar e reduzindo desperdícios.
-
-Cada restaurante opera em seu próprio ambiente isolado (**multi-tenant**), com controle granular por setor (cozinha, confeitaria, açougue, etc.) e rastreabilidade completa por lote.
+A LaLouise nasceu de um problema real: restaurantes controlando validade de alimentos com caneta e papel, sem rastreabilidade, sem histórico e sem alertas de vencimento.
+É uma plataforma SaaS multi-tenant que automatiza o ciclo de vida das etiquetas de validade — da impressão ao descarte — garantindo rastreabilidade completa por lote, conformidade com normas de segurança alimentar e redução de desperdícios. Cada restaurante opera em ambiente isolado, com controle granular por setor e perfis de acesso por função.
 
 ---
 
 ## Para quem é?
 
-- **Redes de restaurantes** que precisam padronizar o controle de validade em múltiplas unidades
-- **Gestores e supervisores** que precisam de visibilidade em tempo real sobre o status dos produtos em estoque
-- **Equipes operacionais** que precisam imprimir e gerenciar etiquetas de forma rápida e confiável
-- **Auditores e responsáveis técnicos** que precisam de rastreabilidade de lotes e histórico de descartes
+- **Restaurantes de pequeno e médio** porte que ainda controlam validade com caneta, papel ou planilha
+- **Gestores e supervisores** que precisam saber o que está próximo do vencimento em cada setor de forma automática
+- **Equipes operacionais** que precisam imprimir e realocar etiquetas rapidamente entre setores sem perder o lote, mantendo o fluxo do alimento internamente
+- **Estabelecimentos que recebem visitas da vigilância sanitária** e precisam comprovar conformidade com histórico rastreável
 
 ---
 
 ## Principais Funcionalidades
 
-### ️ Gestão de Etiquetas
-- Emissão de etiquetas de validade com data de fabricação, vencimento e lote
-- Reimpressão de etiquetas sem perda de rastreabilidade
-- Ciclo de vida completo: **Ativa → Expirando → Expirada → Descartada**
-- Alertas automáticos de produtos próximos ao vencimento
+### 🏷️ Gestão de Etiquetas (Core)
+- Emissão de etiquetas com produto, responsável, setor, lote, fabricação e validade
+- Rastreabilidade completa do fluxo: entrada na câmara fria → realocação para cozinha → bancada → descarte
+- Reimpressão por setor sem perda de lote — etiqueta anterior descartada automaticamente e gerada nova com mesmo lote mas validade atualizada conforme novo setor/armazenamento
+- Ciclo de vida: **Ativa → Expirando → Expirada → Descartada**
+- Histórico mantido por 90 dias após vencimento ou descarte para comprovação e auditoria
 
-### ️ Gestão de Produtos
-- Cadastro de produtos por categoria e restaurante
-- Controle por setor (cozinha, linha fria, confeitaria, etc.)
-- Atribuição de validades padrão por produto
+### 📦 Gestão de Recursos Base
+- Produtos por categoria e restaurante (Categoria influencia validade padrão)
+- Setores com armazenamentos internos (Tambem influenciam validade e alertas)
+- Usuarios com diferentes perfis e contextos (Admin, Manager, Staff) vinculados automaticamente ao seu restaurante e setor
+- Restaurantes, cada um com seu próprio ambiente isolado (multi-tenancy)
 
-### ️ Impressão Automática
-- Envio imediato para impressoras Zebra via protocolo ZPL
+### 🖨️ Impressão Automática
 - Agente de impressão instalado localmente em cada unidade
-- Comunicação assíncrona via mensageria (RabbitMQ)
+- Impressão imediata ao emitir ou reimprimir uma etiqueta
+- Comunicação assíncrona — funciona mesmo com instabilidade de rede ou falhas temporárias de recursos locais das unidades
 
-###  Controle de Acesso
-- Três perfis de acesso: **Admin**, **Manager** e **Staff**
-- Cada usuário tem acesso apenas ao seu restaurante e setor
-- Bloqueio automático de conta por tentativas de acesso suspeitas
+### 🔔 Alertas e Monitoramento
+- Job de varredura noturna atualiza status de todas as etiquetas
+- Notificações automáticas por e-mail toda madrugada após varredura
+- Alertas de produtos próximos ao vencimento reduzem perdas e retrabalho
 
-###  Dashboard Gerencial
-- Visão geral do status de validade por unidade e setor
-- Histórico de impressões e descartes
-
----
+### 🔐 Controle de Acesso
+- Três perfis: **Admin**, **Manager** e **Staff**
+- Manager vinculado automaticamente ao seu restaurante — sem configuração manual
+- Staff vinculado automaticamente ao seu setor — sem configuração manual
+- Acesso controlado de forma diferente dependendo do perfil, garantindo segurança e usabilidade
+- Bloqueio automático por tentativas suspeitas de acesso
 
 ## Arquitetura do Sistema
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        CLOUD (VPS Linux)                     │
+│                        CLOUD (VPS Linux)                    │
 │                                                             │
-│  ┌──────────────┐    HTTPS/SSL    ┌─────────────────────┐  │
-│  │  Next.js UI  │ ◄──── Nginx ────► │  Spring Boot API   │  │
-│  │  (Vercel)    │                 │  (Docker · :8080)   │  │
-│  └──────────────┘                 └──────────┬──────────┘  │
+│  ┌──────────────┐    HTTPS/SSL    ┌─────────────────────┐   │
+│  │  Next.js UI  │ ◄──── Nginx ──► │  Spring Boot API    │   │
+│  │  (Vercel)    │                 │  (Docker · :8080)   │   │
+│  └──────────────┘                 └──────────┬──────────┘   │
 │                                              │              │
 │                        ┌─────────────────────┤              │
 │                        │                     │              │
-│              ┌─────────▼──────┐  ┌───────────▼─────────┐  │
-│              │  PostgreSQL 16  │  │  Redis (Rate Limit)  │  │
-│              │  (Docker)       │  │  (Docker)            │  │
-│              └────────────────┘  └────────────────────── ┘  │
+│              ┌─────────▼──────┐  ┌───────────▼─────────┐    │
+│              │  PostgreSQL 16 │  │  Redis (Rate Limit) │    │
+│              │  (Docker)      │  │  (Docker)           │    │
+│              └────────────────┘  └─────────────────────┘    │
 │                                                             │
-│              ┌──────────────────────────────────────────┐  │
-│              │           RabbitMQ (AMQP)                  │  │
-│              │   exchange: label.exchange                  │  │
-│              │   routing: print.{restaurantId}             │  │
-│              └──────────────────┬───────────────────────┘  │
+│              ┌──────────────────────────────────────────┐   │
+│              │           RabbitMQ (AMQP)                │   │
+│              │   exchange: label.exchange               │   │
+│              │   routing: print.{restaurantId}          │   │
+│              └──────────────────┬───────────────────────┘   │
 └─────────────────────────────────┼───────────────────────────┘
                                   │ AMQP
               ┌───────────────────▼───────────────────┐
-              │   Print Agent (Windows Service)        │
-              │   Spring Boot · ZPL → Zebra Printer    │
+              │   Print Agent (Windows Service)       │
+              │   Spring Boot · ZPL → Zebra Printer   │
               └───────────────────────────────────────┘
 ```
 
@@ -141,85 +142,21 @@ A resolução do contexto de tenant é feita automaticamente no backend a partir
 
 ## Segurança
 
-A LaLouise adota uma **estratégia de segurança em camadas**:
+A LaLouise adota uma estratégia de segurança em camadas — do transporte até o domínio:
 
--  **JWT** — Autenticação stateless com tokens assinados
-- ️ **Spring Security** — Controle de acesso por roles com `@PreAuthorize`
-- ⏱️ **Redis Rate Limiting** — Limitação de requisições por endpoint
--  **Brute Force Protection** — Algoritmo de bloqueio automático de conta após tentativas suspeitas de login
--  **Nginx + SSL/HTTPS** — Terminação TLS e cabeçalhos de segurança no servidor
-- ✅ **Bean Validation** — Validação de entrada em todos os DTOs
-- ️ **Value Objects** — Validação de domínio encapsulada (ex: `ProductName`, `Lot`)
-- ️ **Defesas em camada** — Validações no frontend, controller, serviço e domínio
+**Autenticação & Autorização**
+- **JWT** — Autenticação stateless com tokens assinados
+- **Spring Security** — Controle de acesso por roles com `@PreAuthorize`
+- **Brute Force Protection** — Bloqueio automático após tentativas suspeitas de login
 
----
+**Infraestrutura**
+- **Nginx + SSL/HTTPS** — Terminação TLS e cabeçalhos de segurança
+- **Redis Rate Limiting** — Limitação de requisições por endpoint
 
-## Como Executar o Projeto Completo
-
-### Pré-requisitos
-
-- Docker e Docker Compose
-- Java 21+
-- Node.js 20+ e pnpm
-- RabbitMQ acessível (nuvem ou local)
-- Redis acessível
-
-### 1. Backend
-
-```bash
-cd lalouise
-cp .env.example .env  # configure suas variáveis
-./gradlew clean bootJar
-docker compose up -d
-```
-
-### 2. Frontend
-
-```bash
-cd ui
-pnpm install
-pnpm dev
-```
-
-### 3. Print Agent (por unidade Windows)
-
-```bash
-cd printer
-./gradlew clean bootJar
-# Siga o guia em printer/README.md para instalar como Windows Service
-```
-
-> Consulte cada README técnico para detalhes completos de configuração.
-
----
-
-## Estrutura de Pastas
-
-```
-lalouiseprinter/
-├── lalouise/          # Backend API — Spring Boot 4 + Java 21
-│   ├── src/
-│   │   ├── main/java/ # Código-fonte (DDD: domain, application, infra)
-│   │   └── resources/ # Configs, migrations Flyway
-│   ├── docker-compose.yml
-│   └── build.gradle
-│
-├── ui/                # Frontend — Next.js 16 + React 19 + TypeScript
-│   ├── src/
-│   │   ├── app/       # Rotas Next.js (App Router)
-│   │   ├── features/  # Módulos de funcionalidade
-│   │   └── shared/    # Componentes, stores, tipos compartilhados
-│   └── package.json
-│
-├── printer/           # Print Agent — Spring Boot 3 + AMQP + ZPL
-│   ├── src/
-│   └── build.gradle
-│
-├── README.md          # Este arquivo
-└── RELEASE.md         # Guia de releases e versionamento
-```
-
----
+**Validação de Dados**
+- **Bean Validation** — Validação de entrada em todos os DTOs
+- **Value Objects** — Validação de domínio encapsulada (`ProductName`, `Lot`)
+- **Defesas em camada** — Validações no frontend, controller, serviço e domínio
 
 # ️ LaLouise — Controle de Qualidade e Validade para Restaurantes
 

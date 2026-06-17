@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="2c853387-23af-4620-89d9-84ad3fe6f9e8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +41,7 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/matheus-fraga/Área de trabalho/lalouiseprinter/printer",
+    "last_opened_file_path": "/home/matheus-fraga/Área de trabalho/lalouiseprinter",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
