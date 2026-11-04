@@ -4,6 +4,7 @@ import br.com.matheusfragadev.lalouise.infra.entrypoint.CustomEntryPoint;
 import br.com.matheusfragadev.lalouise.infra.security.access.AccessPolicyFilter;
 import br.com.matheusfragadev.lalouise.infra.security.jwt.JwtFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +35,9 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final CustomEntryPoint customEntryPoint;
     private final AccessPolicyFilter accessPolicyFilter;
+
+    @Value("${app.frontend.base-url:https://lalouiseconsultoria.com.br}")
+    private String frontendBaseUrl = "https://lalouiseconsultoria.com.br";
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -69,9 +73,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
+        String normalizedBaseUrl = frontendBaseUrl == null ? "https://lalouiseconsultoria.com.br" : frontendBaseUrl.replaceAll("/$", "");
+        String domain = normalizedBaseUrl.replaceFirst("^https?://", "");
+        String wwwOrigin = normalizedBaseUrl.startsWith("https://www.") || domain.startsWith("www.")
+                ? normalizedBaseUrl
+                : "https://www." + domain;
+
         config.setAllowedOriginPatterns(List.of(
-                "https://lalouiseconsultoria.com.br",
-                "https://www.lalouiseconsultoria.com.br"
+                normalizedBaseUrl,
+                wwwOrigin
         ));
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

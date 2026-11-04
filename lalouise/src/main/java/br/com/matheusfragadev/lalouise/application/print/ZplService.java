@@ -2,6 +2,7 @@ package br.com.matheusfragadev.lalouise.application.print;
 
 import br.com.matheusfragadev.lalouise.application.print.utils.command.ZplGenerateCommand;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
@@ -19,6 +20,9 @@ public class ZplService {
     private static final DateTimeFormatter TIME_FMT = DateTimeFormatter
             .ofPattern("HH:mm")
             .withZone(ZONE);
+
+    @Value("${app.frontend.base-url:https://lalouiseconsultoria.com.br}")
+    private String frontendBaseUrl = "https://lalouiseconsultoria.com.br";
 
     public String generate(ZplGenerateCommand result, Integer copies) {
         try {
@@ -102,9 +106,12 @@ public class ZplService {
             log.warn("restaurantId ou labelId nulos, QR Code não será gerado");
             return "";
         }
+        String normalizedBaseUrl = frontendBaseUrl == null ? "https://lalouiseconsultoria.com.br" : frontendBaseUrl.replaceAll("/$", "");
         String url = String.format(
-                "https://lalouiseprinter-upsj.vercel.app/dashboard/restaurants/%s/resources/labels/%s",
-                restaurantId, labelId
+                "%s/dashboard/restaurants/%s/resources/labels/%s",
+                normalizedBaseUrl,
+                restaurantId,
+                labelId
         );
         return String.format("^FO%d,%d^BQN,2,3^FDLA,%s^FS%n", x, y, url);
     }
